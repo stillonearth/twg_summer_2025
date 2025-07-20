@@ -35,10 +35,13 @@ bevy = { version = "0.16", default-features = false, features = [
     "x11",
 ] }
 rand = "0.8.5"
-crane_core = { "git" = "https://github.com/lucasjinreal/Crane.git", package = "crane-core" }
+crane_core = { "git" = "https://github.com/stillonearth/Crane.git", package = "crane-core" }
 clap = "4.5.41"
 tokio = { version = "1.46.1", features = ["full"] }
 log = "0.4.27"
+regex = "1.11.1"
+colored = "3.0.0"
+anyhow = "1.0.97"
 
 [lints.clippy]
 too_many_arguments = "allow"

@@ -9,7 +9,10 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_plugins(CraneAiPlugin)
         .add_systems(Startup, (setup_ui, send_test_prompt))
-        .add_systems(Update, read_response)
+        .add_systems(
+            Update,
+            (read_generation_response, read_async_generation_response),
+        )
         .run();
 }
 
@@ -49,23 +52,27 @@ fn send_test_prompt(mut ev_gen_req: EventWriter<AiGenerationRequest>) {
 }
 
 // Read and display the AI response on screen
-fn read_response(
+fn read_generation_response(
     mut ev_responses: EventReader<AiGenerationResponse>,
     mut text_query: Query<&mut Text, With<ResponseText>>,
 ) {
     for response in ev_responses.read() {
         for (mut text) in text_query.iter_mut() {
-            match &response.result {
-                Ok(ai_text) => {
-                    *text = Text::new(format!(
-                        "[Response ID {}] AI said:\n\n{}",
-                        response.id, ai_text
-                    ));
-                }
-                Err(err) => {
-                    *text = Text::new(format!("[Response ID {}] Error:\n\n{}", response.id, err));
-                }
-            }
+            *text = Text::new(format!(
+                "[Response ID {}] AI said:\n\n{}",
+                response.id, response.result
+            ));
+        }
+    }
+}
+
+fn read_async_generation_response(
+    mut ev_responses: EventReader<AsyncAiGenerationResponse>,
+    mut text_query: Query<&mut Text, With<ResponseText>>,
+) {
+    for response in ev_responses.read() {
+        for (mut text) in text_query.iter_mut() {
+            *text = Text::new(format!("{}{}", text.0, response.result));
         }
     }
 }

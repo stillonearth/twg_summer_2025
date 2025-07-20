@@ -2,7 +2,11 @@ use bevy::prelude::*;
 use crane_core::{
     autotokenizer::AutoTokenizer,
     chat::Role,
-    generation::{based::ModelForCausalLM, streamer::TextStreamer, GenerationConfig},
+    generation::{
+        based::ModelForCausalLM,
+        streamer::{AsyncTextStreamer, StreamerMessage, TokenStreamer},
+        GenerationConfig,
+    },
     models::{qwen25::Model as Qwen25Model, DType, Device},
     Msg,
 };
@@ -18,55 +22,41 @@ impl Plugin for CraneAiPlugin {
         app.add_systems(Startup, setup_ai_model)
             .add_systems(
                 Update,
-                (handle_generation_requests, handle_generation_responses),
+                (
+                    handle_generation_requests,
+                    handle_generation_responses,
+                    handle_async_generation_responses,
+                ),
             )
             .add_event::<AiGenerationRequest>()
             .add_event::<AiGenerationResponse>()
+            .add_event::<AsyncAiGenerationResponse>()
             .init_resource::<AiModelResource>();
     }
 }
 
 #[derive(Resource)]
 pub struct AiModelResource {
-    pub model: Arc<Mutex<Qwen25Model>>,
-    pub tokenizer: AutoTokenizer,
-    pub generation_config: GenerationConfig,
-    pub request_sender: mpsc::UnboundedSender<GenerationTask>,
-    pub response_receiver: mpsc::UnboundedReceiver<GenerationResult>,
+    pub model: Option<Arc<Mutex<Qwen25Model>>>,
+    pub tokenizer: Option<AutoTokenizer>,
+    pub generation_config: Option<GenerationConfig>,
+    pub request_sender: Option<mpsc::UnboundedSender<GenerationTask>>,
+    pub generation_response_receiver: Option<mpsc::UnboundedReceiver<GenerationResult>>,
+    pub async_generation_response_sender: Option<mpsc::UnboundedSender<AsyncGenerationResult>>,
+    pub async_generation_response_receiver: Option<mpsc::UnboundedReceiver<AsyncGenerationResult>>,
     pub is_initialized: bool,
 }
 
 impl Default for AiModelResource {
     fn default() -> Self {
-        // Create dummy channels that will be replaced during initialization
-        let (req_tx, _req_rx) = mpsc::unbounded_channel::<GenerationTask>();
-        let (_res_tx, res_rx) = mpsc::unbounded_channel::<GenerationResult>();
-
-        // Create a dummy model - this will be replaced during initialization
-        let config = AiConfig::default();
-        let dummy_model = Qwen25Model::new(&config.model_path, &config.device, &config.dtype)
-            .expect("Failed to create dummy model");
-        let dummy_tokenizer = AutoTokenizer::from_pretrained(&config.model_path, None)
-            .expect("Failed to create dummy tokenizer");
-
-        let dummy_gen_config = GenerationConfig {
-            max_new_tokens: config.max_new_tokens,
-            temperature: Some(config.temperature),
-            top_p: Some(config.top_p),
-            repetition_penalty: config.repetition_penalty,
-            repeat_last_n: config.repeat_last_n,
-            do_sample: config.do_sample,
-            pad_token_id: dummy_tokenizer.get_token("<|end_of_text|>"),
-            eos_token_id: dummy_tokenizer.get_token("<|im_end|>"),
-            report_speed: true,
-        };
-
         Self {
-            model: Arc::new(Mutex::new(dummy_model)),
-            tokenizer: dummy_tokenizer,
-            generation_config: dummy_gen_config,
-            request_sender: req_tx,
-            response_receiver: res_rx,
+            model: None,
+            tokenizer: None,
+            generation_config: None,
+            request_sender: None,
+            generation_response_receiver: None,
+            async_generation_response_sender: None,
+            async_generation_response_receiver: None,
             is_initialized: false,
         }
     }
@@ -83,7 +73,13 @@ pub struct AiGenerationRequest {
 #[derive(Event)]
 pub struct AiGenerationResponse {
     pub id: u32,
-    pub result: Result<String, String>,
+    pub result: String,
+}
+
+#[derive(Event)]
+pub struct AsyncAiGenerationResponse {
+    pub id: u32,
+    pub result: String,
 }
 
 #[derive(Clone)]
@@ -120,11 +116,17 @@ pub struct GenerationTask {
     messages: Vec<ChatMessage>,
     max_tokens: Option<u32>,
     temperature: Option<f32>,
+    async_sender: mpsc::UnboundedSender<AsyncGenerationResult>,
 }
 
 pub struct GenerationResult {
     id: u32,
-    result: Result<String, String>,
+    result: String,
+}
+
+pub struct AsyncGenerationResult {
+    id: u32,
+    result: String,
 }
 
 #[derive(Component)]
@@ -164,9 +166,6 @@ fn setup_ai_model(mut ai_resource: ResMut<AiModelResource>) {
 
     let config = AiConfig::default();
 
-    //// Print candle build info
-    //crane_core::utils::utils::print_candle_build_info();
-
     // Initialize tokenizer
     match AutoTokenizer::from_pretrained(&config.model_path, None) {
         Ok(tokenizer) => {
@@ -174,11 +173,8 @@ fn setup_ai_model(mut ai_resource: ResMut<AiModelResource>) {
 
             // Initialize model
             match Qwen25Model::new(&config.model_path, &config.device, &config.dtype) {
-                Ok(mut model) => {
+                Ok(model) => {
                     info!("Successfully loaded AI model");
-
-                    // Warmup the model
-                    let _ = model.warmup();
 
                     // Create generation config
                     let gen_config = GenerationConfig {
@@ -196,6 +192,8 @@ fn setup_ai_model(mut ai_resource: ResMut<AiModelResource>) {
                     // Create channels for async communication
                     let (req_tx, mut req_rx) = mpsc::unbounded_channel::<GenerationTask>();
                     let (res_tx, res_rx) = mpsc::unbounded_channel::<GenerationResult>();
+                    let (async_res_tx, async_res_rx) =
+                        mpsc::unbounded_channel::<AsyncGenerationResult>();
 
                     // Move model to Arc<Mutex<>> for thread safety
                     let model_arc = Arc::new(Mutex::new(model));
@@ -214,27 +212,37 @@ fn setup_ai_model(mut ai_resource: ResMut<AiModelResource>) {
                                     &model_arc_clone,
                                     &tokenizer_clone,
                                     &gen_config_clone,
+                                    task.id,
                                     task.messages,
                                     task.max_tokens,
                                     task.temperature,
+                                    task.async_sender,
                                 )
                                 .await;
 
-                                let _ = res_tx.send(GenerationResult {
-                                    id: task.id,
-                                    result,
-                                });
+                                if let Ok(result) = result {
+                                    if let Err(e) = res_tx.send(GenerationResult {
+                                        id: task.id,
+                                        result,
+                                    }) {
+                                        error!("Failed to send generation result: {}", e);
+                                    }
+                                }
                             }
                         });
                     });
 
                     // Update resources
-                    ai_resource.model = model_arc;
-                    ai_resource.tokenizer = tokenizer;
-                    ai_resource.generation_config = gen_config;
-                    ai_resource.request_sender = req_tx;
-                    ai_resource.response_receiver = res_rx;
+                    ai_resource.model = Some(model_arc);
+                    ai_resource.tokenizer = Some(tokenizer);
+                    ai_resource.generation_config = Some(gen_config);
+                    ai_resource.request_sender = Some(req_tx);
+                    ai_resource.generation_response_receiver = Some(res_rx);
+                    ai_resource.async_generation_response_sender = Some(async_res_tx);
+                    ai_resource.async_generation_response_receiver = Some(async_res_rx);
                     ai_resource.is_initialized = true;
+
+                    info!("AI model initialization completed successfully");
                 }
                 Err(e) => {
                     error!("Failed to load AI model: {}", e);
@@ -255,16 +263,21 @@ fn handle_generation_requests(
         return;
     }
 
-    for request in generation_requests.read() {
-        let task = GenerationTask {
-            id: request.id,
-            messages: request.messages.clone(),
-            max_tokens: request.max_tokens,
-            temperature: request.temperature,
-        };
+    if let Some(request_sender) = &ai_resource.request_sender {
+        if let Some(async_sender) = &ai_resource.async_generation_response_sender {
+            for request in generation_requests.read() {
+                let task = GenerationTask {
+                    id: request.id,
+                    messages: request.messages.clone(),
+                    max_tokens: request.max_tokens,
+                    temperature: request.temperature,
+                    async_sender: async_sender.clone(),
+                };
 
-        if let Err(e) = ai_resource.request_sender.send(task) {
-            error!("Failed to send generation request: {}", e);
+                if let Err(e) = request_sender.send(task) {
+                    error!("Failed to send generation request: {}", e);
+                }
+            }
         }
     }
 }
@@ -277,11 +290,31 @@ fn handle_generation_responses(
         return;
     }
 
-    while let Ok(result) = ai_resource.response_receiver.try_recv() {
-        generation_responses.write(AiGenerationResponse {
-            id: result.id,
-            result: result.result,
-        });
+    if let Some(receiver) = &mut ai_resource.generation_response_receiver {
+        while let Ok(result) = receiver.try_recv() {
+            generation_responses.write(AiGenerationResponse {
+                id: result.id,
+                result: result.result,
+            });
+        }
+    }
+}
+
+fn handle_async_generation_responses(
+    mut ai_resource: ResMut<AiModelResource>,
+    mut generation_responses: EventWriter<AsyncAiGenerationResponse>,
+) {
+    if !ai_resource.is_initialized {
+        return;
+    }
+
+    if let Some(receiver) = &mut ai_resource.async_generation_response_receiver {
+        while let Ok(result) = receiver.try_recv() {
+            generation_responses.write(AsyncAiGenerationResponse {
+                id: result.id,
+                result: result.result,
+            });
+        }
     }
 }
 
@@ -289,10 +322,40 @@ async fn generate_response(
     model_arc: &Arc<Mutex<Qwen25Model>>,
     tokenizer: &AutoTokenizer,
     gen_config: &GenerationConfig,
+    request_id: u32,
     messages: Vec<ChatMessage>,
     max_tokens: Option<u32>,
     temperature: Option<f32>,
+    async_sender: mpsc::UnboundedSender<AsyncGenerationResult>,
 ) -> Result<String, String> {
+    // Create a custom streamer that sends async responses with the correct ID
+    let (mut custom_streamer, receiver) = AsyncTextStreamer::new(tokenizer.clone());
+
+    // Start a thread to handle streaming tokens for this specific request
+    let async_sender_clone = async_sender.clone();
+    std::thread::spawn(move || {
+        for message in receiver {
+            match message {
+                StreamerMessage::Token(result) => {
+                    if let Err(e) = async_sender_clone.send(AsyncGenerationResult {
+                        id: request_id,
+                        result: result,
+                    }) {
+                        error!("Failed to send async generation result: {}", e);
+                        break;
+                    }
+                }
+                StreamerMessage::End => {
+                    info!("Streaming completed for request {}", request_id);
+                    break;
+                }
+                _ => {
+                    // Handle other message types if needed
+                }
+            }
+        }
+    });
+
     // Convert ChatMessage to crane_core format
     let chats: Vec<_> = messages
         .into_iter()
@@ -323,23 +386,15 @@ async fn generate_response(
         custom_config.temperature = Some(temp as f64);
     }
 
-    // Create streamer
-    let mut streamer = TextStreamer {
-        tokenizer: tokenizer.clone(),
-        buffer: String::new(),
-    };
-
-    // Generate response
+    // Generate response with the custom streamer
     let output_ids = model
-        .generate(&input_ids, &custom_config, Some(&mut streamer))
+        .generate(&input_ids, &custom_config, Some(&mut custom_streamer))
         .map_err(|e| format!("Generation failed: {}", e))?;
 
     // Decode the response
     let response = tokenizer
         .decode(&output_ids, false)
         .map_err(|e| format!("Failed to decode response: {}", e))?;
-
-    println!("response :: {}", response);
 
     Ok(response)
 }
