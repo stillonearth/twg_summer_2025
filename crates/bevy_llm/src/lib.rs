@@ -11,6 +11,7 @@ use crane_core::{
     Msg,
 };
 use log::*;
+use regex::Regex;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use tokio::sync::mpsc;
@@ -184,8 +185,8 @@ fn setup_ai_model(mut ai_resource: ResMut<AiModelResource>) {
                         repetition_penalty: config.repetition_penalty,
                         repeat_last_n: config.repeat_last_n,
                         do_sample: config.do_sample,
-                        pad_token_id: tokenizer.get_token("<|end_of_text|>"),
-                        eos_token_id: tokenizer.get_token("<|im_end|>"),
+                        pad_token_id: tokenizer.get_token("<|endoftext|>"),
+                        eos_token_id: tokenizer.get_token("<|im_start|>"),
                         report_speed: true,
                     };
 
@@ -221,11 +222,13 @@ fn setup_ai_model(mut ai_resource: ResMut<AiModelResource>) {
                                 .await;
 
                                 if let Ok(result) = result {
-                                    if let Err(e) = res_tx.send(GenerationResult {
-                                        id: task.id,
-                                        result,
-                                    }) {
-                                        error!("Failed to send generation result: {}", e);
+                                    if let Some(llm_result) = extract_between_markers(&result) {
+                                        if let Err(e) = res_tx.send(GenerationResult {
+                                            id: task.id,
+                                            result: llm_result,
+                                        }) {
+                                            error!("Failed to send generation result: {}", e);
+                                        }
                                     }
                                 }
                             }
@@ -423,4 +426,11 @@ impl AiGenerationRequest {
             temperature,
         }
     }
+}
+
+fn extract_between_markers(text: &str) -> Option<String> {
+    let re = Regex::new(r"<\|im_start\|>assistant\s*(.*?)\s*<\|im_end\|>").unwrap();
+    re.captures(text)
+        .and_then(|caps| caps.get(1))
+        .map(|m| m.as_str().to_string())
 }

@@ -57,10 +57,7 @@ fn read_generation_response(
 ) {
     for response in ev_responses.read() {
         for (mut text) in text_query.iter_mut() {
-            *text = Text::new(format!(
-                "[Response ID {}] AI said:\n\n{}",
-                response.id, response.result
-            ));
+            *text = Text::new(format!("[Response ID {}] {}", response.id, response.result));
         }
     }
 }
@@ -69,6 +66,7 @@ fn read_async_generation_response(
     mut ev_responses: EventReader<AsyncAiGenerationResponse>,
     mut text_query: Query<(&mut Text, &mut ResponseText)>,
 ) {
+    return;
     for response in ev_responses.read() {
         for (mut text, mut response_text) in text_query.iter_mut() {
             response_text.0 = format!("{}{}", response_text.0, response.result);
