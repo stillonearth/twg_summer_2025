@@ -1,3 +1,4 @@
+```rust
 use bevy::prelude::*;
 use crane_core::{
     autotokenizer::AutoTokenizer,
@@ -36,7 +37,7 @@ impl Plugin for CraneAiPlugin {
     }
 }
 
-#[derive(Resource)]
+#[derive(Resource, Default)]
 pub struct AiModelResource {
     pub model: Option<Arc<Mutex<Qwen25Model>>>,
     pub tokenizer: Option<AutoTokenizer>,
@@ -46,21 +47,6 @@ pub struct AiModelResource {
     pub async_generation_response_sender: Option<mpsc::UnboundedSender<AsyncGenerationResult>>,
     pub async_generation_response_receiver: Option<mpsc::UnboundedReceiver<AsyncGenerationResult>>,
     pub is_initialized: bool,
-}
-
-impl Default for AiModelResource {
-    fn default() -> Self {
-        Self {
-            model: None,
-            tokenizer: None,
-            generation_config: None,
-            request_sender: None,
-            generation_response_receiver: None,
-            async_generation_response_sender: None,
-            async_generation_response_receiver: None,
-            is_initialized: false,
-        }
-    }
 }
 
 #[derive(Event)]
@@ -90,25 +76,23 @@ pub struct ChatMessage {
 }
 
 impl ChatMessage {
-    pub fn user(content: impl Into<String>) -> Self {
+    pub fn new(role: Role, content: impl Into<String>) -> Self {
         Self {
-            role: Role::User,
+            role,
             content: content.into(),
         }
+    }
+
+    pub fn user(content: impl Into<String>) -> Self {
+        Self::new(Role::User, content)
     }
 
     pub fn assistant(content: impl Into<String>) -> Self {
-        Self {
-            role: Role::Assistant,
-            content: content.into(),
-        }
+        Self::new(Role::Assistant, content)
     }
 
     pub fn system(content: impl Into<String>) -> Self {
-        Self {
-            role: Role::System,
-            content: content.into(),
-        }
+        Self::new(Role::System, content)
     }
 }
 
@@ -160,101 +144,77 @@ impl Default for AiConfig {
 }
 
 fn setup_ai_model(mut ai_resource: ResMut<AiModelResource>) {
-    // Skip initialization if already done
     if ai_resource.is_initialized {
         return;
     }
 
     let config = AiConfig::default();
 
-    // Initialize tokenizer
     match AutoTokenizer::from_pretrained(&config.model_path, None) {
-        Ok(tokenizer) => {
-            info!("Successfully loaded tokenizer from: {}", config.model_path);
+        Ok(tokenizer) => match Qwen25Model::new(&config.model_path, &config.device, &config.dtype) {
+            Ok(model) => {
+                let gen_config = GenerationConfig {
+                    max_new_tokens: config.max_new_tokens,
+                    temperature: Some(config.temperature),
+                    top_p: Some(config.top_p),
+                    repetition_penalty: config.repetition_penalty,
+                    repeat_last_n: config.repeat_last_n,
+                    do_sample: config.do_sample,
+                    pad_token_id: tokenizer.get_token("<|endoftext|>"),
+                    eos_token_id: tokenizer.get_token("<|im_start|>"),
+                    report_speed: true,
+                };
 
-            // Initialize model
-            match Qwen25Model::new(&config.model_path, &config.device, &config.dtype) {
-                Ok(model) => {
-                    info!("Successfully loaded AI model");
+                let (req_tx, mut req_rx) = mpsc::unbounded_channel();
+                let (res_tx, res_rx) = mpsc::unbounded_channel();
+                let (async_tx, async_rx) = mpsc::unbounded_channel();
 
-                    // Create generation config
-                    let gen_config = GenerationConfig {
-                        max_new_tokens: config.max_new_tokens,
-                        temperature: Some(config.temperature),
-                        top_p: Some(config.top_p),
-                        repetition_penalty: config.repetition_penalty,
-                        repeat_last_n: config.repeat_last_n,
-                        do_sample: config.do_sample,
-                        pad_token_id: tokenizer.get_token("<|endoftext|>"),
-                        eos_token_id: tokenizer.get_token("<|im_start|>"),
-                        report_speed: true,
-                    };
+                let model_arc = Arc::new(Mutex::new(model));
+                let model_clone = model_arc.clone();
+                let tokenizer_clone = tokenizer.clone();
+                let config_clone = gen_config.clone();
 
-                    // Create channels for async communication
-                    let (req_tx, mut req_rx) = mpsc::unbounded_channel::<GenerationTask>();
-                    let (res_tx, res_rx) = mpsc::unbounded_channel::<GenerationResult>();
-                    let (async_res_tx, async_res_rx) =
-                        mpsc::unbounded_channel::<AsyncGenerationResult>();
-
-                    // Move model to Arc<Mutex<>> for thread safety
-                    let model_arc = Arc::new(Mutex::new(model));
-                    let tokenizer_clone = tokenizer.clone();
-                    let gen_config_clone = gen_config.clone();
-
-                    // Clone the Arc for the background thread
-                    let model_arc_clone = model_arc.clone();
-
-                    // Spawn background thread for AI generation
-                    thread::spawn(move || {
-                        let rt = tokio::runtime::Runtime::new().unwrap();
-                        rt.block_on(async move {
-                            while let Some(task) = req_rx.recv().await {
-                                let result = generate_response(
-                                    &model_arc_clone,
-                                    &tokenizer_clone,
-                                    &gen_config_clone,
-                                    task.id,
-                                    task.messages,
-                                    task.max_tokens,
-                                    task.temperature,
-                                    task.async_sender,
-                                )
-                                .await;
-
-                                if let Ok(result) = result {
-                                    if let Some(llm_result) = extract_between_markers(&result) {
-                                        if let Err(e) = res_tx.send(GenerationResult {
-                                            id: task.id,
-                                            result: llm_result,
-                                        }) {
-                                            error!("Failed to send generation result: {}", e);
-                                        }
-                                    }
+                thread::spawn(move || {
+                    let rt = tokio::runtime::Runtime::new().unwrap();
+                    rt.block_on(async move {
+                        while let Some(task) = req_rx.recv().await {
+                            if let Ok(result) = generate_response(
+                                &model_clone,
+                                &tokenizer_clone,
+                                &config_clone,
+                                task.id,
+                                task.messages,
+                                task.max_tokens,
+                                task.temperature,
+                                task.async_sender.clone(),
+                            )
+                            .await
+                            {
+                                if let Some(parsed) = extract_between_markers(&result) {
+                                    let _ = res_tx.send(GenerationResult {
+                                        id: task.id,
+                                        result: parsed,
+                                    });
                                 }
                             }
-                        });
+                        }
                     });
+                });
 
-                    // Update resources
-                    ai_resource.model = Some(model_arc);
-                    ai_resource.tokenizer = Some(tokenizer);
-                    ai_resource.generation_config = Some(gen_config);
-                    ai_resource.request_sender = Some(req_tx);
-                    ai_resource.generation_response_receiver = Some(res_rx);
-                    ai_resource.async_generation_response_sender = Some(async_res_tx);
-                    ai_resource.async_generation_response_receiver = Some(async_res_rx);
-                    ai_resource.is_initialized = true;
+                ai_resource.model = Some(model_arc);
+                ai_resource.tokenizer = Some(tokenizer);
+                ai_resource.generation_config = Some(gen_config);
+                ai_resource.request_sender = Some(req_tx);
+                ai_resource.generation_response_receiver = Some(res_rx);
+                ai_resource.async_generation_response_sender = Some(async_tx);
+                ai_resource.async_generation_response_receiver = Some(async_rx);
+                ai_resource.is_initialized = true;
 
-                    info!("AI model initialization completed successfully");
-                }
-                Err(e) => {
-                    error!("Failed to load AI model: {}", e);
-                }
+                info!("AI model initialized successfully");
             }
-        }
-        Err(e) => {
-            error!("Failed to load tokenizer: {}", e);
-        }
+            Err(e) => error!("Failed to load AI model: {}", e),
+        },
+        Err(e) => error!("Failed to load tokenizer: {}", e),
     }
 }
 
@@ -266,21 +226,20 @@ fn handle_generation_requests(
         return;
     }
 
-    if let Some(request_sender) = &ai_resource.request_sender {
-        if let Some(async_sender) = &ai_resource.async_generation_response_sender {
-            for request in generation_requests.read() {
-                let task = GenerationTask {
-                    id: request.id,
-                    messages: request.messages.clone(),
-                    max_tokens: request.max_tokens,
-                    temperature: request.temperature,
-                    async_sender: async_sender.clone(),
-                };
+    if let (Some(req_tx), Some(async_tx)) = (
+        &ai_resource.request_sender,
+        &ai_resource.async_generation_response_sender,
+    ) {
+        for request in generation_requests.read() {
+            let task = GenerationTask {
+                id: request.id,
+                messages: request.messages.clone(),
+                max_tokens: request.max_tokens,
+                temperature: request.temperature,
+                async_sender: async_tx.clone(),
+            };
 
-                if let Err(e) = request_sender.send(task) {
-                    error!("Failed to send generation request: {}", e);
-                }
-            }
+            let _ = req_tx.send(task);
         }
     }
 }
@@ -331,78 +290,50 @@ async fn generate_response(
     temperature: Option<f32>,
     async_sender: mpsc::UnboundedSender<AsyncGenerationResult>,
 ) -> Result<String, String> {
-    // Create a custom streamer that sends async responses with the correct ID
-    let (mut custom_streamer, receiver) = AsyncTextStreamer::new(tokenizer.clone());
+    let (mut streamer, receiver) = AsyncTextStreamer::new(tokenizer.clone());
 
-    // Start a thread to handle streaming tokens for this specific request
-    let async_sender_clone = async_sender.clone();
-    std::thread::spawn(move || {
+    let sender_clone = async_sender.clone();
+    thread::spawn(move || {
         for message in receiver {
-            match message {
-                StreamerMessage::Token(result) => {
-                    if let Err(e) = async_sender_clone.send(AsyncGenerationResult {
-                        id: request_id,
-                        result: result,
-                    }) {
-                        error!("Failed to send async generation result: {}", e);
-                        break;
-                    }
-                }
-                StreamerMessage::End => {
-                    info!("Streaming completed for request {}", request_id);
-                    break;
-                }
-                _ => {
-                    // Handle other message types if needed
-                }
+            if let StreamerMessage::Token(token) = message {
+                let _ = sender_clone.send(AsyncGenerationResult {
+                    id: request_id,
+                    result: token,
+                });
             }
         }
     });
 
-    // Convert ChatMessage to crane_core format
-    let chats: Vec<_> = messages
-        .into_iter()
-        .map(|msg| Msg!(msg.role, msg.content))
-        .collect();
-
-    // Apply chat template
+    let chats: Vec<_> = messages.into_iter().map(|m| Msg!(m.role, m.content)).collect();
     let prompt = tokenizer
         .apply_chat_template(&chats, true)
-        .map_err(|e| format!("Failed to apply chat template: {}", e))?;
+        .map_err(|e| format!("Template error: {}", e))?;
 
-    // Lock the model for generation
     let mut model = model_arc
         .lock()
-        .map_err(|e| format!("Failed to lock model: {}", e))?;
+        .map_err(|e| format!("Lock error: {}", e))?;
 
-    // Prepare inputs
     let input_ids = model
         .prepare_inputs(&prompt)
-        .map_err(|e| format!("Failed to prepare inputs: {}", e))?;
+        .map_err(|e| format!("Input error: {}", e))?;
 
-    // Create custom generation config if needed
-    let mut custom_config = gen_config.clone();
-    if let Some(max_tokens) = max_tokens {
-        custom_config.max_new_tokens = max_tokens as usize;
+    let mut config = gen_config.clone();
+    if let Some(tokens) = max_tokens {
+        config.max_new_tokens = tokens as usize;
     }
     if let Some(temp) = temperature {
-        custom_config.temperature = Some(temp as f64);
+        config.temperature = Some(temp as f64);
     }
 
-    // Generate response with the custom streamer
-    let output_ids = model
-        .generate(&input_ids, &custom_config, Some(&mut custom_streamer))
+    let output = model
+        .generate(&input_ids, &config, Some(&mut streamer))
         .map_err(|e| format!("Generation failed: {}", e))?;
 
-    // Decode the response
-    let response = tokenizer
-        .decode(&output_ids, false)
-        .map_err(|e| format!("Failed to decode response: {}", e))?;
-
-    Ok(response)
+    tokenizer
+        .decode(&output, false)
+        .map_err(|e| format!("Decode error: {}", e))
 }
 
-// Helper functions for easy usage
 impl AiGenerationRequest {
     pub fn new(id: u32, messages: Vec<ChatMessage>) -> Self {
         Self {
@@ -429,8 +360,9 @@ impl AiGenerationRequest {
 }
 
 fn extract_between_markers(text: &str) -> Option<String> {
-    let re = Regex::new(r"<\|im_start\|>assistant\s*(.*?)\s*<\|im_end\|>").unwrap();
-    re.captures(text)
-        .and_then(|caps| caps.get(1))
+    Regex::new(r"<\|im_start\|>assistant\s*(.*?)\s*<\|im_end\|>")
+        .ok()?
+        .captures(text)?
+        .get(1)
         .map(|m| m.as_str().to_string())
 }
