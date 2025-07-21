@@ -3,8 +3,6 @@ use bevy::{input::common_conditions::input_toggle_active, prelude::*};
 use bevy_ecs_tiled::prelude::*;
 use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
 
-const MOVE_SPEED: f32 = 200.;
-
 mod collisions;
 mod debug;
 mod game_objects;
@@ -27,7 +25,11 @@ fn main() {
         .add_systems(Startup, startup)
         .add_systems(
             Update,
-            (player::move_player, check_nearest_object, debug_draw_system),
+            (
+                player::move_player,
+                collisions::check_nearest_object,
+                debug::debug_draw_system,
+            ),
         )
         .run();
 }
@@ -43,7 +45,7 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
         .observe(|_: Trigger<TiledMapCreated>, mut commands: Commands| {
             commands.spawn((
                 RigidBody::Dynamic,
-                PlayerMarker,
+                player::PlayerMarker,
                 Name::new("PlayerControlledObject (Avian2D physics)"),
                 Collider::circle(10.),
                 Transform::from_xyz(0., -50., 0.),
@@ -51,14 +53,7 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
         })
         .observe(
             |trigger: Trigger<TiledColliderCreated>, mut commands: Commands| {
-                // Add both the RigidBody and WallProperties when a collider is created
-                commands.entity(trigger.entity).insert((
-                    RigidBody::Static,
-                    WallProperties {
-                        name: "Wall".to_string(),
-                        wall_type: WallType::Stone,
-                    },
-                ));
+                commands.entity(trigger.entity).insert((RigidBody::Static,));
             },
         );
 }

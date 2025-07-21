@@ -96,7 +96,7 @@
         "Room_Builder_Office_32x32.tsx"
     ],
     "project": "my-room.tiled-project",
-    "property.type": "llm_game::WallProperties",
+    "property.type": "llm_game::game_objects::WallProperties",
     "recentFiles": [
         "/home/cwiz/code/gamedev/bevy_ecs_tiled/assets/maps/demo.tmx",
         "Room_Builder_Office_32x32.tsx",
