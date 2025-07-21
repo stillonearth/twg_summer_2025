@@ -1,0 +1,113 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "Room_Builder_Office_32x32.tsx",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "/home/cwiz/code/gamedev/bevy_ecs_tiled/assets/Magic Market/Tilesets/Objects.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/cwiz/code/gamedev/bevy_ecs_tiled/assets/Magic Market/Tilesets/Tileset floor - 16x16.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/cwiz/code/gamedev/bevy_ecs_tiled/assets/Magic Market/Tilesets/Tileset props - 16x16.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/cwiz/code/gamedev/bevy_ecs_tiled/assets/Magic Market/Tilesets/Tileset props - 16x32.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/cwiz/code/gamedev/bevy_ecs_tiled/assets/Magic Market/Tilesets/Tileset props - 32x16.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/cwiz/code/gamedev/bevy_ecs_tiled/assets/Magic Market/Tilesets/Tileset props - 32x32.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/cwiz/code/gamedev/bevy_ecs_tiled/assets/Magic Market/Tilesets/Tileset props - 48x16.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/cwiz/code/gamedev/bevy_ecs_tiled/assets/Magic Market/Tilesets/Tileset props - 48x32.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/cwiz/code/gamedev/bevy_ecs_tiled/assets/Magic Market/Tilesets/Tileset water - 16x16.tsx": {
+            "scaleInDock": 1
+        },
+        "/home/cwiz/code/gamedev/bevy_ecs_tiled/assets/maps/demo.tmx": {
+            "scale": 1.47546875,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 320.2372127501853,
+                "y": 320.2372127501853
+            }
+        },
+        "/home/cwiz/code/gamedev/bevy_ecs_tiled/assets/maps/orthogonal/multiple_layers_with_colliders.tmx": {
+            "scale": 3,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 299.6666666666667,
+                "y": 400.33333333333337
+            }
+        },
+        "/home/cwiz/code/gamedev/bevy_ecs_tiled/assets/tiles/orthogonal_1.tsx": {
+            "dynamicWrapping": true
+        },
+        "4x-2x.tsx": {
+            "dynamicWrapping": false,
+            "scaleInEditor": 1
+        },
+        "Modern_Office_Shadowless_32x32.tsx": {
+            "dynamicWrapping": false
+        },
+        "Room_Builder_Office_32x32.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "furniture 2.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 1
+        },
+        "furniture spritesheet.tsx": {
+            "scaleInDock": 1,
+            "scaleInEditor": 2
+        },
+        "furniture.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "my_room.tmx": {
+            "scale": 0.75,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 479.3333333333333,
+                "y": 319.33333333333337
+            }
+        }
+    },
+    "last.imagePath": "/home/cwiz/code/gamedev/twg_summer_2025/assets",
+    "map.lastUsedFormat": "tmx",
+    "openFiles": [
+        "my_room.tmx",
+        "Room_Builder_Office_32x32.tsx"
+    ],
+    "project": "my-room.tiled-project",
+    "property.type": "string",
+    "recentFiles": [
+        "/home/cwiz/code/gamedev/bevy_ecs_tiled/assets/maps/demo.tmx",
+        "Room_Builder_Office_32x32.tsx",
+        "4x-2x.tsx",
+        "furniture.tsx",
+        "furniture spritesheet.tsx",
+        "my_room.tmx"
+    ],
+    "tileset.lastUsedFormat": "tsx",
+    "tileset.tileSize": {
+        "height": 32,
+        "width": 32
+    },
+    "tileset.type": 1
+}
