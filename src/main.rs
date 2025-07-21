@@ -1,9 +1,14 @@
 use avian2d::prelude::*;
-use bevy::prelude::*;
+use bevy::{input::common_conditions::input_toggle_active, prelude::*};
 use bevy_ecs_tiled::prelude::*;
+use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
 
 const MOVE_SPEED: f32 = 200.;
-const GRAVITY_SCALE: f32 = 10.0;
+
+mod collisions;
+mod debug;
+mod game_objects;
+mod player;
 
 fn main() {
     App::new()
@@ -11,27 +16,30 @@ fn main() {
         .add_plugins(TiledMapPlugin::default())
         .add_plugins(TiledPhysicsPlugin::<TiledPhysicsAvianBackend>::default())
         .add_plugins(PhysicsPlugins::default().with_length_unit(100.0))
-        .add_plugins(PhysicsDebugPlugin::default())
+        .add_plugins((
+            EguiPlugin {
+                enable_multipass_for_primary_context: true,
+            },
+            WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
+        ))
+        .register_type::<game_objects::WallProperties>()
+        .register_type::<game_objects::WallType>()
         .add_systems(Startup, startup)
-        .add_systems(Update, move_player)
+        .add_systems(
+            Update,
+            (player::move_player, check_nearest_object, debug_draw_system),
+        )
         .run();
 }
 
 fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    // Spawn a Bevy 2D camera
     commands.spawn(Camera2d);
-
     commands.spawn(Text(String::from(
-        "Move the ball using arrow keys or try to rotate the map!",
+        "Move the ball using arrow keys! Press spacebar to check nearest wall properties.",
     )));
-
-    // Load a map asset and retrieve the corresponding handle
     let map_handle: Handle<TiledMap> = asset_server.load("my_room.tmx");
-
-    // Spawn a new entity with this handle
     commands
         .spawn((TiledMapHandle(map_handle), TilemapAnchor::Center))
-        // Wait for map loading to complete and spawn a simple player-controlled object
         .observe(|_: Trigger<TiledMapCreated>, mut commands: Commands| {
             commands.spawn((
                 RigidBody::Dynamic,
@@ -41,46 +49,16 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
                 Transform::from_xyz(0., -50., 0.),
             ));
         })
-        // Automatically insert a `RigidBody::Static` component on all the colliders entities from the map
         .observe(
             |trigger: Trigger<TiledColliderCreated>, mut commands: Commands| {
-                commands.entity(trigger.entity).insert(RigidBody::Static);
+                // Add both the RigidBody and WallProperties when a collider is created
+                commands.entity(trigger.entity).insert((
+                    RigidBody::Static,
+                    WallProperties {
+                        name: "Wall".to_string(),
+                        wall_type: WallType::Stone,
+                    },
+                ));
             },
         );
-}
-
-// A 'player' marker component
-#[derive(Default, Clone, Component)]
-pub struct PlayerMarker;
-
-// A simplistic controller
-fn move_player(
-    keyboard_input: Res<ButtonInput<KeyCode>>,
-    mut player: Query<&mut LinearVelocity, With<PlayerMarker>>,
-) {
-    for mut rb_vel in player.iter_mut() {
-        let mut direction = Vec2::ZERO;
-
-        if keyboard_input.pressed(KeyCode::ArrowRight) {
-            direction += Vec2::new(1.0, 0.0);
-        }
-
-        if keyboard_input.pressed(KeyCode::ArrowLeft) {
-            direction -= Vec2::new(1.0, 0.0);
-        }
-
-        if keyboard_input.pressed(KeyCode::ArrowUp) {
-            direction += Vec2::new(0.0, 1.0);
-        }
-
-        if keyboard_input.pressed(KeyCode::ArrowDown) {
-            direction -= Vec2::new(0.0, 1.0);
-        }
-
-        if direction != Vec2::ZERO {
-            direction /= direction.length();
-        }
-
-        rb_vel.0 = direction * MOVE_SPEED;
-    }
 }

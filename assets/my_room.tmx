@@ -79,82 +79,162 @@
 </data>
  </layer>
  <objectgroup id="7" name="Colliders">
-  <object id="5" x="41" y="577" width="882" height="8">
+  <object id="5" name="wall 3" x="41" y="577" width="882" height="8">
+   <properties>
+    <property name="wall" type="class" propertytype="llm_game::WallProperties">
+     <properties>
+      <property name="name" value="wall 3"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="8" name="wall 5" x="531" y="194" width="11" height="383">
+   <properties>
+    <property name="wall" type="class">
+     <properties>
+      <property name="name" value="room-kitchen wall"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="9" name="wall 2" x="33" y="33" width="10" height="553">
+   <properties>
+    <property name="wall" type="class" propertytype="llm_game::WallProperties">
+     <properties>
+      <property name="name" value="wall 2"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="10" name="wall 1" x="35" y="34" width="318" height="9">
+   <properties>
+    <property name="wall" type="class">
+     <properties>
+      <property name="name" value="outer left top wall"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="11" name="wall 6" x="353" y="35" width="10" height="167">
+   <properties>
+    <property name="wall" type="class">
+     <properties>
+      <property name="name" value="room inner wall"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="12" name="wall 7" x="353" y="193" width="107" height="10">
+   <properties>
+    <property name="wall" type="class">
+     <properties>
+      <property name="name" value="room inner wall bottom"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="13" name="wall 8" x="354" y="33" width="222" height="10">
    <properties>
     <property name="object_type" value="wall"/>
    </properties>
   </object>
-  <object id="8" x="531" y="194" width="11" height="383">
+  <object id="14" name="wall 12" x="641" y="33" width="12" height="95">
    <properties>
-    <property name="object_type" value="wall"/>
+    <property name="wall" type="class">
+     <properties>
+      <property name="name" value="toilet wall"/>
+     </properties>
+    </property>
    </properties>
   </object>
-  <object id="9" x="33" y="33" width="10" height="553">
+  <object id="15" name="wall 11" x="640" y="191" width="12" height="107">
    <properties>
-    <property name="object_type" value="wall"/>
+    <property name="wall" type="class">
+     <properties>
+      <property name="name" value="toilet wall"/>
+     </properties>
+    </property>
    </properties>
   </object>
-  <object id="10" x="35" y="34" width="318" height="9">
+  <object id="16" x="642" y="287" width="284" height="10">
    <properties>
-    <property name="object_type" value="wall"/>
+    <property name="wall" type="class">
+     <properties>
+      <property name="name" value="toilet wall"/>
+     </properties>
+    </property>
    </properties>
   </object>
-  <object id="11" x="353" y="35" width="10" height="167">
+  <object id="17" name="wall 4" x="915" y="289" width="10" height="296">
    <properties>
-    <property name="object_type" value="wall"/>
+    <property name="wall" type="class">
+     <properties>
+      <property name="name" value="kitchen outer wall"/>
+     </properties>
+    </property>
    </properties>
   </object>
-  <object id="12" x="353" y="193" width="107" height="10">
+  <object id="18" name="wall 10" x="915" y="33" width="11" height="264">
    <properties>
-    <property name="object_type" value="wall"/>
+    <property name="wall" type="class">
+     <properties>
+      <property name="name" value="toilet-outer wall"/>
+     </properties>
+    </property>
    </properties>
   </object>
-  <object id="13" x="354" y="33" width="222" height="10">
+  <object id="19" name="wall 9" x="644" y="33" width="283" height="10">
    <properties>
-    <property name="object_type" value="wall"/>
+    <property name="wall" type="class">
+     <properties>
+      <property name="name" value="bathroom-outer wall"/>
+     </properties>
+    </property>
    </properties>
   </object>
-  <object id="14" x="641" y="33" width="12" height="95">
-   <properties>
-    <property name="object_type" value="wall"/>
-   </properties>
-  </object>
-  <object id="15" x="640" y="192" width="12" height="107">
-   <properties>
-    <property name="object_type" value="wall"/>
-   </properties>
-  </object>
-  <object id="16" x="642" y="288" width="284" height="10">
-   <properties>
-    <property name="object_type" value="wall"/>
-   </properties>
-  </object>
-  <object id="17" x="915" y="289" width="10" height="296">
-   <properties>
-    <property name="object_type" value="wall"/>
-   </properties>
-  </object>
-  <object id="18" x="915" y="34" width="11" height="264">
-   <properties>
-    <property name="object_type" value="wall"/>
-   </properties>
-  </object>
-  <object id="19" x="644" y="33" width="283" height="10">
-   <properties>
-    <property name="object_type" value="wall"/>
-   </properties>
-  </object>
-  <object id="21" x="649" y="94" width="266" height="2"/>
-  <object id="22" x="640" y="350" width="275" height="3"/>
-  <object id="23" x="641" y="300" width="2" height="52"/>
+  <object id="21" name="wall 13" x="649" y="94" width="266" height="2"/>
+  <object id="22" name="wall 14" x="640" y="350" width="275" height="3"/>
+  <object id="23" name="wall 15" x="641" y="300" width="2" height="52"/>
   <object id="24" x="366" y="95" width="210" height="1"/>
   <object id="26" x="575" y="43" width="1" height="53"/>
   <object id="27" x="46" y="95" width="307"/>
-  <object id="29" x="353" y="203" width="2" height="52"/>
-  <object id="35" x="355" y="254" width="31" height="2"/>
+  <object id="29" x="353" y="203" width="2" height="52">
+   <properties>
+    <property name="wall" type="class">
+     <properties>
+      <property name="name" value="room inner wall"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="35" x="355" y="254" width="31" height="2">
+   <properties>
+    <property name="wall" type="class">
+     <properties>
+      <property name="name" value="room inner wall"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
   <object id="36" x="386" y="241" width="1" height="15"/>
-  <object id="37" x="387" y="241" width="61" height="2"/>
-  <object id="38" x="445" y="203" width="3" height="40"/>
+  <object id="37" x="387" y="241" width="61" height="2">
+   <properties>
+    <property name="wall" type="class">
+     <properties>
+      <property name="name" value="room inner wall"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="38" x="445" y="203" width="3" height="40">
+   <properties>
+    <property name="wall" type="class">
+     <properties>
+      <property name="name" value="room inner wall"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
  </objectgroup>
  <layer id="4" name="Objects" width="30" height="20">
   <data encoding="csv">

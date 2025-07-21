@@ -89,13 +89,14 @@
         }
     },
     "last.imagePath": "/home/cwiz/code/gamedev/twg_summer_2025/assets",
+    "last.objectTypesPath": "/home/cwiz/code/gamedev/twg_summer_2025/tiled_types_export.json",
     "map.lastUsedFormat": "tmx",
     "openFiles": [
         "my_room.tmx",
         "Room_Builder_Office_32x32.tsx"
     ],
     "project": "my-room.tiled-project",
-    "property.type": "string",
+    "property.type": "llm_game::WallProperties",
     "recentFiles": [
         "/home/cwiz/code/gamedev/bevy_ecs_tiled/assets/maps/demo.tmx",
         "Room_Builder_Office_32x32.tsx",
