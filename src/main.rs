@@ -2,11 +2,13 @@ use avian2d::prelude::*;
 use bevy::{input::common_conditions::input_toggle_active, prelude::*};
 use bevy_ecs_tiled::prelude::*;
 use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
+
 mod collisions;
 mod debug;
 mod game_objects;
 mod player;
 mod sprites;
+mod ui;
 
 fn main() {
     App::new()
@@ -20,6 +22,7 @@ fn main() {
             },
             WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
         ))
+        .add_plugins(ui::HikikomoriUIPlugin)
         .register_type::<game_objects::WallProperties>()
         .register_type::<game_objects::WallType>()
         .add_systems(Startup, startup) // Remove sprites::spawn_character_sprite from here
@@ -31,6 +34,7 @@ fn main() {
                 debug::debug_draw_system,
                 sprites::animate_sprite,
                 sprites::update_animation_indices,
+                ui::example_game_loop,
             ),
         )
         .run();
