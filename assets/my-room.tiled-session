@@ -57,10 +57,12 @@
         },
         "4x-2x.tsx": {
             "dynamicWrapping": false,
+            "scaleInDock": 1,
             "scaleInEditor": 1
         },
         "Modern_Office_Shadowless_32x32.tsx": {
-            "dynamicWrapping": false
+            "dynamicWrapping": false,
+            "scaleInDock": 1
         },
         "Room_Builder_Office_32x32.tsx": {
             "scaleInDock": 1,
@@ -81,14 +83,14 @@
         },
         "my_room.tmx": {
             "scale": 0.75,
-            "selectedLayer": 1,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 479.3333333333333,
-                "y": 319.33333333333337
+                "x": 478.66666666666663,
+                "y": 318.6666666666665
             }
         }
     },
-    "last.imagePath": "/home/cwiz/code/gamedev/twg_summer_2025/assets",
+    "last.imagePath": "/home/cwiz/code/gamedev/twg_summer_2025/assets/Modern",
     "last.objectTypesPath": "/home/cwiz/code/gamedev/twg_summer_2025/tiled_types_export.json",
     "map.lastUsedFormat": "tmx",
     "openFiles": [
@@ -98,17 +100,17 @@
     "project": "my-room.tiled-project",
     "property.type": "llm_game::game_objects::WallProperties",
     "recentFiles": [
+        "my_room.tmx",
         "/home/cwiz/code/gamedev/bevy_ecs_tiled/assets/maps/demo.tmx",
         "Room_Builder_Office_32x32.tsx",
         "4x-2x.tsx",
         "furniture.tsx",
-        "furniture spritesheet.tsx",
-        "my_room.tmx"
+        "furniture spritesheet.tsx"
     ],
     "tileset.lastUsedFormat": "tsx",
     "tileset.tileSize": {
         "height": 32,
         "width": 32
     },
-    "tileset.type": 1
+    "tileset.type": 0
 }
