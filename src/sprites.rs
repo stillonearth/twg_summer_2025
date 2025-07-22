@@ -1,5 +1,5 @@
 use avian2d::prelude::{Collider, LockedAxes, RigidBody};
-use bevy::prelude::*;
+use bevy::{prelude::*, render::view::RenderLayers};
 
 use crate::player;
 
@@ -8,6 +8,7 @@ pub const SHEET_1_ROWS: u32 = 21;
 pub const N_FRAMES_WALK: usize = 8;
 
 pub const PLAYER_ASSET_SHEET_1: &str = "character.png";
+pub const LAYER_SPRITES: usize = 1;
 
 #[derive(Copy, Clone, Reflect, Default, Debug, PartialEq, Eq)]
 pub enum AnimatedCharacterType {
@@ -179,4 +180,26 @@ pub fn spawn_character_sprite(
         Collider::circle(10.),
         LockedAxes::ROTATION_LOCKED,
     ));
+}
+
+pub fn add_render_layers_to_sprites(
+    mut commands: Commands,
+    sprites_without_layers: Query<Entity, (With<Sprite>, Without<RenderLayers>)>,
+    mut has_run: Local<bool>,
+) {
+    if *has_run {
+        return;
+    }
+
+    for entity in sprites_without_layers.iter() {
+        commands
+            .entity(entity)
+            .insert(RenderLayers::layer(LAYER_SPRITES));
+    }
+
+    let count = sprites_without_layers.iter().count();
+
+    if count != 0 {
+        *has_run = true;
+    }
 }

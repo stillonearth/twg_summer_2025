@@ -1,4 +1,4 @@
-use bevy::{prelude::*, text::FontStyle};
+use bevy::{prelude::*, render::view::RenderLayers, text::FontStyle};
 use bevy_inspector_egui::egui::TextStyle;
 
 pub struct HikikomoriUIPlugin;
@@ -6,7 +6,6 @@ pub struct HikikomoriUIPlugin;
 impl Plugin for HikikomoriUIPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<GameState>()
-            .init_resource::<UIAssets>()
             .add_systems(Startup, setup_ui)
             .add_systems(
                 Update,
@@ -156,6 +155,20 @@ impl UIColors {
             Mood::Manic => Color::srgb(0.9, 0.3, 0.6),
         }
     }
+
+    pub fn resource_color(value: f32, good_color: Color, bad_color: Color) -> Color {
+        let ratio = (value / 100.0).clamp(0.0, 1.0);
+
+        // Extract RGB components properly
+        let bad = bad_color.to_srgba();
+        let good = good_color.to_srgba();
+
+        Color::srgb(
+            bad.red + (good.red - bad.red) * ratio,
+            bad.green + (good.green - bad.green) * ratio,
+            bad.blue + (good.blue - bad.blue) * ratio,
+        )
+    }
 }
 
 // UI component markers
@@ -181,27 +194,20 @@ pub enum ResourceType {
     Food,
 }
 
-// Resource for UI assets
-#[derive(Resource, Default)]
-pub struct UIAssets {
-    pub font: Handle<Font>,
-}
+pub const LAYER_UI: usize = 0;
 
 // Setup the UI layout
-fn setup_ui(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut ui_assets: ResMut<UIAssets>,
-) {
+fn setup_ui(mut commands: Commands) {
     // Root UI container
     commands
         .spawn((
             Node {
-                width: Val::Percent(100.0),
+                width: Val::Px(230.0),
                 height: Val::Percent(100.0),
                 justify_content: JustifyContent::SpaceBetween,
                 ..default()
             },
+            // RenderLayers::layer(LAYER_UI),
             Name::new("Game UI"),
         ))
         .with_children(|parent| {
@@ -292,39 +298,39 @@ fn setup_ui(
                 });
 
             // Top-right panel: Time display
-            parent
-                .spawn((
-                    Node {
-                        width: Val::Px(200.0),
-                        height: Val::Auto,
-                        flex_direction: FlexDirection::Column,
-                        align_items: AlignItems::FlexEnd,
-                        padding: UiRect::all(Val::Px(16.0)),
-                        margin: UiRect::all(Val::Px(8.0)),
-                        ..default()
-                    },
-                    // BackgroundColor(UIColors::BACKGROUND.into()),
-                ))
-                .with_children(|panel| {
-                    panel.spawn((
-                        Text::new("10:00"),
-                        TextFont {
-                            font_size: 24.0,
-                            ..default()
-                        },
-                        TextColor(UIColors::TEXT),
-                        TimeDisplay,
-                    ));
+            // parent
+            //     .spawn((
+            //         Node {
+            //             width: Val::Px(200.0),
+            //             height: Val::Auto,
+            //             flex_direction: FlexDirection::Column,
+            //             align_items: AlignItems::FlexEnd,
+            //             padding: UiRect::all(Val::Px(16.0)),
+            //             margin: UiRect::all(Val::Px(8.0)),
+            //             ..default()
+            //         },
+            //         // BackgroundColor(UIColors::BACKGROUND.into()),
+            //     ))
+            //     .with_children(|panel| {
+            //         panel.spawn((
+            //             Text::new("10:00"),
+            //             TextFont {
+            //                 font_size: 24.0,
+            //                 ..default()
+            //             },
+            //             TextColor(UIColors::TEXT),
+            //             TimeDisplay,
+            //         ));
 
-                    panel.spawn((
-                        Text::new("Day 1"),
-                        TextFont {
-                            font_size: 16.0,
-                            ..default()
-                        },
-                        TextColor(UIColors::TEXT_DIM),
-                    ));
-                });
+            //         panel.spawn((
+            //             Text::new("Day 1"),
+            //             TextFont {
+            //                 font_size: 16.0,
+            //                 ..default()
+            //             },
+            //             TextColor(UIColors::TEXT_DIM),
+            //         ));
+            //     });
         });
 }
 
@@ -384,12 +390,12 @@ fn update_resource_bars(
             };
 
             // Update fill bar for this resource
-            // for &child in children.iter() {
-            //     if let Ok((mut style, mut bg_color)) = fill_query.get_mut(child) {
-            //         style.width = Val::Percent(resource_value);
-            //         bg_color.0 = UIColors::resource_color(resource_value, good_color, bad_color);
-            //     }
-            // }
+            for child in children.iter() {
+                if let Ok((mut style, mut bg_color)) = fill_query.get_mut(child) {
+                    style.width = Val::Percent(resource_value);
+                    bg_color.0 = UIColors::resource_color(resource_value, good_color, bad_color);
+                }
+            }
         }
     }
 }

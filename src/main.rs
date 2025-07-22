@@ -1,7 +1,9 @@
 use avian2d::prelude::*;
-use bevy::{input::common_conditions::input_toggle_active, prelude::*};
+use bevy::{input::common_conditions::input_toggle_active, prelude::*, render::view::RenderLayers};
 use bevy_ecs_tiled::prelude::*;
 use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
+
+use crate::{sprites::LAYER_SPRITES, ui::LAYER_UI};
 
 mod collisions;
 mod debug;
@@ -13,6 +15,7 @@ mod ui;
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
+        .add_plugins(ui::HikikomoriUIPlugin)
         .add_plugins(TiledMapPlugin::default())
         .add_plugins(TiledPhysicsPlugin::<TiledPhysicsAvianBackend>::default())
         .add_plugins(PhysicsPlugins::default().with_length_unit(100.0))
@@ -22,10 +25,11 @@ fn main() {
             },
             WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
         ))
-        .add_plugins(ui::HikikomoriUIPlugin)
         .register_type::<game_objects::WallProperties>()
         .register_type::<game_objects::WallType>()
-        .add_systems(Startup, startup) // Remove sprites::spawn_character_sprite from here
+        .register_type::<game_objects::Bed>()
+        .register_type::<game_objects::Bath>()
+        .add_systems(Startup, (startup,))
         .add_systems(
             Update,
             (
@@ -35,13 +39,27 @@ fn main() {
                 sprites::animate_sprite,
                 sprites::update_animation_indices,
                 ui::example_game_loop,
+                game_objects::setup_bed_hoverable,
+                game_objects::setup_bath_hoverable,
+                sprites::add_render_layers_to_sprites,
             ),
         )
         .run();
 }
 
 fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
-    commands.spawn(Camera2d);
+    commands.spawn((Camera2d, IsDefaultUiCamera));
+
+    commands.spawn((
+        Camera2d,
+        Camera {
+            order: 1,
+            clear_color: ClearColorConfig::None,
+            ..default()
+        },
+        RenderLayers::layer(LAYER_SPRITES),
+    ));
+
     let map_handle: Handle<TiledMap> = asset_server.load("my_room.tmx");
     commands
         .spawn((TiledMapHandle(map_handle), TilemapAnchor::Center))
@@ -50,7 +68,6 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
              commands: Commands,
              asset_server: Res<AssetServer>,
              texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>| {
-                // Call the combined spawn function when the map is created
                 sprites::spawn_character_sprite(commands, asset_server, texture_atlas_layouts);
             },
         )
