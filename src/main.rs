@@ -2,11 +2,11 @@ use avian2d::prelude::*;
 use bevy::{input::common_conditions::input_toggle_active, prelude::*};
 use bevy_ecs_tiled::prelude::*;
 use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
-
 mod collisions;
 mod debug;
 mod game_objects;
 mod player;
+mod sprites;
 
 fn main() {
     App::new()
@@ -22,13 +22,15 @@ fn main() {
         ))
         .register_type::<game_objects::WallProperties>()
         .register_type::<game_objects::WallType>()
-        .add_systems(Startup, startup)
+        .add_systems(Startup, startup) // Remove sprites::spawn_character_sprite from here
         .add_systems(
             Update,
             (
                 player::move_player,
                 collisions::check_nearest_object,
                 debug::debug_draw_system,
+                sprites::animate_sprite,
+                sprites::update_animation_indices,
             ),
         )
         .run();
@@ -36,21 +38,18 @@ fn main() {
 
 fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn(Camera2d);
-    commands.spawn(Text(String::from(
-        "Move the ball using arrow keys! Press spacebar to check nearest wall properties.",
-    )));
     let map_handle: Handle<TiledMap> = asset_server.load("my_room.tmx");
     commands
         .spawn((TiledMapHandle(map_handle), TilemapAnchor::Center))
-        .observe(|_: Trigger<TiledMapCreated>, mut commands: Commands| {
-            commands.spawn((
-                RigidBody::Dynamic,
-                player::PlayerMarker,
-                Name::new("PlayerControlledObject (Avian2D physics)"),
-                Collider::circle(10.),
-                Transform::from_xyz(0., -50., 0.),
-            ));
-        })
+        .observe(
+            |_: Trigger<TiledMapCreated>,
+             commands: Commands,
+             asset_server: Res<AssetServer>,
+             texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>| {
+                // Call the combined spawn function when the map is created
+                sprites::spawn_character_sprite(commands, asset_server, texture_atlas_layouts);
+            },
+        )
         .observe(
             |trigger: Trigger<TiledColliderCreated>, mut commands: Commands| {
                 commands.entity(trigger.entity).insert((RigidBody::Static,));
