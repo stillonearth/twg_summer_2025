@@ -216,19 +216,23 @@ fn setup_navigation_grid(
 pub fn setup_walkable_tile_handlers(
     mut commands: Commands,
     query: Query<Entity, With<WalkableTile>>,
+    mut sprite_query: Query<&mut Sprite>,
     mut has_run: Local<bool>,
 ) {
     if *has_run {
         return;
     }
-
     for entity in query.iter() {
         commands
             .entity(entity)
             .insert(Pickable::default())
             .observe(handle_tile_click);
-    }
 
+        // Make sprite transparent
+        if let Ok(mut sprite) = sprite_query.get_mut(entity) {
+            sprite.color = Color::NONE; // or Color::rgba(0.0, 0.0, 0.0, 0.0)
+        }
+    }
     if !query.is_empty() {
         *has_run = true;
     }
@@ -242,7 +246,7 @@ fn handle_tile_click(
     navigation_grid: Res<NavigationGrid>,
     tile_size: Res<TileSize>,
 ) {
-    let Ok(player_transform) = player_query.get_single() else {
+    let Ok(player_transform) = player_query.single() else {
         return;
     };
 
@@ -254,7 +258,7 @@ fn handle_tile_click(
     let target_grid_pos = navigation_grid.world_to_grid(tile_transform.translation, tile_size.0);
 
     // Use EventWriter instead of commands.trigger
-    nav_events.send(NavigateToTile {
+    nav_events.write(NavigateToTile {
         from: player_grid_pos,
         to: target_grid_pos,
     });

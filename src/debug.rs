@@ -12,7 +12,7 @@ pub fn debug_draw_system(
     collider_query: Query<(Entity, &GlobalTransform, &Collider), Without<PlayerMarker>>,
     wall_properties_query: Query<&WallProperties>,
 ) {
-    if let Ok(player_transform) = player_query.get_single() {
+    if let Ok(player_transform) = player_query.single() {
         let player_pos = player_transform.translation.truncate();
 
         // Draw interaction range circles

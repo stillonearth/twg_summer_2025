@@ -10,7 +10,7 @@ pub fn check_nearest_object(
     wall_properties_query: Query<&WallProperties>,
 ) {
     if keyboard_input.just_pressed(KeyCode::Space) {
-        if let Ok(player_transform) = player_query.get_single() {
+        if let Ok(player_transform) = player_query.single() {
             let player_pos = player_transform.translation().truncate();
 
             let nearest_by_distance = find_nearest_by_distance_separate_queries(
@@ -54,8 +54,6 @@ pub fn find_nearest_by_distance_separate_queries(
     let max_interaction_distance = 100.0;
     let mut nearest_distance = f32::INFINITY;
     let mut nearest_wall = None;
-
-    println!("find_nearest_by_distance_separate_queries");
 
     for (_entity, child_of, wall_transform, collider) in collider_query.iter() {
         // Check if this entity has wall properties

@@ -12,21 +12,19 @@ const MOVE_SPEED: f32 = 200.;
 #[derive(Default, Clone, Component)]
 pub struct PlayerMarker;
 
-#[derive(Component)]
-#[derive(Default)]
+#[derive(Component, Default)]
 pub struct PlayerMovement {
     pub path: Vec<GridPos>,
     pub current_target_index: usize,
     pub is_moving: bool,
 }
 
-
 pub fn move_player_from_command(
     mut move_events: EventReader<MovePlayerCommand>,
     mut player_query: Query<&mut PlayerMovement, With<PlayerMarker>>,
 ) {
     for event in move_events.read() {
-        if let Ok(mut player_movement) = player_query.get_single_mut() {
+        if let Ok(mut player_movement) = player_query.single_mut() {
             // Skip the first position in the path (current position)
             let path = if event.path.len() > 1 {
                 event.path[1..].to_vec()
@@ -122,7 +120,6 @@ pub fn move_player_along_path(
 pub fn move_player(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     mut player: Query<(&mut LinearVelocity, &mut PlayerMovement), With<PlayerMarker>>,
-    mut animation_query: Query<&mut CharacterAnimation, With<AnimatedCharacterSprite>>,
 ) {
     // Movement logic using arrow keys
     for (mut rb_vel, mut player_movement) in player.iter_mut() {
@@ -158,31 +155,6 @@ pub fn move_player(
         } else if !player_movement.is_moving {
             // Only stop if not pathfinding
             rb_vel.0 = Vec2::ZERO;
-        }
-    }
-
-    // Animation logic using arrow keys (only if not pathfinding)
-    for (_, player_movement) in player.iter() {
-        if player_movement.is_moving {
-            continue; // Skip keyboard animation if pathfinding
-        }
-
-        for mut character_animation in &mut animation_query {
-            if keyboard_input.pressed(KeyCode::ArrowUp) {
-                character_animation.direction = AnimationDirection::Up;
-                character_animation.animation_type = AnimationType::Walk;
-            } else if keyboard_input.pressed(KeyCode::ArrowDown) {
-                character_animation.direction = AnimationDirection::Down;
-                character_animation.animation_type = AnimationType::Walk;
-            } else if keyboard_input.pressed(KeyCode::ArrowLeft) {
-                character_animation.direction = AnimationDirection::Left;
-                character_animation.animation_type = AnimationType::Walk;
-            } else if keyboard_input.pressed(KeyCode::ArrowRight) {
-                character_animation.direction = AnimationDirection::Right;
-                character_animation.animation_type = AnimationType::Walk;
-            } else {
-                character_animation.animation_type = AnimationType::Stand;
-            }
         }
     }
 }
