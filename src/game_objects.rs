@@ -273,19 +273,27 @@ pub fn show_tooltip_on_hover<T: NamedComponent>(
         .fold(Vec3::ZERO, |acc, pos| acc + pos)
         / same_name_components.len() as f32;
 
-    // Spawn tooltip entity at center position (slightly above)
+    // Spawn tooltip as a world space text entity
     commands.spawn((
         GameObjectTooltip {
             target_name: target_component.name().to_string(),
         },
-        Text::new(target_component.name().to_string()),
+        Text2d::new(target_component.name().to_string()),
         TextFont {
             font_size: 20.0,
             ..default()
         },
         TextColor(Color::WHITE),
-        Transform::from_translation(center + Vec3::new(0.0, 30.0, 1000.0)),
-        ZIndex(1000),
+        Transform::from_translation(center + Vec3::new(0.0, 40.0, 10.0)),
+        // Add a background for better visibility
+        Sprite {
+            color: Color::srgba(0.0, 0.0, 0.0, 0.8),
+            custom_size: Some(Vec2::new(
+                target_component.name().len() as f32 * 12.0 + 10.0,
+                25.0,
+            )),
+            ..default()
+        },
     ));
 }
 
