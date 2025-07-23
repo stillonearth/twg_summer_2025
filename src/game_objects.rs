@@ -1,8 +1,23 @@
 use bevy::prelude::*;
 use std::fmt::Debug;
 
+use crate::navigation::{GridPos, NavigateToTile, NavigationGrid, TileSize};
+use crate::player::PlayerMarker;
+
 pub struct GameObjectsPlugin;
 
+// Add this event for object interaction navigation
+#[derive(Event)]
+pub struct NavigateToObjectEvent {
+    pub object_position: Vec2,
+    pub object_name: String,
+}
+
+// Marker component to indicate an object can be clicked for navigation
+#[derive(Component)]
+pub struct ClickNavigable;
+
+// Update your existing GameObjectsPlugin
 impl Plugin for GameObjectsPlugin {
     fn build(&self, app: &mut App) {
         app.register_type::<WallProperties>()
@@ -17,9 +32,12 @@ impl Plugin for GameObjectsPlugin {
             .register_type::<Toilet>()
             .register_type::<Sink>()
             .register_type::<WalkableTile>()
+            // Add the object navigation event
+            .add_event::<NavigateToObjectEvent>()
             .add_systems(
                 Update,
                 (
+                    // Existing hoverable systems
                     setup_bed_hoverable,
                     setup_bath_hoverable,
                     setup_kitchen_hoverable,
@@ -30,6 +48,18 @@ impl Plugin for GameObjectsPlugin {
                     setup_couch_hoverable,
                     setup_water_bottle_hoverable,
                     cleanup_orphaned_tooltips,
+                    // New clickable systems
+                    setup_bed_clickable,
+                    setup_bath_clickable,
+                    setup_kitchen_clickable,
+                    setup_toilet_clickable,
+                    setup_sink_clickable,
+                    setup_mirror_clickable,
+                    setup_computer_desk_clickable,
+                    setup_couch_clickable,
+                    setup_water_bottle_clickable,
+                    // Object navigation handler
+                    handle_object_navigation_events,
                 ),
             );
     }
@@ -403,4 +433,176 @@ pub fn cleanup_orphaned_tooltips(
             }
         }
     }
+}
+
+// Generic function to add click navigation to any NamedComponent
+pub fn setup_object_clickable<T: NamedComponent>(
+    mut commands: Commands,
+    query: Query<Entity, (With<T>, Without<ClickNavigable>)>,
+) {
+    for entity in query.iter() {
+        commands
+            .entity(entity)
+            .insert(ClickNavigable)
+            .observe(navigate_to_object_on_click::<T>);
+    }
+}
+
+// Generic observer function for handling clicks on objects
+pub fn navigate_to_object_on_click<T: NamedComponent>(
+    trigger: Trigger<Pointer<Click>>,
+    mut navigation_events: EventWriter<NavigateToObjectEvent>,
+    target_query: Query<(&T, &Transform)>,
+) {
+    let Ok((target_component, target_transform)) = target_query.get(trigger.target()) else {
+        return;
+    };
+
+    // Send navigation event to move to this object
+    navigation_events.send(NavigateToObjectEvent {
+        object_position: target_transform.translation.truncate(),
+        object_name: target_component.name().to_string(),
+    });
+
+    info!("Clicked on {}, navigating player", target_component.name());
+}
+
+// System to handle object navigation events and find nearest walkable tile
+pub fn handle_object_navigation_events(
+    mut object_nav_events: EventReader<NavigateToObjectEvent>,
+    mut tile_nav_events: EventWriter<NavigateToTile>,
+    player_query: Query<&Transform, With<PlayerMarker>>,
+    walkable_tiles_query: Query<&Transform, (With<WalkableTile>, Without<PlayerMarker>)>,
+    navigation_grid: Res<NavigationGrid>,
+    tile_size: Res<TileSize>,
+) {
+    for event in object_nav_events.read() {
+        let Ok(player_transform) = player_query.get_single() else {
+            continue;
+        };
+
+        let player_grid_pos =
+            navigation_grid.world_to_grid(player_transform.translation, tile_size.0);
+        let object_position = event.object_position;
+
+        // Find the nearest walkable tile to the object
+        let nearest_walkable_grid_pos = find_nearest_walkable_tile(
+            object_position,
+            &walkable_tiles_query,
+            &navigation_grid,
+            &tile_size,
+        );
+
+        if let Some(target_grid_pos) = nearest_walkable_grid_pos {
+            // Send tile navigation event to trigger pathfinding
+            tile_nav_events.send(NavigateToTile {
+                from: player_grid_pos,
+                to: target_grid_pos,
+            });
+
+            info!(
+                "Moving from {:?} to nearest walkable tile {:?} for object: {}",
+                player_grid_pos, target_grid_pos, event.object_name
+            );
+        } else {
+            warn!("No walkable tiles found near object: {}", event.object_name);
+        }
+    }
+}
+
+// Helper function to find the nearest walkable tile to a given position
+fn find_nearest_walkable_tile(
+    target_position: Vec2,
+    walkable_tiles_query: &Query<&Transform, (With<WalkableTile>, Without<PlayerMarker>)>,
+    navigation_grid: &NavigationGrid,
+    tile_size: &TileSize,
+) -> Option<GridPos> {
+    let mut nearest_tile: Option<(GridPos, f32)> = None;
+
+    for tile_transform in walkable_tiles_query.iter() {
+        let tile_position = tile_transform.translation.truncate();
+        let distance = target_position.distance(tile_position);
+        let grid_pos = navigation_grid.world_to_grid(tile_transform.translation, tile_size.0);
+
+        // Make sure the tile is actually walkable in our grid
+        if !navigation_grid.is_walkable(grid_pos) {
+            continue;
+        }
+
+        match nearest_tile {
+            None => {
+                nearest_tile = Some((grid_pos, distance));
+            }
+            Some((_, current_distance)) if distance < current_distance => {
+                nearest_tile = Some((grid_pos, distance));
+            }
+            _ => {}
+        }
+    }
+
+    nearest_tile.map(|(grid_pos, _)| grid_pos)
+}
+
+// Specific setup systems for each object type
+pub fn setup_bed_clickable(
+    commands: Commands,
+    query: Query<Entity, (With<Bed>, Without<ClickNavigable>)>,
+) {
+    setup_object_clickable::<Bed>(commands, query);
+}
+
+pub fn setup_bath_clickable(
+    commands: Commands,
+    query: Query<Entity, (With<Bath>, Without<ClickNavigable>)>,
+) {
+    setup_object_clickable::<Bath>(commands, query);
+}
+
+pub fn setup_kitchen_clickable(
+    commands: Commands,
+    query: Query<Entity, (With<Kitchen>, Without<ClickNavigable>)>,
+) {
+    setup_object_clickable::<Kitchen>(commands, query);
+}
+
+pub fn setup_mirror_clickable(
+    commands: Commands,
+    query: Query<Entity, (With<Mirror>, Without<ClickNavigable>)>,
+) {
+    setup_object_clickable::<Mirror>(commands, query);
+}
+
+pub fn setup_computer_desk_clickable(
+    commands: Commands,
+    query: Query<Entity, (With<ComputerDesk>, Without<ClickNavigable>)>,
+) {
+    setup_object_clickable::<ComputerDesk>(commands, query);
+}
+
+pub fn setup_couch_clickable(
+    commands: Commands,
+    query: Query<Entity, (With<Couch>, Without<ClickNavigable>)>,
+) {
+    setup_object_clickable::<Couch>(commands, query);
+}
+
+pub fn setup_water_bottle_clickable(
+    commands: Commands,
+    query: Query<Entity, (With<WaterBottle>, Without<ClickNavigable>)>,
+) {
+    setup_object_clickable::<WaterBottle>(commands, query);
+}
+
+pub fn setup_toilet_clickable(
+    commands: Commands,
+    query: Query<Entity, (With<Toilet>, Without<ClickNavigable>)>,
+) {
+    setup_object_clickable::<Toilet>(commands, query);
+}
+
+pub fn setup_sink_clickable(
+    commands: Commands,
+    query: Query<Entity, (With<Sink>, Without<ClickNavigable>)>,
+) {
+    setup_object_clickable::<Sink>(commands, query);
 }
