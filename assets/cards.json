@@ -1,0 +1,643 @@
+[
+  {
+    "card_number": 1,
+    "name": "Sleep",
+    "description": "Get a full night's rest",
+    "category": "sleep",
+    "resource_effects": {
+      "sleep": 60.0,
+      "health": 10.0
+    },
+    "time_cost": 8.0,
+    "card_type": "BasicNeed",
+    "availability": "always",
+    "prompt": "A cozy bedroom with unmade bed, soft pillows, dim lighting, peaceful sleep scene, anime pixel art style",
+    "effect": "Restore 60 Sleep and 10 Health. Takes 8 hours.",
+    "flavor_text": "\"In dreams, we find the peace that daylight steals.\""
+  },
+  {
+    "card_number": 2,
+    "name": "Quick Nap",
+    "description": "Short rest to recover energy",
+    "category": "sleep",
+    "resource_effects": {
+      "sleep": 25.0,
+      "mental": 5.0
+    },
+    "time_cost": 2.0,
+    "card_type": "BasicNeed",
+    "availability": "always",
+    "prompt": "Person curled up on couch with blanket, afternoon sunlight through window, brief rest, anime pixel art style",
+    "effect": "Restore 25 Sleep and 5 Mental. Takes 2 hours.",
+    "flavor_text": "Sometimes twenty minutes can save your sanity."
+  },
+  {
+    "card_number": 3,
+    "name": "Rest in Bed",
+    "description": "Lie down without sleeping",
+    "category": "sleep",
+    "resource_effects": {
+      "sleep": 10.0,
+      "mental": -5.0
+    },
+    "time_cost": 1.0,
+    "card_type": "BasicNeed",
+    "availability": "object:bed",
+    "prompt": "Person lying in bed staring at ceiling, restless, unable to sleep, melancholic mood, anime pixel art style",
+    "effect": "Restore 10 Sleep but lose 5 Mental. Takes 1 hour. Requires Bed.",
+    "flavor_text": "The mind races while the body lies still."
+  },
+  {
+    "card_number": 4,
+    "name": "Cook Meal",
+    "description": "Prepare proper food",
+    "category": "food",
+    "resource_effects": {
+      "food": 50.0,
+      "health": 15.0,
+      "mental": 10.0
+    },
+    "time_cost": 1.5,
+    "card_type": "BasicNeed",
+    "availability": "object:kitchen",
+    "prompt": "Small kitchen with steam rising from cooking pot, fresh ingredients, warm homemade meal, anime pixel art style",
+    "effect": "Restore 50 Food, 15 Health, and 10 Mental. Takes 1.5 hours. Requires Kitchen.",
+    "flavor_text": "\"The smell of garlic and onions is the first step back to humanity.\""
+  },
+  {
+    "card_number": 5,
+    "name": "Grab Snacks",
+    "description": "Quick junk food",
+    "category": "food",
+    "resource_effects": {
+      "food": 20.0,
+      "health": -5.0
+    },
+    "time_cost": 0.25,
+    "card_type": "BasicNeed",
+    "availability": "object:fridge",
+    "prompt": "Bag of chips and instant noodles, unhealthy snacks scattered on table, quick convenience food, anime pixel art style",
+    "effect": "Restore 20 Food but lose 5 Health. Takes 15 minutes. Requires Fridge.",
+    "flavor_text": "Empty calories for an empty soul."
+  },
+  {
+    "card_number": 6,
+    "name": "Order Delivery",
+    "description": "Get food delivered",
+    "category": "food",
+    "resource_effects": {
+      "food": 40.0,
+      "mental": -10.0
+    },
+    "time_cost": 0.5,
+    "card_type": "BasicNeed",
+    "availability": "object:phone",
+    "prompt": "Phone with food delivery app, takeout containers, guilt about ordering again, anime pixel art style",
+    "effect": "Restore 40 Food but lose 10 Mental. Takes 30 minutes. Requires Phone.",
+    "flavor_text": "\"Hello, yes, the usual please... again.\""
+  },
+  {
+    "card_number": 7,
+    "name": "Drink Water",
+    "description": "Stay hydrated",
+    "category": "food",
+    "resource_effects": {
+      "health": 5.0
+    },
+    "time_cost": 0.1,
+    "card_type": "BasicNeed",
+    "availability": "always",
+    "prompt": "Glass of clear water, simple hydration, basic self-care, clean and refreshing, anime pixel art style",
+    "effect": "Restore 5 Health. Instant.",
+    "flavor_text": "The simplest acts of self-care are often the hardest."
+  },
+  {
+    "card_number": 8,
+    "name": "Take Shower",
+    "description": "Clean yourself properly",
+    "category": "hygiene",
+    "resource_effects": {
+      "health": 20.0,
+      "mental": 15.0
+    },
+    "time_cost": 0.75,
+    "card_type": "BasicNeed",
+    "availability": "object:bathroom",
+    "prompt": "Steamy bathroom, hot shower running, feeling refreshed and clean, self-care moment, anime pixel art style",
+    "effect": "Restore 20 Health and 15 Mental. Takes 45 minutes. Requires Bathroom.",
+    "flavor_text": "Hot water washes away more than just dirt."
+  },
+  {
+    "card_number": 9,
+    "name": "Basic Hygiene",
+    "description": "Brush teeth, wash face",
+    "category": "hygiene",
+    "resource_effects": {
+      "health": 10.0,
+      "mental": 5.0
+    },
+    "time_cost": 0.25,
+    "card_type": "BasicNeed",
+    "availability": "object:bathroom",
+    "prompt": "Bathroom sink with toothbrush and soap, basic morning routine, minimal self-care, anime pixel art style",
+    "effect": "Restore 10 Health and 5 Mental. Takes 15 minutes. Requires Bathroom.",
+    "flavor_text": "Small steps toward feeling human again."
+  },
+  {
+    "card_number": 10,
+    "name": "Skip Hygiene",
+    "description": "Can't be bothered today",
+    "category": "hygiene",
+    "resource_effects": {
+      "health": -5.0,
+      "mental": -10.0
+    },
+    "time_cost": 0.0,
+    "card_type": "BasicNeed",
+    "availability": "always",
+    "prompt": "Unkempt person avoiding mirror, messy hair, neglecting self-care, depression mood, anime pixel art style",
+    "effect": "Lose 5 Health and 10 Mental. Instant.",
+    "flavor_text": "The mirror judges, so I look away."
+  },
+  {
+    "card_number": 11,
+    "name": "Watch Shows",
+    "description": "Normal TV viewing",
+    "category": "tv",
+    "resource_effects": {
+      "mental": 10.0,
+      "sleep": -5.0
+    },
+    "time_cost": 2.0,
+    "card_type": "Entertainment",
+    "availability": "object:tv",
+    "prompt": "Person on couch watching TV, colorful screen glow, entertainment escape, relaxed viewing, anime pixel art style",
+    "effect": "Restore 10 Mental but lose 5 Sleep. Takes 2 hours. Requires TV.",
+    "flavor_text": "Other people's stories help me forget my own."
+  },
+  {
+    "card_number": 12,
+    "name": "Binge Series",
+    "description": "Marathon viewing session",
+    "category": "tv",
+    "resource_effects": {
+      "mental": 15.0,
+      "health": -10.0,
+      "sleep": -15.0
+    },
+    "time_cost": 6.0,
+    "card_type": "Entertainment",
+    "availability": "object:tv",
+    "prompt": "Person surrounded by snack wrappers, multiple episodes playing, obsessive binge watching, anime pixel art style",
+    "effect": "Restore 15 Mental but lose 10 Health and 15 Sleep. Takes 6 hours. Requires TV.",
+    "flavor_text": "\"Just one more episode...\" she said, twelve hours ago."
+  },
+  {
+    "card_number": 13,
+    "name": "Channel Surf",
+    "description": "Mindlessly flip channels",
+    "category": "tv",
+    "resource_effects": {
+      "mental": -5.0
+    },
+    "time_cost": 1.0,
+    "card_type": "Entertainment",
+    "availability": "object:tv",
+    "prompt": "Remote control clicking rapidly, static TV screens, mindless channel surfing, boredom, anime pixel art style",
+    "effect": "Lose 5 Mental. Takes 1 hour. Requires TV.",
+    "flavor_text": "Click. Nothing. Click. Nothing. Click. Still nothing."
+  },
+  {
+    "card_number": 14,
+    "name": "Watch News",
+    "description": "Stay informed about the world",
+    "category": "tv",
+    "resource_effects": {
+      "mental": -15.0
+    },
+    "time_cost": 1.0,
+    "card_type": "Entertainment",
+    "availability": "object:tv",
+    "prompt": "Depressing news broadcast on TV, worried person watching, negative world events, anxiety inducing, anime pixel art style",
+    "effect": "Lose 15 Mental. Takes 1 hour. Requires TV.",
+    "flavor_text": "\"Breaking News: Everything is terrible, and here's why.\""
+  },
+  {
+    "card_number": 15,
+    "name": "Play Games",
+    "description": "Enjoy some gaming",
+    "category": "gaming",
+    "resource_effects": {
+      "mental": 20.0,
+      "sleep": -10.0
+    },
+    "time_cost": 3.0,
+    "card_type": "Entertainment",
+    "availability": "object:gameconsole",
+    "prompt": "Gaming controller in hands, exciting video game on screen, immersive gameplay, focused gaming, anime pixel art style",
+    "effect": "Restore 20 Mental but lose 10 Sleep. Takes 3 hours. Requires Game Console.",
+    "flavor_text": "In digital worlds, I can be the hero."
+  },
+  {
+    "card_number": 16,
+    "name": "Gaming Marathon",
+    "description": "All-day gaming session",
+    "category": "gaming",
+    "resource_effects": {
+      "mental": 25.0,
+      "health": -20.0,
+      "sleep": -25.0,
+      "food": -15.0
+    },
+    "time_cost": 12.0,
+    "card_type": "Entertainment",
+    "availability": "object:gameconsole",
+    "prompt": "Person gaming through night, multiple controllers, energy drinks, obsessive all-day gaming session, anime pixel art style",
+    "effect": "Restore 25 Mental but lose 20 Health, 25 Sleep, and 15 Food. Takes 12 hours. Requires Game Console.",
+    "flavor_text": "Day and night blur together in the blue glow."
+  },
+  {
+    "card_number": 17,
+    "name": "Retro Games",
+    "description": "Play old favorites",
+    "category": "gaming",
+    "resource_effects": {
+      "mental": 15.0
+    },
+    "time_cost": 2.0,
+    "card_type": "Entertainment",
+    "availability": "object:gameconsole",
+    "prompt": "Old gaming console, retro pixel games on screen, nostalgic gaming session, classic controllers, anime pixel art style",
+    "effect": "Restore 15 Mental. Takes 2 hours. Requires Game Console.",
+    "flavor_text": "Simpler times, simpler games, simpler me."
+  },
+  {
+    "card_number": 18,
+    "name": "Rage Quit",
+    "description": "Game is too frustrating",
+    "category": "gaming",
+    "resource_effects": {
+      "mental": -20.0
+    },
+    "time_cost": 0.5,
+    "card_type": "Entertainment",
+    "availability": "object:gameconsole",
+    "prompt": "Angry person throwing controller, game over screen, frustration and rage, gaming failure, anime pixel art style",
+    "effect": "Lose 20 Mental. Takes 30 minutes. Requires Game Console.",
+    "flavor_text": "\"This game is stupid!\" *throws controller across room*"
+  },
+  {
+    "card_number": 19,
+    "name": "Browse Internet",
+    "description": "General computer use",
+    "category": "computer",
+    "resource_effects": {
+      "mental": 5.0
+    },
+    "time_cost": 2.0,
+    "card_type": "Entertainment",
+    "availability": "object:computer",
+    "prompt": "Person at computer desk, multiple browser tabs open, casual internet browsing, blue screen glow, anime pixel art style",
+    "effect": "Restore 5 Mental. Takes 2 hours. Requires Computer.",
+    "flavor_text": "Seventeen tabs open, zero productivity achieved."
+  },
+  {
+    "card_number": 20,
+    "name": "Social Media",
+    "description": "Check social platforms",
+    "category": "computer",
+    "resource_effects": {
+      "mental": -15.0
+    },
+    "time_cost": 1.5,
+    "card_type": "Entertainment",
+    "availability": "object:computer",
+    "prompt": "Social media feeds on screen, comparing to others' posts, FOMO and jealousy, depressing social comparison, anime pixel art style",
+    "effect": "Lose 15 Mental. Takes 1.5 hours. Requires Computer.",
+    "flavor_text": "Everyone else's highlight reel vs. my behind-the-scenes."
+  },
+  {
+    "card_number": 21,
+    "name": "Online Shopping",
+    "description": "Browse and buy things",
+    "category": "computer",
+    "resource_effects": {
+      "mental": 10.0
+    },
+    "time_cost": 2.0,
+    "card_type": "Entertainment",
+    "availability": "object:computer",
+    "prompt": "Shopping website on computer, cart full of items, retail therapy, temporary happiness from buying, anime pixel art style",
+    "effect": "Restore 10 Mental. Takes 2 hours. Requires Computer.",
+    "flavor_text": "Maybe this purchase will fill the void."
+  },
+  {
+    "card_number": 22,
+    "name": "Watch Videos",
+    "description": "Entertainment videos online",
+    "category": "computer",
+    "resource_effects": {
+      "mental": 8.0,
+      "sleep": -5.0
+    },
+    "time_cost": 3.0,
+    "card_type": "Entertainment",
+    "availability": "object:computer",
+    "prompt": "Video streaming on computer, endless video recommendations, entertainment rabbit hole, anime pixel art style",
+    "effect": "Restore 8 Mental but lose 5 Sleep. Takes 3 hours. Requires Computer.",
+    "flavor_text": "The algorithm knows me better than I know myself."
+  },
+  {
+    "card_number": 23,
+    "name": "Download Everything",
+    "description": "Collect digital media obsessively",
+    "category": "computer",
+    "resource_effects": {
+      "mental": -5.0
+    },
+    "time_cost": 4.0,
+    "card_type": "Entertainment",
+    "availability": "object:computer",
+    "prompt": "Computer with countless downloaded files, digital hoarding, obsessive collecting behavior, cluttered desktop, anime pixel art style",
+    "effect": "Lose 5 Mental. Takes 4 hours. Requires Computer.",
+    "flavor_text": "I'll watch this someday. I swear I'll watch this someday."
+  },
+  {
+    "card_number": 24,
+    "name": "Ignore Calls",
+    "description": "Let it ring",
+    "category": "social",
+    "resource_effects": {
+      "mental": -10.0
+    },
+    "time_cost": 0.0,
+    "card_type": "Social",
+    "availability": "event:phone_ring",
+    "prompt": "Ringing phone being ignored, person covering ears, avoiding social contact, isolation, anime pixel art style",
+    "effect": "Lose 10 Mental. Instant. Triggered by Phone Ring event.",
+    "flavor_text": "If I don't answer, the problem doesn't exist."
+  },
+  {
+    "card_number": 25,
+    "name": "Check Messages",
+    "description": "Read texts and notifications",
+    "category": "social",
+    "resource_effects": {
+      "mental": -5.0
+    },
+    "time_cost": 0.5,
+    "card_type": "Social",
+    "availability": "object:phone",
+    "prompt": "Phone screen with unread messages, anxiety about responding, social pressure notifications, anime pixel art style",
+    "effect": "Lose 5 Mental. Takes 30 minutes. Requires Phone.",
+    "flavor_text": "Twelve unread messages. Twelve points of anxiety."
+  },
+  {
+    "card_number": 26,
+    "name": "Answer Call",
+    "description": "Actually talk to someone",
+    "category": "social",
+    "resource_effects": {
+      "mental": 15.0,
+      "sleep": -10.0
+    },
+    "time_cost": 1.0,
+    "card_type": "Social",
+    "availability": "event:phone_ring",
+    "prompt": "Person nervously answering phone, social interaction, breaking isolation, emotionally draining conversation, anime pixel art style",
+    "effect": "Restore 15 Mental but lose 10 Sleep. Takes 1 hour. Triggered by Phone Ring event.",
+    "flavor_text": "\"Hello? Yes, I'm still alive. Barely.\""
+  },
+  {
+    "card_number": 27,
+    "name": "Send Message",
+    "description": "Reply to someone",
+    "category": "social",
+    "resource_effects": {
+      "mental": 5.0
+    },
+    "time_cost": 0.25,
+    "card_type": "Social",
+    "availability": "object:phone",
+    "prompt": "Typing message on phone, careful word choice, small social connection, hesitant communication, anime pixel art style",
+    "effect": "Restore 5 Mental. Takes 15 minutes. Requires Phone.",
+    "flavor_text": "Type. Delete. Type again. Delete. Send 'ok'."
+  },
+  {
+    "card_number": 28,
+    "name": "Ignore Door",
+    "description": "Pretend you're not home",
+    "category": "social",
+    "resource_effects": {
+      "mental": -15.0
+    },
+    "time_cost": 0.0,
+    "card_type": "Social",
+    "availability": "event:door_knock",
+    "prompt": "Person hiding from door knock, visitor silhouette outside, avoiding human contact, fear of interaction, anime pixel art style",
+    "effect": "Lose 15 Mental. Instant. Triggered by Door Knock event.",
+    "flavor_text": "Shhh. Maybe they'll think no one's home."
+  },
+  {
+    "card_number": 29,
+    "name": "Peek Outside",
+    "description": "Look through curtains",
+    "category": "social",
+    "resource_effects": {
+      "mental": -5.0
+    },
+    "time_cost": 0.1,
+    "card_type": "Social",
+    "availability": "object:window",
+    "prompt": "Person carefully peeking through curtains, outside world visible, curiosity mixed with fear, anime pixel art style",
+    "effect": "Lose 5 Mental. Instant. Requires Window.",
+    "flavor_text": "The world continues without me."
+  },
+  {
+    "card_number": 30,
+    "name": "Hide",
+    "description": "Stay completely silent",
+    "category": "social",
+    "resource_effects": {
+      "mental": -20.0
+    },
+    "time_cost": 0.5,
+    "card_type": "Social",
+    "availability": "event:door_knock",
+    "prompt": "Person crouched in corner hiding, visitor outside door, extreme social avoidance, paralyzing fear, anime pixel art style",
+    "effect": "Lose 20 Mental. Takes 30 minutes. Triggered by Door Knock event.",
+    "flavor_text": "Breathe quietly. Count to one hundred. They'll leave."
+  },
+  {
+    "card_number": 31,
+    "name": "Crash Sleep",
+    "description": "Collapse from exhaustion",
+    "category": "crisis",
+    "resource_effects": {
+      "sleep": 80.0,
+      "health": -10.0
+    },
+    "time_cost": 12.0,
+    "card_type": "Crisis",
+    "availability": "crisis:sleep_low",
+    "prompt": "Person collapsed from exhaustion, falling asleep anywhere, extreme fatigue, uncontrolled sleep, anime pixel art style",
+    "effect": "Restore 80 Sleep but lose 10 Health. Takes 12 hours. Available when Sleep is critically low.",
+    "flavor_text": "The body takes what the mind refused to give."
+  },
+  {
+    "card_number": 32,
+    "name": "Panic Eating",
+    "description": "Stress-induced binge eating",
+    "category": "crisis",
+    "resource_effects": {
+      "food": 60.0,
+      "health": -15.0,
+      "mental": -10.0
+    },
+    "time_cost": 1.0,
+    "card_type": "Crisis",
+    "availability": "crisis:food_low",
+    "prompt": "Person stress eating, surrounded by empty food containers, compulsive eating behavior, emotional eating crisis, anime pixel art style",
+    "effect": "Restore 60 Food but lose 15 Health and 10 Mental. Takes 1 hour. Available when Food is critically low.",
+    "flavor_text": "If I can't fill the emptiness inside, I'll fill my stomach."
+  },
+  {
+    "card_number": 33,
+    "name": "Hide Under Blanket",
+    "description": "Retreat from everything",
+    "category": "crisis",
+    "resource_effects": {
+      "mental": -5.0,
+      "sleep": 10.0
+    },
+    "time_cost": 3.0,
+    "card_type": "Crisis",
+    "availability": "crisis:mental_low",
+    "prompt": "Person completely covered by blanket, hiding from world, total withdrawal, makeshift safety cocoon, anime pixel art style",
+    "effect": "Lose 5 Mental but restore 10 Sleep. Takes 3 hours. Available when Mental is low.",
+    "flavor_text": "Under here, the world can't hurt me."
+  },
+  {
+    "card_number": 34,
+    "name": "Call for Help",
+    "description": "Reach out in desperation",
+    "category": "crisis",
+    "resource_effects": {
+      "mental": 30.0,
+      "health": 10.0
+    },
+    "time_cost": 2.0,
+    "card_type": "Crisis",
+    "availability": "crisis:any_critical",
+    "prompt": "Person desperately reaching for phone, calling for help, breakthrough moment, seeking support, anime pixel art style",
+    "effect": "Restore 30 Mental and 10 Health. Takes 2 hours. Available during any critical crisis.",
+    "flavor_text": "\"Help. Please. I can't do this alone anymore.\""
+  },
+  {
+    "card_number": 35,
+    "name": "Mental Breakdown",
+    "description": "Everything becomes too much",
+    "category": "crisis",
+    "resource_effects": {
+      "mental": -50.0,
+      "health": -20.0
+    },
+    "time_cost": 4.0,
+    "card_type": "Crisis",
+    "availability": "crisis:mental_critical",
+    "prompt": "Person having mental breakdown, overwhelming emotions, complete emotional collapse, crisis moment, anime pixel art style",
+    "effect": "Lose 50 Mental and 20 Health. Takes 4 hours. Available when Mental is critically low.",
+    "flavor_text": "The dam breaks. Everything floods out at once."
+  },
+  {
+    "card_number": 36,
+    "name": "Morning Anxiety",
+    "description": "Dread the day ahead",
+    "category": "time_specific",
+    "resource_effects": {
+      "mental": -20.0
+    },
+    "time_cost": 1.0,
+    "card_type": "TimeSpecific",
+    "availability": "time:6-9",
+    "prompt": "Person waking up anxious, morning sunlight through window, dreading the day ahead, morning anxiety, anime pixel art style",
+    "effect": "Lose 20 Mental. Takes 1 hour. Available between 6-9 AM.",
+    "flavor_text": "Another day. Another chance to fail."
+  },
+  {
+    "card_number": 37,
+    "name": "3AM Thoughts",
+    "description": "Existential dread hits",
+    "category": "time_specific",
+    "resource_effects": {
+      "mental": -25.0,
+      "sleep": -20.0
+    },
+    "time_cost": 2.0,
+    "card_type": "TimeSpecific",
+    "availability": "time:2-5",
+    "prompt": "Person awake at 3AM, dark room, existential thoughts, late night mental spiral, insomnia and dread, anime pixel art style",
+    "effect": "Lose 25 Mental and 20 Sleep. Takes 2 hours. Available between 2-5 AM.",
+    "flavor_text": "3 AM: When the universe whispers all its cruelest truths."
+  },
+  {
+    "card_number": 38,
+    "name": "Sunday Scaries",
+    "description": "Dread the upcoming week",
+    "category": "time_specific",
+    "resource_effects": {
+      "mental": -15.0
+    },
+    "time_cost": 1.0,
+    "card_type": "TimeSpecific",
+    "availability": "time:sunday_evening",
+    "prompt": "Sunday evening anxiety, calendar showing Monday, weekend ending dread, anticipating work week, anime pixel art style",
+    "effect": "Lose 15 Mental. Takes 1 hour. Available Sunday evenings.",
+    "flavor_text": "Sunday evening: The weekend's funeral service."
+  },
+  {
+    "card_number": 39,
+    "name": "They're Watching",
+    "description": "Everyone is monitoring you",
+    "category": "delusion",
+    "resource_effects": {
+      "mental": -30.0
+    },
+    "time_cost": 1.0,
+    "card_type": "Delusion",
+    "availability": "llm_generated",
+    "prompt": "Person looking paranoid, security cameras everywhere, feeling watched, paranoid delusion, surveillance anxiety, anime pixel art style",
+    "effect": "Lose 30 Mental. Takes 1 hour. Randomly generated event.",
+    "flavor_text": "The cameras blink in morse code. They know I know."
+  },
+  {
+    "card_number": 40,
+    "name": "Secret Genius",
+    "description": "You're meant for greatness",
+    "category": "delusion",
+    "resource_effects": {
+      "mental": 20.0
+    },
+    "time_cost": 2.0,
+    "card_type": "Delusion",
+    "availability": "llm_generated",
+    "prompt": "Person imagining themselves as genius, grandiose fantasy, delusions of grandeur, superiority complex, anime pixel art style",
+    "effect": "Restore 20 Mental. Takes 2 hours. Randomly generated event.",
+    "flavor_text": "They'll understand my brilliance... eventually."
+  },
+  {
+    "card_number": 41,
+    "name": "Different Life",
+    "description": "Imagine being someone else",
+    "category": "delusion",
+    "resource_effects": {
+      "mental": 10.0
+    },
+    "time_cost": 1.5,
+    "card_type": "Delusion",
+    "availability": "llm_generated",
+    "prompt": "Person daydreaming about different life, fantasy world overlay, escapist imagination, alternate reality, anime pixel art style",
+    "effect": "Restore 10 Mental. Takes 1.5 hours. Randomly generated event.",
+    "flavor_text": "In another life, I'm happy. In another life, I matter."
+  }
+]

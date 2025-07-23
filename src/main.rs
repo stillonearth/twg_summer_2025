@@ -1,10 +1,12 @@
 use avian2d::prelude::*;
 use bevy::{input::common_conditions::input_toggle_active, prelude::*, render::view::RenderLayers};
+use bevy_common_assets::json::JsonAssetPlugin;
 use bevy_ecs_tiled::prelude::*;
 use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
 
-use crate::sprites::LAYER_SPRITES;
+use crate::{cards::ActivityCards, sprites::LAYER_SPRITES};
 
+mod cards;
 mod collisions;
 mod debug;
 mod game_objects;
@@ -28,6 +30,7 @@ fn main() {
             WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
         ))
         .add_plugins(navigation::NavigationGridPlugin {})
+        .add_plugins(JsonAssetPlugin::<cards::ActivityCards>::new(&["json"]))
         .add_systems(Startup, (startup,))
         .add_systems(
             Update,
@@ -45,6 +48,9 @@ fn main() {
         )
         .run();
 }
+
+#[derive(Resource, Deref, DerefMut)]
+struct ActivityCardsHandle(Handle<ActivityCards>);
 
 fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((Camera2d, IsDefaultUiCamera));
@@ -75,4 +81,7 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
                 commands.entity(trigger.entity).insert((RigidBody::Static,));
             },
         );
+
+    let activity_cards_handle = ActivityCardsHandle(asset_server.load("cards.json"));
+    commands.insert_resource(activity_cards_handle);
 }
