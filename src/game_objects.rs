@@ -232,7 +232,7 @@ pub fn navigate_to_object_on_click<T: NamedComponent>(
         return;
     };
 
-    navigation_events.send(NavigateToObjectEvent {
+    navigation_events.write(NavigateToObjectEvent {
         object_position: target_transform.translation.truncate(),
         object_name: target_component.name().to_string(),
     });
@@ -251,28 +251,35 @@ pub fn show_tooltip_on_hover<T: NamedComponent>(
     for entity in existing_tooltips.iter() {
         commands.entity(entity).despawn();
     }
-
     let Ok(target_component) = target_query.get(trigger.target()) else {
         return;
     };
-
-    // Find all components with the same name and calculate center position
+    // Find all components with the same name
     let same_name_components: Vec<_> = component_query
         .iter()
         .filter(|(_, component, _)| component.name() == target_component.name())
         .collect();
-
     if same_name_components.is_empty() {
         return;
     }
-
-    // Calculate center position of all components with same name
-    let center = same_name_components
+    // Find the highest Y position (maximum Y value)
+    let highest_y = same_name_components
         .iter()
-        .map(|(_, _, transform)| transform.translation)
-        .fold(Vec3::ZERO, |acc, pos| acc + pos)
-        / same_name_components.len() as f32;
-
+        .map(|(_, _, transform)| transform.translation.y)
+        .max_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal))
+        .unwrap_or(0.0);
+    // Find the leftmost X position (minimum X value)
+    let leftmost_x = same_name_components
+        .iter()
+        .map(|(_, _, transform)| transform.translation.x)
+        .min_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal))
+        .unwrap_or(0.0);
+    // Position tooltip at the left edge above the highest row
+    let tooltip_position = Vec3::new(
+        leftmost_x + 64.0 - 16.0, // Left X of all components
+        highest_y + 32.0,         // Above the highest component
+        100.0,                    // Z position for visibility
+    );
     // Spawn tooltip as a world space text entity
     commands.spawn((
         GameObjectTooltip {
@@ -280,20 +287,21 @@ pub fn show_tooltip_on_hover<T: NamedComponent>(
         },
         Text2d::new(target_component.name().to_string()),
         TextFont {
-            font_size: 20.0,
+            font_size: 15.0,
             ..default()
         },
-        TextColor(Color::WHITE),
-        Transform::from_translation(center + Vec3::new(0.0, 40.0, 10.0)),
+        TextColor(Color::BLACK),
+        Transform::from_translation(tooltip_position),
         // Add a background for better visibility
         Sprite {
-            color: Color::srgba(0.0, 0.0, 0.0, 0.8),
+            color: Color::srgba(1.0, 1.0, 1.0, 0.8), // Fixed alpha value (was 1.8 which is invalid)
             custom_size: Some(Vec2::new(
                 target_component.name().len() as f32 * 12.0 + 10.0,
                 25.0,
             )),
             ..default()
         },
+        ZIndex(5),
     ));
 }
 
@@ -319,7 +327,7 @@ pub fn handle_object_navigation_events(
     tile_size: Res<TileSize>,
 ) {
     for event in object_nav_events.read() {
-        let Ok(player_transform) = player_query.get_single() else {
+        let Ok(player_transform) = player_query.single() else {
             continue;
         };
 
@@ -333,7 +341,7 @@ pub fn handle_object_navigation_events(
             &navigation_grid,
             &tile_size,
         ) {
-            tile_nav_events.send(NavigateToTile {
+            tile_nav_events.write(NavigateToTile {
                 from: player_grid_pos,
                 to: target_grid_pos,
             });

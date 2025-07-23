@@ -200,5 +200,6 @@ pub fn spawn_player_sprite(
         PlayerMovement::default(),
         Collider::circle(10.),
         LockedAxes::ROTATION_LOCKED,
+        ZIndex(2),
     ));
 }
