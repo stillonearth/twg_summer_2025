@@ -1,6 +1,41 @@
 use bevy::{prelude::*, text::FontStyle};
 use std::fmt::Debug;
 
+pub struct GameObjectsPlugin;
+
+impl Plugin for GameObjectsPlugin {
+    fn build(&self, app: &mut App) {
+        app
+            // Register all the component types for reflection
+            .register_type::<WallProperties>()
+            .register_type::<WallType>()
+            .register_type::<Bed>()
+            .register_type::<Bath>()
+            .register_type::<Kitchen>()
+            .register_type::<Mirror>()
+            .register_type::<ComputerDesk>()
+            .register_type::<Couch>()
+            .register_type::<WaterBottle>()
+            .register_type::<Toilet>()
+            .register_type::<Sink>()
+            // Add all the hoverable setup systems
+            .add_systems(
+                Update,
+                (
+                    setup_bed_hoverable,
+                    setup_bath_hoverable,
+                    setup_kitchen_hoverable,
+                    setup_toilet_hoverable,
+                    setup_sink_hoverable,
+                    setup_mirror_hoverable,
+                    setup_computer_desk_hoverable,
+                    setup_couch_hoverable,
+                    setup_water_bottle_hoverable,
+                ),
+            );
+    }
+}
+
 #[derive(Default, Reflect, Clone)]
 #[reflect(Default)]
 pub enum WallType {
@@ -23,10 +58,21 @@ pub struct WallProperties {
     pub wall_type: WallType,
 }
 
+// Trait for components that have a name field and can be made hoverable
+pub trait NamedComponent: Component + Clone {
+    fn name(&self) -> &str;
+}
+
 #[derive(Component, Reflect, Default, Clone)]
 #[reflect(Component, Default)]
 pub struct Bed {
     pub name: String,
+}
+
+impl NamedComponent for Bed {
+    fn name(&self) -> &str {
+        &self.name
+    }
 }
 
 #[derive(Component, Reflect, Default, Clone)]
@@ -35,10 +81,22 @@ pub struct Bath {
     pub name: String,
 }
 
+impl NamedComponent for Bath {
+    fn name(&self) -> &str {
+        &self.name
+    }
+}
+
 #[derive(Component, Reflect, Default, Clone)]
 #[reflect(Component, Default)]
 pub struct Kitchen {
     pub name: String,
+}
+
+impl NamedComponent for Kitchen {
+    fn name(&self) -> &str {
+        &self.name
+    }
 }
 
 #[derive(Component, Reflect, Default, Clone)]
@@ -47,10 +105,22 @@ pub struct Mirror {
     pub name: String,
 }
 
+impl NamedComponent for Mirror {
+    fn name(&self) -> &str {
+        &self.name
+    }
+}
+
 #[derive(Component, Reflect, Default, Clone)]
 #[reflect(Component, Default)]
 pub struct ComputerDesk {
     pub name: String,
+}
+
+impl NamedComponent for ComputerDesk {
+    fn name(&self) -> &str {
+        &self.name
+    }
 }
 
 #[derive(Component, Reflect, Default, Clone)]
@@ -59,10 +129,22 @@ pub struct Couch {
     pub name: String,
 }
 
+impl NamedComponent for Couch {
+    fn name(&self) -> &str {
+        &self.name
+    }
+}
+
 #[derive(Component, Reflect, Default, Clone)]
 #[reflect(Component, Default)]
 pub struct WaterBottle {
     pub name: String,
+}
+
+impl NamedComponent for WaterBottle {
+    fn name(&self) -> &str {
+        &self.name
+    }
 }
 
 #[derive(Component, Reflect, Default, Clone)]
@@ -71,433 +153,141 @@ pub struct Toilet {
     pub name: String,
 }
 
+impl NamedComponent for Toilet {
+    fn name(&self) -> &str {
+        &self.name
+    }
+}
+
 #[derive(Component, Reflect, Default, Clone)]
 #[reflect(Component, Default)]
 pub struct Sink {
     pub name: String,
 }
 
-pub fn setup_bed_hoverable(
+impl NamedComponent for Sink {
+    fn name(&self) -> &str {
+        &self.name
+    }
+}
+
+// Generic hoverable setup system
+pub fn setup_hoverable<T: NamedComponent>(
     mut commands: Commands,
-    bed_query: Query<Entity, With<Bed>>,
+    query: Query<Entity, With<T>>,
     mut has_run: Local<bool>,
 ) {
     if *has_run {
         return;
     }
 
-    for entity in bed_query.iter() {
+    for entity in query.iter() {
         commands
             .entity(entity)
-            .insert(Pickable::default())
-            .observe(recolor_same_bed_on::<Pointer<Over>>(Color::srgb(
+            .insert((Pickable::default(), ZIndex(100)))
+            .observe(recolor_same_component_on::<T, Pointer<Over>>(Color::srgb(
                 0.0, 1.0, 1.0,
             )))
-            .observe(recolor_same_bed_on::<Pointer<Out>>(Color::srgba(
+            .observe(recolor_same_component_on::<T, Pointer<Out>>(Color::srgba(
                 1.0, 1.0, 1.0, 1.0,
             )));
     }
 
-    let count = bed_query.iter().count();
+    let count = query.iter().count();
 
     if count != 0 {
         *has_run = true;
     }
+}
+
+// Generic recolor function
+pub fn recolor_same_component_on<T: NamedComponent, E: Debug + Clone + Reflect>(
+    color: Color,
+) -> impl Fn(Trigger<E>, Query<&T>, Query<(Entity, &T)>, Query<&mut Sprite>) {
+    move |ev, target_query, component_query, mut sprites| {
+        let Ok(target_component) = target_query.get(ev.target()) else {
+            return;
+        };
+
+        for (entity, component) in component_query.iter() {
+            if component.name() == target_component.name() {
+                if let Ok(mut sprite) = sprites.get_mut(entity) {
+                    sprite.color = color;
+                }
+            }
+        }
+    }
+}
+
+// Specific system functions
+pub fn setup_bed_hoverable(
+    commands: Commands,
+    query: Query<Entity, With<Bed>>,
+    has_run: Local<bool>,
+) {
+    setup_hoverable::<Bed>(commands, query, has_run);
 }
 
 pub fn setup_bath_hoverable(
-    mut commands: Commands,
-    bath_query: Query<Entity, With<Bath>>,
-    mut has_run: Local<bool>,
+    commands: Commands,
+    query: Query<Entity, With<Bath>>,
+    has_run: Local<bool>,
 ) {
-    if *has_run {
-        return;
-    }
-
-    for entity in bath_query.iter() {
-        commands
-            .entity(entity)
-            .insert((Pickable::default(), ZIndex(100)))
-            .observe(recolor_same_bath_on::<Pointer<Over>>(Color::srgb(
-                0.0, 1.0, 1.0,
-            )))
-            .observe(recolor_same_bath_on::<Pointer<Out>>(Color::srgba(
-                1.0, 1.0, 1.0, 1.0,
-            )));
-    }
-
-    let count = bath_query.iter().count();
-
-    if count != 0 {
-        *has_run = true;
-    }
+    setup_hoverable::<Bath>(commands, query, has_run);
 }
 
-pub fn recolor_same_bath_on<E: Debug + Clone + Reflect>(
-    color: Color,
-) -> impl Fn(Trigger<E>, Query<&Bath>, Query<(Entity, &Bath)>, Query<&mut Sprite>) {
-    move |ev, target_bath_query, bath_query, mut sprites| {
-        // Get the name of the target bath
-        let Ok(target_bath) = target_bath_query.get(ev.target()) else {
-            return;
-        };
-
-        // Find and recolor all baths with the same name
-        for (entity, bath) in bath_query.iter() {
-            if bath.name == target_bath.name {
-                if let Ok(mut sprite) = sprites.get_mut(entity) {
-                    sprite.color = color;
-                }
-            }
-        }
-    }
-}
-
-pub fn recolor_same_bed_on<E: Debug + Clone + Reflect>(
-    color: Color,
-) -> impl Fn(Trigger<E>, Query<&Bed>, Query<(Entity, &Bed)>, Query<&mut Sprite>) {
-    move |ev, target_bed_query, bath_query, mut sprites| {
-        // Get the name of the target bath
-        let Ok(target_bed) = target_bed_query.get(ev.target()) else {
-            return;
-        };
-
-        // Find and recolor all baths with the same name
-        for (entity, bath) in bath_query.iter() {
-            if bath.name == target_bed.name {
-                if let Ok(mut sprite) = sprites.get_mut(entity) {
-                    sprite.color = color;
-                }
-            }
-        }
-    }
-}
-
-// Kitchen implementations
 pub fn setup_kitchen_hoverable(
-    mut commands: Commands,
-    kitchen_query: Query<Entity, With<Kitchen>>,
-    mut has_run: Local<bool>,
+    commands: Commands,
+    query: Query<Entity, With<Kitchen>>,
+    has_run: Local<bool>,
 ) {
-    if *has_run {
-        return;
-    }
-
-    for entity in kitchen_query.iter() {
-        commands
-            .entity(entity)
-            .insert((Pickable::default(), ZIndex(100)))
-            .observe(recolor_same_kitchen_on::<Pointer<Over>>(Color::srgb(
-                0.0, 1.0, 1.0,
-            )))
-            .observe(recolor_same_kitchen_on::<Pointer<Out>>(Color::srgba(
-                1.0, 1.0, 1.0, 1.0,
-            )));
-    }
-
-    let count = kitchen_query.iter().count();
-
-    if count != 0 {
-        *has_run = true;
-    }
+    setup_hoverable::<Kitchen>(commands, query, has_run);
 }
 
-pub fn recolor_same_kitchen_on<E: Debug + Clone + Reflect>(
-    color: Color,
-) -> impl Fn(Trigger<E>, Query<&Kitchen>, Query<(Entity, &Kitchen)>, Query<&mut Sprite>) {
-    move |ev, target_kitchen_query, kitchen_query, mut sprites| {
-        let Ok(target_kitchen) = target_kitchen_query.get(ev.target()) else {
-            return;
-        };
-
-        for (entity, kitchen) in kitchen_query.iter() {
-            if kitchen.name == target_kitchen.name {
-                if let Ok(mut sprite) = sprites.get_mut(entity) {
-                    sprite.color = color;
-                }
-            }
-        }
-    }
-}
-
-// Mirror implementations
 pub fn setup_mirror_hoverable(
-    mut commands: Commands,
-    mirror_query: Query<Entity, With<Mirror>>,
-    mut has_run: Local<bool>,
+    commands: Commands,
+    query: Query<Entity, With<Mirror>>,
+    has_run: Local<bool>,
 ) {
-    if *has_run {
-        return;
-    }
-
-    for entity in mirror_query.iter() {
-        commands
-            .entity(entity)
-            .insert((Pickable::default(), ZIndex(100)))
-            .observe(recolor_same_mirror_on::<Pointer<Over>>(Color::srgb(
-                0.0, 1.0, 1.0,
-            )))
-            .observe(recolor_same_mirror_on::<Pointer<Out>>(Color::srgba(
-                1.0, 1.0, 1.0, 1.0,
-            )));
-    }
-
-    let count = mirror_query.iter().count();
-
-    if count != 0 {
-        *has_run = true;
-    }
+    setup_hoverable::<Mirror>(commands, query, has_run);
 }
 
-pub fn recolor_same_mirror_on<E: Debug + Clone + Reflect>(
-    color: Color,
-) -> impl Fn(Trigger<E>, Query<&Mirror>, Query<(Entity, &Mirror)>, Query<&mut Sprite>) {
-    move |ev, target_mirror_query, mirror_query, mut sprites| {
-        let Ok(target_mirror) = target_mirror_query.get(ev.target()) else {
-            return;
-        };
-
-        for (entity, mirror) in mirror_query.iter() {
-            if mirror.name == target_mirror.name {
-                if let Ok(mut sprite) = sprites.get_mut(entity) {
-                    sprite.color = color;
-                }
-            }
-        }
-    }
-}
-
-// ComputerDesk implementations
 pub fn setup_computer_desk_hoverable(
-    mut commands: Commands,
-    computer_desk_query: Query<Entity, With<ComputerDesk>>,
-    mut has_run: Local<bool>,
+    commands: Commands,
+    query: Query<Entity, With<ComputerDesk>>,
+    has_run: Local<bool>,
 ) {
-    if *has_run {
-        return;
-    }
-
-    for entity in computer_desk_query.iter() {
-        commands
-            .entity(entity)
-            .insert((Pickable::default(), ZIndex(100)))
-            .observe(recolor_same_computer_desk_on::<Pointer<Over>>(Color::srgb(
-                0.0, 1.0, 1.0,
-            )))
-            .observe(recolor_same_computer_desk_on::<Pointer<Out>>(Color::srgba(
-                1.0, 1.0, 1.0, 1.0,
-            )));
-    }
-
-    let count = computer_desk_query.iter().count();
-
-    if count != 0 {
-        *has_run = true;
-    }
+    setup_hoverable::<ComputerDesk>(commands, query, has_run);
 }
 
-pub fn recolor_same_computer_desk_on<E: Debug + Clone + Reflect>(
-    color: Color,
-) -> impl Fn(Trigger<E>, Query<&ComputerDesk>, Query<(Entity, &ComputerDesk)>, Query<&mut Sprite>) {
-    move |ev, target_computer_desk_query, computer_desk_query, mut sprites| {
-        let Ok(target_computer_desk) = target_computer_desk_query.get(ev.target()) else {
-            return;
-        };
-
-        for (entity, computer_desk) in computer_desk_query.iter() {
-            if computer_desk.name == target_computer_desk.name {
-                if let Ok(mut sprite) = sprites.get_mut(entity) {
-                    sprite.color = color;
-                }
-            }
-        }
-    }
-}
-
-// Couch implementations
 pub fn setup_couch_hoverable(
-    mut commands: Commands,
-    couch_query: Query<Entity, With<Couch>>,
-    mut has_run: Local<bool>,
+    commands: Commands,
+    query: Query<Entity, With<Couch>>,
+    has_run: Local<bool>,
 ) {
-    if *has_run {
-        return;
-    }
-
-    for entity in couch_query.iter() {
-        commands
-            .entity(entity)
-            .insert((Pickable::default(), ZIndex(100)))
-            .observe(recolor_same_couch_on::<Pointer<Over>>(Color::srgb(
-                0.0, 1.0, 1.0,
-            )))
-            .observe(recolor_same_couch_on::<Pointer<Out>>(Color::srgba(
-                1.0, 1.0, 1.0, 1.0,
-            )));
-    }
-
-    let count = couch_query.iter().count();
-
-    if count != 0 {
-        *has_run = true;
-    }
+    setup_hoverable::<Couch>(commands, query, has_run);
 }
 
-pub fn recolor_same_couch_on<E: Debug + Clone + Reflect>(
-    color: Color,
-) -> impl Fn(Trigger<E>, Query<&Couch>, Query<(Entity, &Couch)>, Query<&mut Sprite>) {
-    move |ev, target_couch_query, couch_query, mut sprites| {
-        let Ok(target_couch) = target_couch_query.get(ev.target()) else {
-            return;
-        };
-
-        for (entity, couch) in couch_query.iter() {
-            if couch.name == target_couch.name {
-                if let Ok(mut sprite) = sprites.get_mut(entity) {
-                    sprite.color = color;
-                }
-            }
-        }
-    }
-}
-
-// WaterBottle implementations
 pub fn setup_water_bottle_hoverable(
-    mut commands: Commands,
-    water_bottle_query: Query<Entity, With<WaterBottle>>,
-    mut has_run: Local<bool>,
+    commands: Commands,
+    query: Query<Entity, With<WaterBottle>>,
+    has_run: Local<bool>,
 ) {
-    if *has_run {
-        return;
-    }
-
-    for entity in water_bottle_query.iter() {
-        commands
-            .entity(entity)
-            .insert((Pickable::default(), ZIndex(100)))
-            .observe(recolor_same_water_bottle_on::<Pointer<Over>>(Color::srgb(
-                0.0, 1.0, 1.0,
-            )))
-            .observe(recolor_same_water_bottle_on::<Pointer<Out>>(Color::srgba(
-                1.0, 1.0, 1.0, 1.0,
-            )));
-    }
-
-    let count = water_bottle_query.iter().count();
-
-    if count != 0 {
-        *has_run = true;
-    }
+    setup_hoverable::<WaterBottle>(commands, query, has_run);
 }
 
-pub fn recolor_same_water_bottle_on<E: Debug + Clone + Reflect>(
-    color: Color,
-) -> impl Fn(Trigger<E>, Query<&WaterBottle>, Query<(Entity, &WaterBottle)>, Query<&mut Sprite>) {
-    move |ev, target_water_bottle_query, water_bottle_query, mut sprites| {
-        let Ok(target_water_bottle) = target_water_bottle_query.get(ev.target()) else {
-            return;
-        };
-
-        for (entity, water_bottle) in water_bottle_query.iter() {
-            if water_bottle.name == target_water_bottle.name {
-                if let Ok(mut sprite) = sprites.get_mut(entity) {
-                    sprite.color = color;
-                }
-            }
-        }
-    }
-}
-
-// Toilet implementations
 pub fn setup_toilet_hoverable(
-    mut commands: Commands,
-    toilet_query: Query<Entity, With<Toilet>>,
-    mut has_run: Local<bool>,
+    commands: Commands,
+    query: Query<Entity, With<Toilet>>,
+    has_run: Local<bool>,
 ) {
-    if *has_run {
-        return;
-    }
-
-    for entity in toilet_query.iter() {
-        commands
-            .entity(entity)
-            .insert((Pickable::default(), ZIndex(100)))
-            .observe(recolor_same_toilet_on::<Pointer<Over>>(Color::srgb(
-                0.0, 1.0, 1.0,
-            )))
-            .observe(recolor_same_toilet_on::<Pointer<Out>>(Color::srgba(
-                1.0, 1.0, 1.0, 1.0,
-            )));
-    }
-
-    let count = toilet_query.iter().count();
-
-    if count != 0 {
-        *has_run = true;
-    }
+    setup_hoverable::<Toilet>(commands, query, has_run);
 }
 
-pub fn recolor_same_toilet_on<E: Debug + Clone + Reflect>(
-    color: Color,
-) -> impl Fn(Trigger<E>, Query<&Toilet>, Query<(Entity, &Toilet)>, Query<&mut Sprite>) {
-    move |ev, target_toilet_query, toilet_query, mut sprites| {
-        let Ok(target_toilet) = target_toilet_query.get(ev.target()) else {
-            return;
-        };
-
-        for (entity, toilet) in toilet_query.iter() {
-            if toilet.name == target_toilet.name {
-                if let Ok(mut sprite) = sprites.get_mut(entity) {
-                    sprite.color = color;
-                }
-            }
-        }
-    }
-}
-
-// Sink implementations
 pub fn setup_sink_hoverable(
-    mut commands: Commands,
-    sink_query: Query<Entity, With<Sink>>,
-    mut has_run: Local<bool>,
+    commands: Commands,
+    query: Query<Entity, With<Sink>>,
+    has_run: Local<bool>,
 ) {
-    if *has_run {
-        return;
-    }
-
-    for entity in sink_query.iter() {
-        commands
-            .entity(entity)
-            .insert((Pickable::default(), ZIndex(100)))
-            .observe(recolor_same_sink_on::<Pointer<Over>>(Color::srgb(
-                0.0, 1.0, 1.0,
-            )))
-            .observe(recolor_same_sink_on::<Pointer<Out>>(Color::srgba(
-                1.0, 1.0, 1.0, 1.0,
-            )));
-    }
-
-    let count = sink_query.iter().count();
-
-    if count != 0 {
-        *has_run = true;
-    }
-}
-
-pub fn recolor_same_sink_on<E: Debug + Clone + Reflect>(
-    color: Color,
-) -> impl Fn(Trigger<E>, Query<&Sink>, Query<(Entity, &Sink)>, Query<&mut Sprite>) {
-    move |ev, target_sink_query, sink_query, mut sprites| {
-        let Ok(target_sink) = target_sink_query.get(ev.target()) else {
-            return;
-        };
-
-        for (entity, sink) in sink_query.iter() {
-            if sink.name == target_sink.name {
-                if let Ok(mut sprite) = sprites.get_mut(entity) {
-                    sprite.color = color;
-                }
-            }
-        }
-    }
+    setup_hoverable::<Sink>(commands, query, has_run);
 }

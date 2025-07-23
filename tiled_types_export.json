@@ -301,7 +301,7 @@
     ]
   },
   {
-    "id": 191,
+    "id": 190,
     "name": "avian2d::dynamics::integrator::Gravity",
     "type": "class",
     "useAs": [
@@ -425,7 +425,7 @@
     ]
   },
   {
-    "id": 329,
+    "id": 330,
     "name": "avian2d::dynamics::rigid_body::LinearVelocity",
     "type": "class",
     "useAs": [
@@ -463,7 +463,7 @@
     ]
   },
   {
-    "id": 301,
+    "id": 306,
     "name": "avian2d::dynamics::rigid_body::MaxLinearSpeed",
     "type": "class",
     "useAs": [
@@ -835,7 +835,7 @@
     ]
   },
   {
-    "id": 305,
+    "id": 307,
     "name": "avian2d::dynamics::rigid_body::mass_properties::components::computed::ComputedAngularInertia",
     "type": "class",
     "useAs": [
@@ -3240,7 +3240,7 @@
     "members": []
   },
   {
-    "id": 181,
+    "id": 192,
     "name": "bevy_ecs_tiled::map::components::TiledMapLayer",
     "type": "class",
     "useAs": [
@@ -3408,7 +3408,7 @@
     ]
   },
   {
-    "id": 190,
+    "id": 189,
     "name": "bevy_ecs_tiled::world::components::TiledWorldMarker",
     "type": "class",
     "useAs": [
@@ -3419,7 +3419,7 @@
     "members": []
   },
   {
-    "id": 120,
+    "id": 121,
     "name": "bevy_ecs_tilemap::FrustumCulling",
     "type": "class",
     "useAs": [
@@ -5633,7 +5633,7 @@
     ]
   },
   {
-    "id": 188,
+    "id": 187,
     "name": "bevy_render::camera::clear_color::ClearColor",
     "type": "class",
     "useAs": [
@@ -6306,7 +6306,7 @@
     ]
   },
   {
-    "id": 303,
+    "id": 304,
     "name": "bevy_render::view::visibility::NoFrustumCulling",
     "type": "class",
     "useAs": [
@@ -6941,7 +6941,7 @@
     ]
   },
   {
-    "id": 187,
+    "id": 186,
     "name": "bevy_text::text2d::Text2d",
     "type": "class",
     "useAs": [
@@ -7522,7 +7522,7 @@
     "members": []
   },
   {
-    "id": 40,
+    "id": 43,
     "name": "bevy_transform_interpolation::interpolation::ScaleInterpolation",
     "type": "class",
     "useAs": [
@@ -7898,7 +7898,7 @@
     ]
   },
   {
-    "id": 304,
+    "id": 305,
     "name": "bevy_ui::ui_node::BorderRadius",
     "type": "class",
     "useAs": [
@@ -10666,7 +10666,7 @@
     ]
   },
   {
-    "id": 307,
+    "id": 302,
     "name": "llm_game::game_objects::Bath",
     "type": "class",
     "useAs": [
@@ -10683,7 +10683,7 @@
     ]
   },
   {
-    "id": 306,
+    "id": 301,
     "name": "llm_game::game_objects::Bed",
     "type": "class",
     "useAs": [
@@ -10717,7 +10717,7 @@
     ]
   },
   {
-    "id": 330,
+    "id": 329,
     "name": "llm_game::game_objects::Couch",
     "type": "class",
     "useAs": [
@@ -10768,7 +10768,7 @@
     ]
   },
   {
-    "id": 43,
+    "id": 40,
     "name": "llm_game::game_objects::Sink",
     "type": "class",
     "useAs": [
@@ -10802,7 +10802,7 @@
     ]
   },
   {
-    "id": 122,
+    "id": 120,
     "name": "llm_game::game_objects::WallProperties",
     "type": "class",
     "useAs": [
@@ -10825,7 +10825,7 @@
     ]
   },
   {
-    "id": 577,
+    "id": 572,
     "name": "llm_game::game_objects::WallType",
     "type": "class",
     "useAs": [
@@ -10843,7 +10843,7 @@
     ]
   },
   {
-    "id": 576,
+    "id": 571,
     "name": "llm_game::game_objects::WallType:::Variant",
     "type": "enum",
     "storageType": "string",
@@ -10853,7 +10853,7 @@
     "valuesAsFlags": false
   },
   {
-    "id": 185,
+    "id": 181,
     "name": "llm_game::game_objects::WaterBottle",
     "type": "class",
     "useAs": [

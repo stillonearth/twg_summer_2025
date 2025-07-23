@@ -16,6 +16,7 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugins(ui::HikikomoriUIPlugin)
+        .add_plugins(game_objects::GameObjectsPlugin)
         .add_plugins(TiledMapPlugin::default())
         .add_plugins(TiledPhysicsPlugin::<TiledPhysicsAvianBackend>::default())
         .add_plugins(PhysicsPlugins::default().with_length_unit(100.0))
