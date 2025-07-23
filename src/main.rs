@@ -29,6 +29,13 @@ fn main() {
         .register_type::<game_objects::WallType>()
         .register_type::<game_objects::Bed>()
         .register_type::<game_objects::Bath>()
+        .register_type::<game_objects::Kitchen>()
+        .register_type::<game_objects::Mirror>()
+        .register_type::<game_objects::ComputerDesk>()
+        .register_type::<game_objects::Couch>()
+        .register_type::<game_objects::WaterBottle>()
+        .register_type::<game_objects::Toilet>()
+        .register_type::<game_objects::Sink>()
         .add_systems(Startup, (startup,))
         .add_systems(
             Update,
@@ -41,6 +48,13 @@ fn main() {
                 ui::example_game_loop,
                 game_objects::setup_bed_hoverable,
                 game_objects::setup_bath_hoverable,
+                game_objects::setup_kitchen_hoverable,
+                game_objects::setup_toilet_hoverable,
+                game_objects::setup_sink_hoverable,
+                game_objects::setup_mirror_hoverable,
+                game_objects::setup_computer_desk_hoverable,
+                game_objects::setup_couch_hoverable,
+                game_objects::setup_water_bottle_hoverable,
                 sprites::add_render_layers_to_sprites,
             ),
         )

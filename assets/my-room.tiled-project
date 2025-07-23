@@ -11148,6 +11148,40 @@
         {
             "color": "#ff000000",
             "drawFill": true,
+            "id": 535,
+            "members": [
+                {
+                    "name": "name",
+                    "type": "string",
+                    "value": ""
+                }
+            ],
+            "name": "llm_game::game_objects::Bath",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 534,
+            "members": [
+                {
+                    "name": "name",
+                    "type": "string",
+                    "value": ""
+                }
+            ],
+            "name": "llm_game::game_objects::Bed",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
             "id": 531,
             "members": [
                 {
@@ -11200,7 +11234,7 @@
         {
             "color": "#ff000000",
             "drawFill": true,
-            "id": 534,
+            "id": 536,
             "members": [
                 {
                     "name": "name",
@@ -11208,7 +11242,7 @@
                     "value": ""
                 }
             ],
-            "name": "llm_game::game_objects::Bed",
+            "name": "llm_game::game_objects::ComputerDesk",
             "type": "class",
             "useAs": [
                 "property"
@@ -11217,7 +11251,7 @@
         {
             "color": "#ff000000",
             "drawFill": true,
-            "id": 535,
+            "id": 537,
             "members": [
                 {
                     "name": "name",
@@ -11225,7 +11259,92 @@
                     "value": ""
                 }
             ],
-            "name": "llm_game::game_objects::Bath",
+            "name": "llm_game::game_objects::Couch",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 538,
+            "members": [
+                {
+                    "name": "name",
+                    "type": "string",
+                    "value": ""
+                }
+            ],
+            "name": "llm_game::game_objects::Kitchen",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 539,
+            "members": [
+                {
+                    "name": "name",
+                    "type": "string",
+                    "value": ""
+                }
+            ],
+            "name": "llm_game::game_objects::Mirror",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 540,
+            "members": [
+                {
+                    "name": "name",
+                    "type": "string",
+                    "value": ""
+                }
+            ],
+            "name": "llm_game::game_objects::Sink",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 541,
+            "members": [
+                {
+                    "name": "name",
+                    "type": "string",
+                    "value": ""
+                }
+            ],
+            "name": "llm_game::game_objects::Toilet",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 542,
+            "members": [
+                {
+                    "name": "name",
+                    "type": "string",
+                    "value": ""
+                }
+            ],
+            "name": "llm_game::game_objects::WaterBottle",
             "type": "class",
             "useAs": [
                 "property"

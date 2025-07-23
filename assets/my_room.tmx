@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="22" height="14" tilewidth="32" tileheight="32" infinite="0" nextlayerid="12" nextobjectid="91">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="22" height="14" tilewidth="32" tileheight="32" infinite="0" nextlayerid="12" nextobjectid="163">
  <tileset firstgid="1" source="Room_Builder_Office_32x32.tsx"/>
  <tileset firstgid="225" source="Modern_Office_Shadowless_32x32.tsx"/>
  <tileset firstgid="1073" source="4x-2x.tsx"/>
@@ -67,15 +67,15 @@
  </layer>
  <layer id="3" name="Furniture" width="22" height="14">
   <data encoding="csv">
-0,0,0,0,3922,3923,3924,3925,0,2353,2354,0,0,0,4132,4133,4134,0,0,0,2348,56,
-0,0,0,0,3946,3947,3948,3949,0,2369,2370,0,0,0,0,0,0,2929,2922,2923,2364,0,
-0,0,0,0,3970,3971,3972,3973,0,2385,2386,0,0,0,0,0,0,2942,2935,2936,0,0,
+0,0,0,0,3922,3923,3924,3925,0,0,0,0,0,0,4132,4133,4134,0,0,0,0,56,
+0,0,0,0,3946,3947,3948,3949,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,3970,3971,3972,3973,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,2738,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,56,
-0,2147486906,0,0,4033,4034,4035,4036,0,0,0,0,4171,4172,4173,4174,4175,4176,4177,4178,4179,0,
-0,2147486930,0,0,4057,4058,4059,4060,0,0,0,0,4195,4196,4197,4198,4199,4200,4201,4202,4203,2147488209,
-0,2147486954,0,0,4081,4082,4083,4084,0,0,0,0,4219,4220,4221,4222,4223,4224,4225,4226,4227,0,
+0,2147486906,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,2147486930,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2147488209,
+0,2147486954,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,2147486978,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,2147487002,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,2147487026,0,0,0,0,0,0,0,0,0,0,2739,2740,2741,2720,0,0,0,0,0,0,
@@ -92,12 +92,12 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,354,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,370,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,2810,0,0,0,2921,0,0,0,0,0,0,0,0,0,
-0,0,0,0,2844,2845,2846,2847,2823,0,0,0,2934,0,0,0,0,0,0,985,985,0,
-0,0,0,0,2857,2858,2859,2860,2836,0,0,0,0,0,0,0,0,0,0,1001,1001,0,
+0,0,0,0,0,0,0,0,2823,0,0,0,2934,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,2836,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
@@ -400,6 +400,577 @@
     <property name="bath" type="class" propertytype="llm_game::game_objects::Bath">
      <properties>
       <property name="name" value="main bath"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="91" gid="4171" x="384" y="208" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="92" gid="4195" x="384" y="240" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="93" gid="4219" x="384" y="272" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="94" gid="4220" x="416" y="272" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="95" gid="4196" x="416" y="240" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="96" gid="4172" x="416" y="208" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="97" gid="4221" x="448" y="272" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="98" gid="4197" x="448" y="240" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="99" gid="4173" x="448" y="208" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="100" gid="4222" x="480" y="272" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="101" gid="4198" x="480" y="240" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="102" gid="4174" x="480" y="208" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="103" gid="4175" x="512" y="208" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="104" gid="4199" x="512" y="240" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="105" gid="4223" x="512" y="272" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="106" gid="4224" x="544" y="272" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="107" gid="4200" x="544" y="240" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="108" gid="4176" x="544" y="208" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="109" gid="4177" x="576" y="208" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="110" gid="4201" x="576" y="240" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="111" gid="4225" x="576" y="272" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="112" gid="4226" x="608" y="272" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="113" gid="4202" x="608" y="240" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="114" gid="4178" x="608" y="208" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="115" gid="4179" x="640" y="208" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="116" gid="4203" x="640" y="240" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="117" gid="4227" x="640" y="272" width="32" height="32">
+   <properties>
+    <property name="kitchen" type="class" propertytype="llm_game::game_objects::Kitchen">
+     <properties>
+      <property name="name" value="kitchen"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="118" gid="2942" x="544" y="96" width="32" height="32">
+   <properties>
+    <property name="toilet" type="class" propertytype="llm_game::game_objects::Toilet">
+     <properties>
+      <property name="name" value="toilet"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="119" gid="2929" x="544" y="64" width="32" height="32">
+   <properties>
+    <property name="toilet" type="class" propertytype="llm_game::game_objects::Toilet">
+     <properties>
+      <property name="name" value="toilet"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="120" gid="2935" x="576" y="96" width="32" height="32">
+   <properties>
+    <property name="sink" type="class" propertytype="llm_game::game_objects::Sink">
+     <properties>
+      <property name="name" value="sink"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="121" gid="2936" x="608" y="96" width="32" height="32">
+   <properties>
+    <property name="sink" type="class" propertytype="llm_game::game_objects::Sink">
+     <properties>
+      <property name="name" value="sink"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="122" gid="2922" x="576" y="64" width="32" height="32">
+   <properties>
+    <property name="sink" type="class" propertytype="llm_game::game_objects::Sink">
+     <properties>
+      <property name="name" value="sink"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="123" gid="2923" x="608" y="64" width="32" height="32">
+   <properties>
+    <property name="sink" type="class" propertytype="llm_game::game_objects::Sink">
+     <properties>
+      <property name="name" value="sink"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="124" gid="2401" x="288" y="32" width="32" height="32">
+   <properties>
+    <property name="mirror" type="class" propertytype="llm_game::game_objects::Mirror"/>
+   </properties>
+  </object>
+  <object id="125" gid="2402" x="320" y="32" width="32" height="32">
+   <properties>
+    <property name="mirror" type="class" propertytype="llm_game::game_objects::Mirror"/>
+   </properties>
+  </object>
+  <object id="126" gid="2417" x="288" y="64" width="32" height="32">
+   <properties>
+    <property name="mirror" type="class" propertytype="llm_game::game_objects::Mirror"/>
+   </properties>
+  </object>
+  <object id="127" gid="2418" x="320" y="64" width="32" height="32">
+   <properties>
+    <property name="mirror" type="class" propertytype="llm_game::game_objects::Mirror"/>
+   </properties>
+  </object>
+  <object id="128" gid="2433" x="288" y="96" width="32" height="32">
+   <properties>
+    <property name="mirror" type="class" propertytype="llm_game::game_objects::Mirror"/>
+   </properties>
+  </object>
+  <object id="129" gid="2434" x="320" y="96" width="32" height="32">
+   <properties>
+    <property name="mirror" type="class" propertytype="llm_game::game_objects::Mirror"/>
+   </properties>
+  </object>
+  <object id="131" gid="2380" x="656" y="32" width="32" height="32">
+   <properties>
+    <property name="mirror" type="class" propertytype="llm_game::game_objects::Mirror">
+     <properties>
+      <property name="name" value="bath mirror"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="133" gid="2396" x="656" y="64" width="32" height="32">
+   <properties>
+    <property name="mirror" type="class" propertytype="llm_game::game_objects::Mirror">
+     <properties>
+      <property name="name" value="bath mirror"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="137" gid="3964" x="216" y="216" width="32" height="32">
+   <properties>
+    <property name="computer_desk" type="class" propertytype="llm_game::game_objects::ComputerDesk">
+     <properties>
+      <property name="name" value="computer desk"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="138" gid="3963" x="184" y="216" width="32" height="32">
+   <properties>
+    <property name="computer_desk" type="class" propertytype="llm_game::game_objects::ComputerDesk">
+     <properties>
+      <property name="name" value="computer desk"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="139" gid="3962" x="152" y="216" width="32" height="32">
+   <properties>
+    <property name="computer_desk" type="class" propertytype="llm_game::game_objects::ComputerDesk">
+     <properties>
+      <property name="name" value="computer desk"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="140" gid="3961" x="120" y="216" width="32" height="32">
+   <properties>
+    <property name="computer_desk" type="class" propertytype="llm_game::game_objects::ComputerDesk">
+     <properties>
+      <property name="name" value="computer desk"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="141" gid="3985" x="120" y="248" width="32" height="32">
+   <properties>
+    <property name="computer_desk" type="class" propertytype="llm_game::game_objects::ComputerDesk">
+     <properties>
+      <property name="name" value="computer desk"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="142" gid="3986" x="152" y="248" width="32" height="32">
+   <properties>
+    <property name="computer_desk" type="class" propertytype="llm_game::game_objects::ComputerDesk">
+     <properties>
+      <property name="name" value="computer desk"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="143" gid="3987" x="184" y="248" width="32" height="32">
+   <properties>
+    <property name="computer_desk" type="class" propertytype="llm_game::game_objects::ComputerDesk">
+     <properties>
+      <property name="name" value="computer desk"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="144" gid="3988" x="216" y="248" width="32" height="32">
+   <properties>
+    <property name="computer_desk" type="class" propertytype="llm_game::game_objects::ComputerDesk">
+     <properties>
+      <property name="name" value="computer desk"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="145" gid="4009" x="120" y="280" width="32" height="32">
+   <properties>
+    <property name="computer_desk" type="class" propertytype="llm_game::game_objects::ComputerDesk">
+     <properties>
+      <property name="name" value="computer desk"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="146" gid="4010" x="152" y="280" width="32" height="32">
+   <properties>
+    <property name="computer_desk" type="class" propertytype="llm_game::game_objects::ComputerDesk">
+     <properties>
+      <property name="name" value="computer desk"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="147" gid="4011" x="184" y="280" width="32" height="32">
+   <properties>
+    <property name="computer_desk" type="class" propertytype="llm_game::game_objects::ComputerDesk">
+     <properties>
+      <property name="name" value="computer desk"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="148" gid="4012" x="216" y="280" width="32" height="32">
+   <properties>
+    <property name="computer_desk" type="class" propertytype="llm_game::game_objects::ComputerDesk">
+     <properties>
+      <property name="name" value="computer desk"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="149" gid="2857" x="112" y="416" width="32" height="32">
+   <properties>
+    <property name="couch" type="class" propertytype="llm_game::game_objects::Couch">
+     <properties>
+      <property name="name" value="couch"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="150" gid="2858" x="144" y="416" width="32" height="32">
+   <properties>
+    <property name="couch" type="class" propertytype="llm_game::game_objects::Couch">
+     <properties>
+      <property name="name" value="couch"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="151" gid="2859" x="176" y="416" width="32" height="32">
+   <properties>
+    <property name="couch" type="class" propertytype="llm_game::game_objects::Couch">
+     <properties>
+      <property name="name" value="couch"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="152" gid="2859" x="208" y="416" width="32" height="32">
+   <properties>
+    <property name="couch" type="class" propertytype="llm_game::game_objects::Couch">
+     <properties>
+      <property name="name" value="couch"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="153" gid="2860" x="240" y="416" width="32" height="32">
+   <properties>
+    <property name="couch" type="class" propertytype="llm_game::game_objects::Couch">
+     <properties>
+      <property name="name" value="couch"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="154" gid="2847" x="240" y="384" width="32" height="32">
+   <properties>
+    <property name="couch" type="class" propertytype="llm_game::game_objects::Couch">
+     <properties>
+      <property name="name" value="couch"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="155" gid="2846" x="208" y="384" width="32" height="32">
+   <properties>
+    <property name="couch" type="class" propertytype="llm_game::game_objects::Couch">
+     <properties>
+      <property name="name" value="couch"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="156" gid="2845" x="176" y="384" width="32" height="32">
+   <properties>
+    <property name="couch" type="class" propertytype="llm_game::game_objects::Couch">
+     <properties>
+      <property name="name" value="couch"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="157" gid="2845" x="144" y="384" width="32" height="32">
+   <properties>
+    <property name="couch" type="class" propertytype="llm_game::game_objects::Couch">
+     <properties>
+      <property name="name" value="couch"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="158" gid="2844" x="112" y="384" width="32" height="32">
+   <properties>
+    <property name="couch" type="class" propertytype="llm_game::game_objects::Couch">
+     <properties>
+      <property name="name" value="couch"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="159" gid="1001" x="616" y="424" width="32" height="32">
+   <properties>
+    <property name="bottle 1" type="class" propertytype="llm_game::game_objects::WaterBottle"/>
+   </properties>
+  </object>
+  <object id="160" gid="1001" x="648" y="424" width="32" height="32">
+   <properties>
+    <property name="bottle" type="class" propertytype="llm_game::game_objects::WaterBottle">
+     <properties>
+      <property name="name" value="bottle 2"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="161" gid="985" x="616" y="392" width="32" height="32">
+   <properties>
+    <property name="bottle 1" type="class" propertytype="llm_game::game_objects::WaterBottle"/>
+   </properties>
+  </object>
+  <object id="162" gid="985" x="648" y="392" width="32" height="32">
+   <properties>
+    <property name="bottle" type="class" propertytype="llm_game::game_objects::WaterBottle">
+     <properties>
+      <property name="name" value="bottle 2"/>
      </properties>
     </property>
    </properties>
