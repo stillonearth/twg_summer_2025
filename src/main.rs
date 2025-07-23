@@ -27,7 +27,7 @@ fn main() {
             },
             WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
         ))
-        .add_plugins(navigation::NavigationGridPlugin::default())
+        .add_plugins(navigation::NavigationGridPlugin {})
         .add_systems(Startup, (startup,))
         .add_systems(
             Update,
