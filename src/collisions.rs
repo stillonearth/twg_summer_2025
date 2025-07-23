@@ -26,7 +26,6 @@ pub fn check_nearest_object(
                     println!("\n=== Nearest Wall Properties ===");
                     println!("Detection method: {}", method);
                     println!("Name: {}", wall.name);
-                    println!("Type: {}", wall.wall_type);
                     println!("Distance to surface: {:.2} units", distance);
 
                     // Add interaction feedback based on distance

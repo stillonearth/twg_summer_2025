@@ -8,6 +8,7 @@ use crate::{sprites::LAYER_SPRITES, ui::LAYER_UI};
 mod collisions;
 mod debug;
 mod game_objects;
+mod navigation;
 mod player;
 mod sprites;
 mod ui;
@@ -26,17 +27,7 @@ fn main() {
             },
             WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
         ))
-        .register_type::<game_objects::WallProperties>()
-        .register_type::<game_objects::WallType>()
-        .register_type::<game_objects::Bed>()
-        .register_type::<game_objects::Bath>()
-        .register_type::<game_objects::Kitchen>()
-        .register_type::<game_objects::Mirror>()
-        .register_type::<game_objects::ComputerDesk>()
-        .register_type::<game_objects::Couch>()
-        .register_type::<game_objects::WaterBottle>()
-        .register_type::<game_objects::Toilet>()
-        .register_type::<game_objects::Sink>()
+        .add_plugins(navigation::NavigationGridPlugin::default())
         .add_systems(Startup, (startup,))
         .add_systems(
             Update,

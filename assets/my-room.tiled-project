@@ -11349,6 +11349,23 @@
             "useAs": [
                 "property"
             ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 545,
+            "members": [
+                {
+                    "name": "name",
+                    "type": "string",
+                    "value": ""
+                }
+            ],
+            "name": "llm_game::game_objects::WalkableTile",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
         }
     ]
 }

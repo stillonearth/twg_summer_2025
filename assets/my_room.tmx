@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="22" height="14" tilewidth="32" tileheight="32" infinite="0" nextlayerid="12" nextobjectid="163">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="22" height="14" tilewidth="32" tileheight="32" infinite="0" nextlayerid="14" nextobjectid="429">
  <tileset firstgid="1" source="Room_Builder_Office_32x32.tsx"/>
  <tileset firstgid="225" source="Modern_Office_Shadowless_32x32.tsx"/>
  <tileset firstgid="1073" source="4x-2x.tsx"/>
@@ -36,8 +36,8 @@
 40,0,0,0,42,0,0,0,0,0,0,0,42,0,0,0,0,0,0,0,0,40,
 40,0,0,0,42,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,40,
 40,0,0,0,42,0,0,0,0,0,0,0,42,0,0,0,0,0,0,0,0,40,
-40,0,0,0,177,25,0,0,0,2147483674,0,0,0,0,0,0,0,0,0,0,0,40,
-40,0,0,0,193,0,0,0,0,40,0,0,0,0,0,0,0,0,0,0,0,40,
+40,0,0,0,177,82,82,83,0,2147483674,0,0,0,0,0,0,0,0,0,0,0,40,
+40,0,0,0,193,98,98,99,0,40,0,0,0,0,0,0,0,0,0,0,0,40,
 40,0,0,0,0,0,0,0,0,40,0,0,0,0,0,0,0,0,0,0,0,40,
 40,0,0,0,0,0,0,0,0,40,0,0,0,0,0,0,0,0,0,0,0,40,
 40,0,0,0,0,0,0,0,0,40,0,0,0,0,0,0,0,0,0,0,0,40,
@@ -112,7 +112,6 @@
    </properties>
   </object>
   <object id="41" x="32" y="0" width="320"/>
-  <object id="42" x="128" y="480"/>
   <object id="45" x="32" y="416" width="672" height="32">
    <properties>
     <property name="bottom wall" type="class" propertytype="llm_game::game_objects::WallProperties"/>
@@ -212,7 +211,8 @@
     <property name="wall" type="class" propertytype="llm_game::game_objects::WallProperties"/>
    </properties>
   </object>
-  <object id="61" x="824" y="208"/>
+  <object id="293" x="352" y="0" height="64"/>
+  <object id="294" x="128" y="64" width="224"/>
  </objectgroup>
  <objectgroup id="11" name="Intaractable">
   <object id="64" type="bed" gid="2971" x="32" y="80" width="32" height="32">
@@ -971,6 +971,1178 @@
     <property name="bottle" type="class" propertytype="llm_game::game_objects::WaterBottle">
      <properties>
       <property name="name" value="bottle 2"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="13" name="Navigation">
+  <object id="299" gid="169" x="352" y="32" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="300" gid="169" x="352" y="64" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="301" gid="169" x="352" y="96" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="302" gid="169" x="352" y="128" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="303" gid="169" x="352" y="160" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="304" gid="169" x="352" y="256" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="305" gid="169" x="352" y="192" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="306" gid="169" x="352" y="192" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="307" gid="169" x="352" y="224" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="308" gid="169" x="320" y="224" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="309" gid="169" x="320" y="192" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="310" gid="169" x="320" y="160" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="311" gid="169" x="320" y="128" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="312" gid="169" x="288" y="128" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="313" gid="169" x="256" y="128" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="314" gid="169" x="224" y="128" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="315" gid="169" x="192" y="128" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="316" gid="169" x="160" y="128" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="317" gid="169" x="160" y="160" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="318" gid="169" x="192" y="160" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="319" gid="169" x="192" y="160" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="320" gid="169" x="224" y="160" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="321" gid="169" x="256" y="160" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="322" gid="169" x="288" y="160" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="323" gid="169" x="256" y="192" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="324" gid="169" x="256" y="224" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="325" gid="169" x="256" y="256" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="326" gid="169" x="256" y="288" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="327" gid="169" x="256" y="320" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="328" gid="169" x="256" y="352" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="329" gid="169" x="256" y="384" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="330" gid="169" x="224" y="384" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="331" gid="169" x="192" y="384" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="332" gid="169" x="160" y="384" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="333" gid="169" x="128" y="384" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="334" gid="169" x="128" y="352" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="335" gid="169" x="160" y="352" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="336" gid="169" x="192" y="352" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="337" gid="169" x="224" y="352" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="338" gid="169" x="224" y="320" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="339" gid="169" x="192" y="320" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="340" gid="169" x="160" y="320" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="341" gid="169" x="128" y="320" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="342" gid="169" x="128" y="288" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="343" gid="169" x="160" y="288" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="344" gid="169" x="192" y="288" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="345" gid="169" x="224" y="288" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="346" gid="169" x="96" y="288" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="347" gid="169" x="96" y="352" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="348" gid="169" x="96" y="384" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="349" gid="169" x="96" y="320" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="350" gid="169" x="64" y="384" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="351" gid="169" x="64" y="352" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="352" gid="169" x="64" y="320" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="353" gid="169" x="64" y="288" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="354" gid="169" x="64" y="256" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="355" gid="169" x="96" y="256" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="356" gid="169" x="96" y="224" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="357" gid="169" x="64" y="224" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="358" gid="169" x="320" y="256" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="359" gid="169" x="320" y="288" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="360" gid="169" x="320" y="320" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="361" gid="169" x="320" y="384" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="362" gid="169" x="320" y="384" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="363" gid="169" x="320" y="416" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="364" gid="169" x="320" y="384" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="365" gid="169" x="320" y="352" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="366" gid="169" x="352" y="416" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="367" gid="169" x="352" y="384" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="368" gid="169" x="352" y="352" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="369" gid="169" x="352" y="320" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="370" gid="169" x="352" y="288" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="371" gid="169" x="384" y="352" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="372" gid="169" x="384" y="320" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="373" gid="169" x="384" y="288" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="374" gid="169" x="416" y="288" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="375" gid="169" x="416" y="320" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="376" gid="169" x="416" y="352" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="377" gid="169" x="448" y="352" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="378" gid="169" x="448" y="320" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="379" gid="169" x="448" y="288" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="380" gid="169" x="480" y="384" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="381" gid="169" x="480" y="352" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="382" gid="169" x="480" y="320" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="383" gid="169" x="480" y="288" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="384" gid="169" x="512" y="416" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="385" gid="169" x="512" y="384" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="386" gid="169" x="512" y="352" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="387" gid="169" x="512" y="320" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="388" gid="169" x="512" y="288" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="389" gid="169" x="544" y="416" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="390" gid="169" x="544" y="384" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="391" gid="169" x="544" y="352" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="392" gid="169" x="544" y="320" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="393" gid="169" x="544" y="288" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="394" gid="169" x="576" y="416" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="395" gid="169" x="576" y="384" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="396" gid="169" x="576" y="352" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="397" gid="169" x="576" y="320" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="398" gid="169" x="576" y="288" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="399" gid="169" x="608" y="384" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="400" gid="169" x="640" y="384" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="401" gid="169" x="672" y="384" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="402" gid="169" x="672" y="352" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="403" gid="169" x="672" y="320" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="404" gid="169" x="672" y="288" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="405" gid="169" x="640" y="288" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="406" gid="169" x="608" y="288" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="407" gid="169" x="608" y="320" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="408" gid="169" x="608" y="352" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="409" gid="169" x="640" y="352" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="410" gid="169" x="640" y="320" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="411" gid="169" x="416" y="160" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="412" gid="169" x="384" y="128" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="413" gid="169" x="448" y="128" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="414" gid="169" x="416" y="128" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="415" gid="169" x="480" y="128" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="416" gid="169" x="512" y="128" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="417" gid="169" x="544" y="128" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="418" gid="169" x="512" y="96" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="419" gid="169" x="576" y="128" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="420" gid="169" x="608" y="128" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="421" gid="169" x="640" y="128" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="422" gid="169" x="640" y="160" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="423" gid="169" x="608" y="160" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="424" gid="169" x="576" y="160" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="425" gid="169" x="544" y="160" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="426" gid="169" x="512" y="160" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="427" gid="169" x="480" y="160" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="428" gid="169" x="448" y="160" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
      </properties>
     </property>
    </properties>

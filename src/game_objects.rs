@@ -1,13 +1,11 @@
-use bevy::{prelude::*, text::FontStyle};
+use bevy::prelude::*;
 use std::fmt::Debug;
 
 pub struct GameObjectsPlugin;
 
 impl Plugin for GameObjectsPlugin {
     fn build(&self, app: &mut App) {
-        app
-            // Register all the component types for reflection
-            .register_type::<WallProperties>()
+        app.register_type::<WallProperties>()
             .register_type::<WallType>()
             .register_type::<Bed>()
             .register_type::<Bath>()
@@ -18,7 +16,7 @@ impl Plugin for GameObjectsPlugin {
             .register_type::<WaterBottle>()
             .register_type::<Toilet>()
             .register_type::<Sink>()
-            // Add all the hoverable setup systems
+            .register_type::<WalkableTile>()
             .add_systems(
                 Update,
                 (
@@ -31,6 +29,7 @@ impl Plugin for GameObjectsPlugin {
                     setup_computer_desk_hoverable,
                     setup_couch_hoverable,
                     setup_water_bottle_hoverable,
+                    cleanup_orphaned_tooltips,
                 ),
             );
     }
@@ -41,14 +40,6 @@ impl Plugin for GameObjectsPlugin {
 pub enum WallType {
     #[default]
     Stone,
-}
-
-impl std::fmt::Display for WallType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            WallType::Stone => write!(f, "Stone"),
-        }
-    }
 }
 
 #[derive(Component, Reflect, Default, Clone)]
@@ -66,6 +57,12 @@ pub trait NamedComponent: Component + Clone {
 #[derive(Component, Reflect, Default, Clone)]
 #[reflect(Component, Default)]
 pub struct Bed {
+    pub name: String,
+}
+
+#[derive(Component, Reflect, Default, Clone)]
+#[reflect(Component, Default)]
+pub struct WalkableTile {
     pub name: String,
 }
 
@@ -190,7 +187,9 @@ pub fn setup_hoverable<T: NamedComponent>(
             )))
             .observe(recolor_same_component_on::<T, Pointer<Out>>(Color::srgba(
                 1.0, 1.0, 1.0, 1.0,
-            )));
+            )))
+            .observe(show_tooltip_on_hover::<T>)
+            .observe(hide_tooltip_on_unhover::<T>);
     }
 
     let count = query.iter().count();
@@ -290,4 +289,118 @@ pub fn setup_sink_hoverable(
     has_run: Local<bool>,
 ) {
     setup_hoverable::<Sink>(commands, query, has_run);
+}
+
+#[derive(Component)]
+pub struct GameObjectTooltip {
+    pub target_name: String,
+}
+
+pub fn show_tooltip_on_hover<T: NamedComponent>(
+    trigger: Trigger<Pointer<Over>>,
+    mut commands: Commands,
+    target_query: Query<&T>,
+    component_query: Query<(Entity, &T, &Transform)>,
+    existing_tooltips: Query<Entity, With<GameObjectTooltip>>,
+) {
+    // Remove any existing tooltips
+    for entity in existing_tooltips.iter() {
+        commands.entity(entity).despawn();
+    }
+
+    // Get the name of the target component
+    let Ok(target_component) = target_query.get(trigger.target()) else {
+        return;
+    };
+
+    // Find all components with the same name and calculate center position
+    let same_name_components: Vec<_> = component_query
+        .iter()
+        .filter(|(_, component, _)| component.name() == target_component.name())
+        .collect();
+
+    if same_name_components.is_empty() {
+        return;
+    }
+
+    // Calculate center position of all components with same name
+    let center = same_name_components
+        .iter()
+        .map(|(_, _, transform)| transform.translation)
+        .fold(Vec3::ZERO, |acc, pos| acc + pos)
+        / same_name_components.len() as f32;
+
+    // Spawn tooltip entity at center position (slightly above)
+    commands.spawn((
+        GameObjectTooltip {
+            target_name: target_component.name().to_string(),
+        },
+        Text::new(target_component.name().to_string()),
+        TextFont {
+            font_size: 20.0,
+            ..default()
+        },
+        TextColor(Color::WHITE),
+        Transform::from_translation(center + Vec3::new(0.0, 30.0, 1000.0)),
+        ZIndex(1000),
+    ));
+}
+
+pub fn hide_tooltip_on_unhover<T: NamedComponent>(
+    _trigger: Trigger<Pointer<Out>>,
+    mut commands: Commands,
+    existing_tooltips: Query<Entity, With<GameObjectTooltip>>,
+) {
+    // Remove the tooltip
+    for entity in existing_tooltips.iter() {
+        if let Ok(mut ec) = commands.get_entity(entity) {
+            ec.despawn();
+        }
+    }
+}
+
+// Cleanup system to remove orphaned tooltips
+pub fn cleanup_orphaned_tooltips(
+    mut commands: Commands,
+    tooltips: Query<(Entity, &GameObjectTooltip)>,
+    // Check if any component with the tooltip's target name still exists
+    beds: Query<&Bed>,
+    baths: Query<&Bath>,
+    kitchens: Query<&Kitchen>,
+    mirrors: Query<&Mirror>,
+    computer_desks: Query<&ComputerDesk>,
+    couches: Query<&Couch>,
+    water_bottles: Query<&WaterBottle>,
+    toilets: Query<&Toilet>,
+    sinks: Query<&Sink>,
+) {
+    for (tooltip_entity, tooltip) in tooltips.iter() {
+        let name_exists = beds.iter().any(|bed| bed.name == tooltip.target_name)
+            || baths.iter().any(|bath| bath.name == tooltip.target_name)
+            || kitchens
+                .iter()
+                .any(|kitchen| kitchen.name == tooltip.target_name)
+            || mirrors
+                .iter()
+                .any(|mirror| mirror.name == tooltip.target_name)
+            || computer_desks
+                .iter()
+                .any(|desk| desk.name == tooltip.target_name)
+            || couches
+                .iter()
+                .any(|couch| couch.name == tooltip.target_name)
+            || water_bottles
+                .iter()
+                .any(|bottle| bottle.name == tooltip.target_name)
+            || toilets
+                .iter()
+                .any(|toilet| toilet.name == tooltip.target_name)
+            || sinks.iter().any(|sink| sink.name == tooltip.target_name);
+
+        if !name_exists {
+            if let Ok(mut ec) = commands.get_entity(tooltip_entity) {
+                ec.despawn();
+            }
+        }
+    }
 }
