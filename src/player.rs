@@ -116,49 +116,6 @@ pub fn move_player_along_path(
     }
 }
 
-// Your existing keyboard movement system
-pub fn move_player(
-    keyboard_input: Res<ButtonInput<KeyCode>>,
-    mut player: Query<(&mut LinearVelocity, &mut PlayerMovement), With<PlayerMarker>>,
-) {
-    // Movement logic using arrow keys
-    for (mut rb_vel, mut player_movement) in player.iter_mut() {
-        let mut direction = Vec2::ZERO;
-        let mut has_keyboard_input = false;
-
-        if keyboard_input.pressed(KeyCode::ArrowRight) {
-            direction += Vec2::new(1.0, 0.0);
-            has_keyboard_input = true;
-        }
-        if keyboard_input.pressed(KeyCode::ArrowLeft) {
-            direction -= Vec2::new(1.0, 0.0);
-            has_keyboard_input = true;
-        }
-        if keyboard_input.pressed(KeyCode::ArrowUp) {
-            direction += Vec2::new(0.0, 1.0);
-            has_keyboard_input = true;
-        }
-        if keyboard_input.pressed(KeyCode::ArrowDown) {
-            direction -= Vec2::new(0.0, 1.0);
-            has_keyboard_input = true;
-        }
-
-        // If there's keyboard input, cancel pathfinding movement
-        if has_keyboard_input {
-            player_movement.is_moving = false;
-            player_movement.path.clear();
-
-            if direction != Vec2::ZERO {
-                direction /= direction.length();
-            }
-            rb_vel.0 = direction * MOVE_SPEED;
-        } else if !player_movement.is_moving {
-            // Only stop if not pathfinding
-            rb_vel.0 = Vec2::ZERO;
-        }
-    }
-}
-
 pub fn spawn_player_sprite(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -200,6 +157,5 @@ pub fn spawn_player_sprite(
         PlayerMovement::default(),
         Collider::circle(10.),
         LockedAxes::ROTATION_LOCKED,
-        ZIndex(2),
     ));
 }

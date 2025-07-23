@@ -3,6 +3,7 @@ use bevy::{input::common_conditions::input_toggle_active, prelude::*, render::vi
 use bevy_common_assets::json::JsonAssetPlugin;
 use bevy_ecs_tiled::prelude::*;
 use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
+use bevy_la_mesa::{LaMesaPlugin, LaMesaPluginSettings};
 
 use crate::{cards::ActivityCards, sprites::LAYER_SPRITES};
 
@@ -31,19 +32,21 @@ fn main() {
         ))
         .add_plugins(navigation::NavigationGridPlugin {})
         .add_plugins(JsonAssetPlugin::<cards::ActivityCards>::new(&["json"]))
-        .add_systems(Startup, (startup,))
+        .add_plugins(LaMesaPlugin::<cards::ActivityCard>::default())
+        .insert_resource(LaMesaPluginSettings { num_players: 1 })
+        .add_systems(Startup, (startup, cards::setup, cards::setup_ui))
         .add_systems(
             Update,
             (
                 player::move_player_from_command,
                 player::move_player_along_path,
-                player::move_player,
                 collisions::check_nearest_object,
-                debug::debug_draw_system,
+                // debug::debug_draw_system,
                 sprites::animate_sprite,
                 sprites::update_animation_indices,
                 ui::example_game_loop,
                 sprites::add_render_layers_to_sprites,
+                cards::button_system,
             ),
         )
         .run();
