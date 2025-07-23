@@ -1,5 +1,4 @@
-use bevy::{prelude::*, render::view::RenderLayers, text::FontStyle};
-use bevy_inspector_egui::egui::TextStyle;
+use bevy::prelude::*;
 
 pub struct HikikomoriUIPlugin;
 
@@ -84,11 +83,11 @@ impl GameState {
         }
 
         self.time_of_day = match self.current_hour {
-            h if h >= 5.0 && h < 9.0 => TimeOfDay::EarlyMorning,
-            h if h >= 9.0 && h < 12.0 => TimeOfDay::Morning,
-            h if h >= 12.0 && h < 17.0 => TimeOfDay::Afternoon,
-            h if h >= 17.0 && h < 20.0 => TimeOfDay::Evening,
-            h if h >= 20.0 || h < 5.0 => {
+            h if (5.0..9.0).contains(&h) => TimeOfDay::EarlyMorning,
+            h if (9.0..12.0).contains(&h) => TimeOfDay::Morning,
+            h if (12.0..17.0).contains(&h) => TimeOfDay::Afternoon,
+            h if (17.0..20.0).contains(&h) => TimeOfDay::Evening,
+            h if !(5.0..20.0).contains(&h) => {
                 if h >= 20.0 {
                     TimeOfDay::Night
                 } else {
@@ -118,7 +117,7 @@ impl GameState {
     pub fn get_time_string(&self) -> String {
         let hour = self.current_hour as u32;
         let minute = ((self.current_hour % 1.0) * 60.0) as u32;
-        format!("{:02}:{:02}", hour, minute)
+        format!("{hour:02}:{minute:02}")
     }
 
     pub fn get_day_string(&self) -> String {
@@ -278,7 +277,7 @@ fn setup_ui(mut commands: Commands) {
                                             margin: UiRect::top(Val::Px(4.0)),
                                             ..default()
                                         },
-                                        BackgroundColor(Color::srgb(0.2, 0.2, 0.2).into()),
+                                        BackgroundColor(Color::srgb(0.2, 0.2, 0.2)),
                                         ResourceBar { resource_type },
                                     ))
                                     .with_children(|bar| {
@@ -289,7 +288,7 @@ fn setup_ui(mut commands: Commands) {
                                                 height: Val::Percent(100.0),
                                                 ..default()
                                             },
-                                            BackgroundColor(UIColors::ACCENT.into()),
+                                            BackgroundColor(UIColors::ACCENT),
                                             ResourceBarFill,
                                         ));
                                     });
@@ -358,7 +357,7 @@ fn update_mood_display(
                 Mood::Content => "Content",
                 Mood::Manic => "Manic",
             };
-            *text = Text::new(format!("Mood: {}", mood_str));
+            *text = Text::new(format!("Mood: {mood_str}"));
             *text_color = TextColor(UIColors::mood_color(&game_state.current_mood));
         }
     }

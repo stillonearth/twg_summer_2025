@@ -1,7 +1,5 @@
-use avian2d::prelude::{Collider, LockedAxes, RigidBody};
 use bevy::{prelude::*, render::view::RenderLayers};
 
-use crate::player;
 
 pub const SHEET_1_COLUMNS: u32 = 13;
 pub const SHEET_1_ROWS: u32 = 21;
@@ -137,49 +135,6 @@ pub fn update_animation_indices(
         );
         *animation_indices = new_indices;
     }
-}
-
-pub fn spawn_character_sprite(
-    mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
-) {
-    let texture = asset_server.load(PLAYER_ASSET_SHEET_1);
-    let layout =
-        TextureAtlasLayout::from_grid(UVec2::splat(64), SHEET_1_COLUMNS, SHEET_1_ROWS, None, None);
-    let texture_atlas_layout = texture_atlas_layouts.add(layout);
-
-    let character_animation = CharacterAnimation {
-        state: AnimationState::Idle,
-        direction: AnimationDirection::Down,
-        animation_type: AnimationType::Stand,
-    };
-
-    let animation_indices = get_animation_indices(
-        character_animation.animation_type,
-        character_animation.direction,
-    );
-
-    commands.spawn((
-        Sprite::from_atlas_image(
-            texture,
-            TextureAtlas {
-                layout: texture_atlas_layout,
-                index: animation_indices.first,
-            },
-        ),
-        animation_indices,
-        AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
-        character_animation,
-        AnimatedCharacterSprite {
-            animated_character_type: AnimatedCharacterType::Player,
-        },
-        RigidBody::Dynamic,
-        player::PlayerMarker,
-        Name::new("Player"),
-        Collider::circle(10.),
-        LockedAxes::ROTATION_LOCKED,
-    ));
 }
 
 pub fn add_render_layers_to_sprites(

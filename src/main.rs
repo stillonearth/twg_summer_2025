@@ -3,7 +3,7 @@ use bevy::{input::common_conditions::input_toggle_active, prelude::*, render::vi
 use bevy_ecs_tiled::prelude::*;
 use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
 
-use crate::{sprites::LAYER_SPRITES, ui::LAYER_UI};
+use crate::sprites::LAYER_SPRITES;
 
 mod collisions;
 mod debug;
@@ -32,6 +32,8 @@ fn main() {
         .add_systems(
             Update,
             (
+                player::move_player_from_command,
+                player::move_player_along_path,
                 player::move_player,
                 collisions::check_nearest_object,
                 debug::debug_draw_system,
@@ -74,7 +76,7 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
              commands: Commands,
              asset_server: Res<AssetServer>,
              texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>| {
-                sprites::spawn_character_sprite(commands, asset_server, texture_atlas_layouts);
+                player::spawn_player_sprite(commands, asset_server, texture_atlas_layouts);
             },
         )
         .observe(

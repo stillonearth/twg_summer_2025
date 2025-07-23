@@ -236,7 +236,7 @@ pub fn setup_walkable_tile_handlers(
 
 fn handle_tile_click(
     trigger: Trigger<Pointer<Click>>,
-    mut nav_events: EventWriter<NavigateToTile>, // Add this
+    mut nav_events: EventWriter<NavigateToTile>,
     player_query: Query<&Transform, (With<PlayerMarker>, Without<WalkableTile>)>,
     tile_query: Query<&Transform, (With<WalkableTile>, Without<PlayerMarker>)>,
     navigation_grid: Res<NavigationGrid>,
@@ -262,7 +262,7 @@ fn handle_tile_click(
 
 fn handle_navigation_event(
     mut nav_events: EventReader<NavigateToTile>,
-    mut commands: Commands,
+    mut mov_cmds: EventWriter<MovePlayerCommand>,
     navigation_grid: Res<NavigationGrid>,
 ) {
     for event in nav_events.read() {
@@ -271,7 +271,7 @@ fn handle_navigation_event(
         if let Some(path) = navigation_grid.find_path(event.from, event.to) {
             println!("Path found with {} steps: {:?}", path.len(), path);
 
-            commands.trigger(MovePlayerCommand { path });
+            mov_cmds.write(MovePlayerCommand { path });
         } else {
             println!("No path found!");
         }

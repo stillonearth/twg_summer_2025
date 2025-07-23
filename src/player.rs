@@ -1,6 +1,8 @@
 use crate::navigation::{GridPos, MovePlayerCommand, TileSize};
 use crate::sprites::{
-    AnimatedCharacterSprite, AnimationDirection, AnimationType, CharacterAnimation,
+    get_animation_indices, AnimatedCharacterSprite, AnimatedCharacterType, AnimationDirection,
+    AnimationState, AnimationTimer, AnimationType, CharacterAnimation, PLAYER_ASSET_SHEET_1,
+    SHEET_1_COLUMNS, SHEET_1_ROWS,
 };
 use avian2d::prelude::*;
 use bevy::prelude::*; // Add your navigation imports
@@ -11,21 +13,13 @@ const MOVE_SPEED: f32 = 200.;
 pub struct PlayerMarker;
 
 #[derive(Component)]
+#[derive(Default)]
 pub struct PlayerMovement {
     pub path: Vec<GridPos>,
     pub current_target_index: usize,
     pub is_moving: bool,
 }
 
-impl Default for PlayerMovement {
-    fn default() -> Self {
-        Self {
-            path: Vec::new(),
-            current_target_index: 0,
-            is_moving: false,
-        }
-    }
-}
 
 pub fn move_player_from_command(
     mut move_events: EventReader<MovePlayerCommand>,
@@ -59,9 +53,8 @@ pub fn move_player_along_path(
     >,
     mut animation_query: Query<&mut CharacterAnimation, With<AnimatedCharacterSprite>>,
     tile_size: Res<TileSize>,
-    time: Res<Time>,
 ) {
-    for (mut transform, mut rb_vel, mut player_movement) in player_query.iter_mut() {
+    for (transform, mut rb_vel, mut player_movement) in player_query.iter_mut() {
         if !player_movement.is_moving || player_movement.path.is_empty() {
             rb_vel.0 = Vec2::ZERO;
             // Set animation to stand when not moving
@@ -116,12 +109,10 @@ pub fn move_player_along_path(
                 } else {
                     character_animation.direction = AnimationDirection::Left;
                 }
+            } else if normalized_direction.y > 0.0 {
+                character_animation.direction = AnimationDirection::Up;
             } else {
-                if normalized_direction.y > 0.0 {
-                    character_animation.direction = AnimationDirection::Up;
-                } else {
-                    character_animation.direction = AnimationDirection::Down;
-                }
+                character_animation.direction = AnimationDirection::Down;
             }
         }
     }
@@ -194,4 +185,48 @@ pub fn move_player(
             }
         }
     }
+}
+
+pub fn spawn_player_sprite(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
+) {
+    let texture = asset_server.load(PLAYER_ASSET_SHEET_1);
+    let layout =
+        TextureAtlasLayout::from_grid(UVec2::splat(64), SHEET_1_COLUMNS, SHEET_1_ROWS, None, None);
+    let texture_atlas_layout = texture_atlas_layouts.add(layout);
+
+    let character_animation = CharacterAnimation {
+        state: AnimationState::Idle,
+        direction: AnimationDirection::Down,
+        animation_type: AnimationType::Stand,
+    };
+
+    let animation_indices = get_animation_indices(
+        character_animation.animation_type,
+        character_animation.direction,
+    );
+
+    commands.spawn((
+        Sprite::from_atlas_image(
+            texture,
+            TextureAtlas {
+                layout: texture_atlas_layout,
+                index: animation_indices.first,
+            },
+        ),
+        animation_indices,
+        AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
+        character_animation,
+        AnimatedCharacterSprite {
+            animated_character_type: AnimatedCharacterType::Player,
+        },
+        RigidBody::Dynamic,
+        PlayerMarker,
+        Name::new("Player"),
+        PlayerMovement::default(),
+        Collider::circle(10.),
+        LockedAxes::ROTATION_LOCKED,
+    ));
 }

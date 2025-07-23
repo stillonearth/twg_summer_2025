@@ -24,9 +24,9 @@ pub fn check_nearest_object(
             match selected_wall {
                 Some((wall, distance, method)) => {
                     println!("\n=== Nearest Wall Properties ===");
-                    println!("Detection method: {}", method);
+                    println!("Detection method: {method}");
                     println!("Name: {}", wall.name);
-                    println!("Distance to surface: {:.2} units", distance);
+                    println!("Distance to surface: {distance:.2} units");
 
                     // Add interaction feedback based on distance
                     if distance < 20.0 {
@@ -144,5 +144,5 @@ pub fn calculate_distance_to_collider(
         return (dx * dx + dy * dy).sqrt();
     }
 
-    return relative_point.length();
+    relative_point.length()
 }
