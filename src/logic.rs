@@ -283,7 +283,7 @@ fn handle_card_draw(
         let old_phase = phase_state.current_phase;
         phase_state.current_phase = GamePhase::CardSelection;
 
-        phase_changed_events.send(PhaseChangedEvent {
+        phase_changed_events.write(PhaseChangedEvent {
             old_phase,
             new_phase: phase_state.current_phase,
         });
@@ -315,7 +315,7 @@ fn handle_card_selection(
             GamePhase::CharacterAction
         };
 
-        phase_changed_events.send(PhaseChangedEvent {
+        phase_changed_events.write(PhaseChangedEvent {
             old_phase,
             new_phase: phase_state.current_phase,
         });
@@ -339,7 +339,7 @@ fn handle_action_completion(
         let old_phase = phase_state.current_phase;
         phase_state.current_phase = GamePhase::CardDraw;
 
-        phase_changed_events.send(PhaseChangedEvent {
+        phase_changed_events.write(PhaseChangedEvent {
             old_phase,
             new_phase: phase_state.current_phase,
         });
@@ -368,7 +368,7 @@ fn handle_game_step_events(
             game_state.current_hour -= 24.0;
             game_state.current_day += 1;
 
-            day_changed_events.send(DayChangedEvent {
+            day_changed_events.write(DayChangedEvent {
                 old_day,
                 new_day: game_state.current_day,
             });
@@ -379,7 +379,7 @@ fn handle_game_step_events(
 
         // Send time changed event if anything changed
         if old_hour != game_state.current_hour || old_time_of_day != game_state.time_of_day {
-            time_changed_events.send(TimeChangedEvent {
+            time_changed_events.write(TimeChangedEvent {
                 old_hour,
                 new_hour: game_state.current_hour,
                 old_time_of_day,
@@ -407,7 +407,7 @@ fn handle_game_step_events(
                     ResourceType::Food => game_state.food = new_value,
                 }
 
-                resource_changed_events.send(ResourceChangedEvent {
+                resource_changed_events.write(ResourceChangedEvent {
                     resource_type,
                     old_value,
                     new_value,
@@ -420,7 +420,7 @@ fn handle_game_step_events(
         game_state.current_mood = game_state.calculate_mood();
 
         if old_mood != game_state.current_mood {
-            mood_changed_events.send(MoodChangedEvent {
+            mood_changed_events.write(MoodChangedEvent {
                 old_mood,
                 new_mood: game_state.current_mood,
             });
@@ -453,15 +453,6 @@ impl GameStepEvent {
 
 // Helper functions for phase management
 impl GamePhaseState {
-    pub fn can_progress_to_next_phase(&self) -> bool {
-        match self.current_phase {
-            GamePhase::CardDraw => self.cards_drawn_count > 0,
-            GamePhase::CardSelection => self.selected_card_number.is_some(),
-            GamePhase::CharacterAction => true, // Always can progress after action
-            GamePhase::VisualNovelCutscene => self.pending_cutscene.is_none(),
-        }
-    }
-
     pub fn get_phase_name(&self) -> &str {
         match self.current_phase {
             GamePhase::CardDraw => "Card Draw",
