@@ -1,0 +1,1844 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale" />
+    <title>Card Game</title>
+    <style>
+      .card {
+        width: 230px;
+        height: 336px;
+        border: 1px solid #ccc;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+        margin: 10px;
+        display: inline-block;
+        text-align: center;
+        overflow: hidden;
+        background: #000;
+      }
+      .card-title {
+        position: absolute;
+        padding: 10px;
+        font-size: 14px;
+        font-weight: bold;
+        color: #fff !important;
+        padding-left: 57px;
+        text-align: left;
+        margin-top: -23px;
+        width: 180px;
+        z-index: 11;
+
+      }
+      .card-info {
+        padding: 10px;
+        text-align: left;
+        font-family: monospace;
+        font-weight: bold;
+        color: white !important;
+        font-size: small;
+      }
+      .card-type,
+      .card-price,
+      .card-genre {
+        color: #6c757d;
+        font-style: italic;
+      }
+      .card-price {
+        position: absolute;
+        /* top: 170px; */
+        left: 0px;
+        margin-top: 160px;
+        margin-left: 30px;
+        background: red;
+        border-radius: 20px;
+        padding: 10px;
+        color: white;
+        font-weight: bold;
+      }
+      .card-effect {
+        /* margin-top: 10px; */
+        text-align: justify;
+        color: white;
+        padding: 8px;
+        font-size: 12px;
+      }
+      .card-flavorText {
+        /* margin-top: 30px; */
+        position: absolute;
+        width: 220px !important;
+        text-align: left;
+        padding: 8px;
+        font-size: 11px;
+        color: #6c757d;
+        font-style: italic;
+      }
+      .card-image {
+        background-color: red;
+        width: 100%;
+        height: 180px;
+        width: 230px;
+        z-index: 0;
+        border-radius: 5px;
+        z-index: 10;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card" id="cardTemplate" style="display: none">
+      <img class="card-image"></img>
+      <span class="card-price">{{price}}</span>
+      <div class="card-title">{{name}}</div>
+      <div class="card-info">
+        <span class="card-type">{{type}}</span>
+        <span style="color: white">|</span>
+        <span class="card-genre">{{genre}}</span>
+      </div>
+      <div class="card-effect">{{effect}}</div>
+      <div class="card-flavorText">{{flavorText}}</div>
+    </div>
+
+    <script src="./html2canvas.js"></script>
+    <script>
+      let cards = [
+        {
+          name: "Mysterious Stranger",
+          card_type: "conflict",
+          genre: "fantasy",
+          effect:
+            "Add a new character to the story who challenges the main protagonist.",
+          flavor_text:
+            "A shadowy figure approaches, their intentions unclear. Who are you?",
+          price: 10,
+        },
+        {
+          name: "Ancient Prophecy",
+          card_type: "setting",
+          genre: "classic",
+          effect: "Introduce a prophecy that influences the course of events.",
+          flavor_text:
+            "The ancient scrolls foretell a great calamity. Will it come to pass?",
+          price: 15,
+        },
+        {
+          name: "Time Warp",
+          card_type: "plot twist",
+          genre: "sci-fi",
+          effect:
+            "Change the time period of the story, altering its context and challenges.",
+          flavor_text:
+            "Suddenly, the world shifts. Is this a dream or reality?",
+          price: 20,
+        },
+        {
+          name: "Forgotten Artifact",
+          card_type: "conflict",
+          genre: "fantasy",
+          effect: "Introduce an artifact that has unexpected consequences.",
+          flavor_text:
+            "The relic hums with ancient power. What secrets does it hold?",
+          price: 25,
+        },
+        {
+          name: "Unexpected Alliance",
+          card_type: "conflict",
+          genre: "spy",
+          effect:
+            "Two unlikely characters form an alliance, creating a new subplot.",
+          flavor_text:
+            "Enemies become allies in the face of a greater threat. Together, they stand a chance.",
+          price: 30,
+        },
+        {
+          name: "Political Intrigue",
+          card_type: "conflict",
+          genre: "political thriller",
+          effect: "A new political figure emerges with hidden motives.",
+          flavor_text: "The city's council is in disarray. Who can be trusted?",
+          price: 35,
+        },
+        {
+          name: "Lost Love Letter",
+          card_type: "plot twist",
+          genre: "classic",
+          effect: "A love letter reveals hidden feelings and past regrets.",
+          flavor_text:
+            "In the forgotten drawer, a letter is found. Whose heart does it belong to?",
+          price: 40,
+        },
+        {
+          name: "Parallel Universe",
+          card_type: "setting",
+          genre: "sci-fi",
+          effect:
+            "The story moves into an alternate dimension with different rules.",
+          flavor_text:
+            "A tear in the fabric of reality opens up a new world, filled with possibilities and dangers.",
+          price: 45,
+        },
+        {
+          name: "Mysterious Disease",
+          card_type: "conflict",
+          genre: "classic",
+          effect: "An illness strikes, causing panic and chaos in the setting.",
+          flavor_text: "A plague sweeps through the city. Will anyone survive?",
+          price: 50,
+        },
+        {
+          name: "Sudden Revelation",
+          card_type: "plot twist",
+          genre: "spy",
+          effect: "A major character reveals a long-held secret.",
+          flavor_text:
+            "The truth has been hidden, but now it comes to light. All is not as it seems.",
+          price: 55,
+        },
+        {
+          name: "Cataclysmic Event",
+          card_type: "setting",
+          genre: "political thriller",
+          effect:
+            "A natural disaster or catastrophic event reshapes the setting.",
+          flavor_text:
+            "The world as we know it is torn apart. New challenges arise from the ruins.",
+          price: 60,
+        },
+        {
+          name: "Mystical Vision",
+          card_type: "plot twist",
+          genre: "fantasy",
+          effect: "A character has a prophetic vision that changes their path.",
+          flavor_text:
+            "The future is revealed in a dream-like state. What choices will be made?",
+          price: 65,
+        },
+        {
+          name: "Technological Breakthrough",
+          card_type: "setting",
+          genre: "sci-fi",
+          effect: "A new technology revolutionizes the world.",
+          flavor_text:
+            "Invention changes everything. The future is brighter and scarier than ever before.",
+          price: 70,
+        },
+        {
+          name: "Heroic Sacrifice",
+          card_type: "conflict",
+          genre: "classic",
+          effect:
+            "A character makes a selfless sacrifice for the greater good.",
+          flavor_text:
+            "There is no greater love than to lay down one's life for others. The hero falls, but not without purpose.",
+          price: 75,
+        },
+        {
+          name: "Betrayal",
+          card_type: "conflict",
+          genre: "spy",
+          effect:
+            "A trusted ally is revealed to be working against the protagonist.",
+          flavor_text: "Trust has been betrayed. Will the truth ever come out?",
+          price: 80,
+        },
+        {
+          name: "Unexpected Victory",
+          card_type: "conflict",
+          genre: "political thriller",
+          effect:
+            "A seemingly lost battle is won by an unexpected turn of events.",
+          flavor_text:
+            "Against all odds, victory is achieved. The underdog prevails.",
+          price: 85,
+        },
+        {
+          name: "Ancient Curse",
+          card_type: "conflict",
+          genre: "fantasy",
+          effect:
+            "A curse or hex affects the protagonist's life in a significant way.",
+          flavor_text:
+            "Cursed by fate, the hero must find a way to break the bond of ill fortune.",
+          price: 90,
+        },
+        {
+          name: "Revolution",
+          card_type: "setting",
+          genre: "political thriller",
+          effect:
+            "A major social or political revolution begins in the setting.",
+          flavor_text:
+            "The people rise up against oppression. A new era is born, but at what cost?",
+          price: 95,
+        },
+        {
+          name: "Time Loop",
+          card_type: "plot twist",
+          genre: "sci-fi",
+          effect: "Characters are trapped in a time loop.",
+          flavor_text:
+            "Day after day, the same events repeat. Will they break free?",
+          price: 100,
+        },
+        {
+          name: "Hidden Relic",
+          card_type: "conflict",
+          genre: "fantasy",
+          effect:
+            "A powerful relic is discovered, but its true nature remains a mystery.",
+          flavor_text:
+            "Ancient and mysterious, the relic's power lies in waiting. Will it be used for good or ill?",
+          price: 105,
+        },
+        {
+          name: "Moral Dilemma",
+          card_type: "conflict",
+          genre: "classic",
+          effect: "A character faces a difficult ethical decision.",
+          flavor_text:
+            "Right and wrong blur. The path forward is uncertain, but the choice must be made.",
+          price: 110,
+        },
+        {
+          name: "Secret Identity",
+          card_type: "conflict",
+          genre: "spy",
+          effect:
+            "A character's true identity or motives are revealed to be more complex than expected.",
+          flavor_text:
+            "The truth is stranger than fiction. Who is the real hero?",
+          price: 115,
+        },
+        {
+          name: "Eternal Riddle",
+          card_type: "plot twist",
+          genre: "fantasy",
+          effect: "A riddle or puzzle that can only be solved by a chosen few.",
+          flavor_text:
+            "Solve the eternal riddle, and unlock the secrets of ages past. Fail, and the consequences are dire.",
+          price: 120,
+        },
+        {
+          name: "World Peace",
+          card_type: "setting",
+          genre: "political thriller",
+          effect: "A world-changing event leads to global peace and unity.",
+          flavor_text:
+            "War is over. Now comes the hard work of rebuilding and understanding each other.",
+          price: 125,
+        },
+        {
+          name: "Technological Catastrophe",
+          card_type: "setting",
+          genre: "sci-fi",
+          effect:
+            "A major technological failure or disaster affects society in a profound way.",
+          flavor_text:
+            "The machines have failed. The world as we know it is at stake.",
+          price: 130,
+        },
+        {
+          name: "Hero's Quest",
+          card_type: "conflict",
+          genre: "fantasy",
+          effect:
+            "A hero embarks on a grand quest to save their world or people.",
+          flavor_text:
+            "The fate of the realm lies in your hands. Gather your allies and set forth on an epic journey.",
+          price: 135,
+        },
+        {
+          name: "Great Invention",
+          card_type: "setting",
+          genre: "sci-fi",
+          effect: "A significant invention changes the course of history.",
+          flavor_text:
+            "Invention is the mother of progress. A new era dawns with this groundbreaking discovery.",
+          price: 140,
+        },
+        {
+          name: "Ancient Prophecy",
+          card_type: "plot twist",
+          genre: "fantasy",
+          effect:
+            "A long-forgotten prophecy is rediscovered and comes to life.",
+          flavor_text:
+            "The words of the ancients foretell a time of great change. Are you ready for what lies ahead?",
+          price: 145,
+        },
+        {
+          name: "Love Triangle",
+          card_type: "conflict",
+          genre: "classic",
+          effect:
+            "Characters are torn between romantic interests, leading to drama and conflict.",
+          flavor_text:
+            "Hearts entangled in a web of love and betrayal. Whose side will you take?",
+          price: 150,
+        },
+        {
+          name: "Espionage",
+          card_type: "conflict",
+          genre: "spy",
+          effect:
+            "A character is caught up in a high-stakes game of espionage and intrigue.",
+          flavor_text:
+            "The truth lies hidden, but the stakes are too high to look away. Can you stay one step ahead?",
+          price: 155,
+        },
+        {
+          name: "Future War",
+          card_type: "plot twist",
+          genre: "sci-fi",
+          effect: "A war breaks out in a dystopian future.",
+          flavor_text:
+            "The world is divided, and the future hangs in the balance. Will you fight for peace or join the ranks?",
+          price: 160,
+        },
+        {
+          name: "Ancient Artifact",
+          card_type: "conflict",
+          genre: "fantasy",
+          effect: "An ancient artifact with mysterious powers is discovered.",
+          flavor_text:
+            "Power beyond imagination lies in this relic. Will it be used for good or evil?",
+          price: 165,
+        },
+        {
+          name: "Social Revolution",
+          card_type: "setting",
+          genre: "political thriller",
+          effect: "A major social movement sparks change and upheaval.",
+          flavor_text:
+            "The status quo is challenged. A new world order dawns, but at what cost?",
+          price: 170,
+        },
+        {
+          name: "Technological Singularity",
+          card_type: "setting",
+          genre: "sci-fi",
+          effect: "A technological breakthrough leads to a singularity event.",
+          flavor_text:
+            "The future is now. Artificial intelligence surpasses human intellect, and the world changes overnight.",
+          price: 175,
+        },
+        {
+          name: "Hero's Sacrifice",
+          card_type: "conflict",
+          genre: "classic",
+          effect:
+            "A heroic character makes a selfless sacrifice for the greater good.",
+          flavor_text:
+            "There is no greater love than to lay down one's life for others. The hero falls, but not without purpose.",
+          price: 180,
+        },
+        {
+          name: "Cataclysmic Event",
+          card_type: "setting",
+          genre: "sci-fi",
+          effect: "A cataclysmic event reshapes the world in a profound way.",
+          flavor_text:
+            "The world as we know it is no more. Will humanity survive?",
+          price: 185,
+        },
+        {
+          name: "Hero's Journey",
+          card_type: "conflict",
+          genre: "fantasy",
+          effect:
+            "A hero embarks on a grand quest to save their world or people.",
+          flavor_text:
+            "The fate of the realm lies in your hands. Gather your allies and set forth on an epic journey.",
+          price: 190,
+        },
+        {
+          name: "Great Invention",
+          card_type: "setting",
+          genre: "sci-fi",
+          effect: "A significant invention changes the course of history.",
+          flavor_text:
+            "Invention is the mother of progress. A new era dawns with this groundbreaking discovery.",
+          price: 195,
+        },
+        {
+          name: "The Lost Scroll",
+          card_type: "setting",
+          genre: "fantasy",
+          effect:
+            "Introduce an ancient prophecy that could change the course of the story.",
+          flavor_text:
+            "In a dusty corner of an old library, an ancient scroll reveals hidden truths about the world's fate.",
+          price: 10,
+        },
+        {
+          name: "Sudden Storm",
+          card_type: "conflict",
+          genre: "sci-fi",
+          effect:
+            "A sudden storm hits a key location, causing delays and challenges for characters.",
+          flavor_text:
+            "An unexpected meteorological event disrupts the plans of our heroes.",
+          price: 30,
+        },
+        {
+          name: "Mysterious Stranger",
+          card_type: "conflict",
+          genre: "classic",
+          effect:
+            "A mysterious stranger arrives and challenges a main character's beliefs or actions.",
+          flavor_text:
+            "He appeared out of nowhere, his presence stirring up old memories and suspicions.",
+          price: 50,
+        },
+        {
+          name: "The Secret Agent",
+          card_type: "plot twist",
+          genre: "spy",
+          effect:
+            "Reveal that a key character is actually a secret agent working for an opposing side.",
+          flavor_text:
+            "Trust no one, not even the closest allies. They may be watching and waiting to strike.",
+          price: 80,
+        },
+        {
+          name: "Historical Artifact",
+          card_type: "setting",
+          genre: "political thriller",
+          effect:
+            "A historical artifact is discovered that has political ramifications.",
+          flavor_text:
+            "The past holds the key to future alliances and conflicts.",
+          price: 20,
+        },
+        {
+          name: "Unforeseen Alliance",
+          card_type: "plot twist",
+          genre: "fantasy",
+          effect:
+            "Two unlikely characters form an alliance, changing the dynamics of the story.",
+          flavor_text:
+            "Enemies become friends in the face of a greater threat.",
+          price: 70,
+        },
+        {
+          name: "Hidden Motives",
+          card_type: "conflict",
+          genre: "sci-fi",
+          effect: "A character reveals hidden motives that shake up the plot.",
+          flavor_text:
+            "What you see is not always what it seems in a world of technology and illusion.",
+          price: 40,
+        },
+        {
+          name: "The Oracle's Prediction",
+          card_type: "plot twist",
+          genre: "classic",
+          effect:
+            "An oracle predicts an unexpected future event that alters the story direction.",
+          flavor_text:
+            "Fate is written in the stars, but it can be rewritten by the bravest of hearts.",
+          price: 60,
+        },
+        {
+          name: "Bargain with a Daemon",
+          card_type: "conflict",
+          genre: "fantasy",
+          effect:
+            "A character makes a deal with a daemon, setting up future consequences.",
+          flavor_text:
+            "What is the price of power? It may be higher than you think.",
+          price: 50,
+        },
+        {
+          name: "Technological Breakthrough",
+          card_type: "setting",
+          genre: "sci-fi",
+          effect:
+            "A new technology changes the game and opens up possibilities for the story.",
+          flavor_text:
+            "Innovation can be a double-edged sword. What will you do with it?",
+          price: 30,
+        },
+        {
+          name: "Political Upheaval",
+          card_type: "conflict",
+          genre: "political thriller",
+          effect:
+            "A sudden political event causes an upheaval that impacts the story.",
+          flavor_text:
+            "Power struggles are never truly over; they merely change form.",
+          price: 60,
+        },
+        {
+          name: "The Lost City",
+          card_type: "setting",
+          genre: "fantasy",
+          effect:
+            "A lost city is rediscovered, filled with secrets and danger.",
+          flavor_text:
+            "Adventure awaits in the shadows of time-forgotten ruins.",
+          price: 40,
+        },
+        {
+          name: "The Great Betrayal",
+          card_type: "conflict",
+          genre: "spy",
+          effect:
+            "A significant betrayal from a trusted character shakes up the narrative.",
+          flavor_text:
+            "Betrayals can come from unexpected places, even in the darkest of shadows.",
+          price: 90,
+        },
+        {
+          name: "Cultural Festival",
+          card_type: "filler",
+          genre: "classic",
+          effect:
+            "Introduce a cultural festival that provides background and flavor to the story.",
+          flavor_text:
+            "Celebrations are moments of joy amidst adversity, giving strength and unity to those who partake.",
+          price: 20,
+        },
+        {
+          name: "Asteroid Impact",
+          card_type: "conflict",
+          genre: "sci-fi",
+          effect:
+            "An asteroid impact forces characters to adapt to new challenges.",
+          flavor_text: "When the sky falls, humanity must rise from its ashes.",
+          price: 70,
+        },
+        {
+          name: "The Hero's Journey Begins",
+          card_type: "plot twist",
+          genre: "fantasy",
+          effect:
+            "A young hero embarks on a quest that changes the course of history.",
+          flavor_text:
+            "Every great adventure begins with one small step into the unknown.",
+          price: 80,
+        },
+        {
+          name: "Political Revolution",
+          card_type: "conflict",
+          genre: "political thriller",
+          effect:
+            "A political revolution breaks out, reshaping the story's landscape.",
+          flavor_text:
+            "Change is inevitable; resist it or ride its waves to a new horizon.",
+          price: 50,
+        },
+        {
+          name: "The Enchanted Forest",
+          card_type: "setting",
+          genre: "fantasy",
+          effect: "A mystical forest appears, full of magic and mystery.",
+          flavor_text:
+            "Nature's secrets are whispered to those who listen with an open heart.",
+          price: 30,
+        },
+        {
+          name: "The Spy's Gambit",
+          card_type: "conflict",
+          genre: "spy",
+          effect:
+            "A risky move by a spy creates complications and drama in the story.",
+          flavor_text: "Sometimes, to save the day, you must risk it all.",
+          price: 60,
+        },
+        {
+          name: "Alien Arrival",
+          card_type: "setting",
+          genre: "sci-fi",
+          effect:
+            "An alien race arrives with unknown intentions and consequences.",
+          flavor_text:
+            "The universe is vast, full of wonders and dangers beyond imagination.",
+          price: 40,
+        },
+        {
+          name: "The Lost Heir",
+          card_type: "plot twist",
+          genre: "political thriller",
+          effect:
+            "A lost heir to a kingdom or empire is discovered, creating intrigue.",
+          flavor_text:
+            "Power can be reclaimed by those who have the courage to fight for it.",
+          price: 80,
+        },
+        {
+          name: "The Dark Lord's Return",
+          card_type: "conflict",
+          genre: "fantasy",
+          effect:
+            "An ancient evil returns, threatening all that is good and just.",
+          flavor_text:
+            "Darkness can be overcome, but only with the light of hope shining bright.",
+          price: 90,
+        },
+        {
+          name: "The Great War",
+          card_type: "conflict",
+          genre: "classic",
+          effect:
+            "A major war breaks out, altering the course of history and human lives.",
+          flavor_text:
+            "War is a crucible that refines both heroes and villains alike.",
+          price: 50,
+        },
+        {
+          name: "Technological Disaster",
+          card_type: "conflict",
+          genre: "sci-fi",
+          effect:
+            "A technological disaster strikes, causing chaos and requiring adaptation.",
+          flavor_text:
+            "Progress comes at a price; the cost can be devastating.",
+          price: 70,
+        },
+        {
+          name: "The Great Reveal",
+          card_type: "plot twist",
+          genre: "fantasy",
+          effect:
+            "A significant revelation changes everything for the characters and story.",
+          flavor_text:
+            "Sometimes, all it takes is one moment of truth to turn the tide of fate.",
+          price: 90,
+        },
+        {
+          name: "The Enigmatic Stranger",
+          card_type: "conflict",
+          genre: "spy",
+          effect:
+            "A mysterious stranger arrives with secrets and a hidden agenda.",
+          flavor_text:
+            "Not all visitors come in peace, and not everyone is who they seem.",
+          price: 60,
+        },
+        {
+          name: "The Royal Wedding",
+          card_type: "filler",
+          genre: "classic",
+          effect:
+            "A royal wedding adds cultural richness and emotional depth to the story.",
+          flavor_text: "Love knows no boundaries, not even those of royalty.",
+          price: 20,
+        },
+        {
+          name: "The Great Exodus",
+          card_type: "conflict",
+          genre: "sci-fi",
+          effect:
+            "A mass exodus due to environmental or societal collapse changes the narrative.",
+          flavor_text:
+            "When the ground beneath you crumbles, there is no choice but to move forward.",
+          price: 80,
+        },
+        {
+          name: "The Long-Lost Artifact",
+          card_type: "conflict",
+          genre: "fantasy",
+          effect:
+            "A long-lost artifact resurfaces with the power to alter the world.",
+          flavor_text:
+            "Sometimes, the past holds keys that can unlock the future.",
+          price: 90,
+        },
+        {
+          name: "The Great Upheaval",
+          card_type: "conflict",
+          genre: "political thriller",
+          effect:
+            "A major political upheaval reshapes the power dynamics and story arc.",
+          flavor_text:
+            "When the old order falls, a new one must rise from its ashes.",
+          price: 50,
+        },
+        {
+          name: "The Mysterious Event",
+          card_type: "conflict",
+          genre: "spy",
+          effect:
+            "An unexplained event causes panic and suspicion among characters.",
+          flavor_text:
+            "Suspicion breeds distrust, and trust is the currency of alliances.",
+          price: 60,
+        },
+        {
+          name: "The Great Festival",
+          card_type: "filler",
+          genre: "classic",
+          effect:
+            "A grand festival provides cultural richness and character interaction.",
+          flavor_text:
+            "Festivals are not just celebrations; they are the heartbeats of communities.",
+          price: 20,
+        },
+        {
+          name: "The Astronomical Event",
+          card_type: "setting",
+          genre: "sci-fi",
+          effect:
+            "A rare astronomical event influences characters and plot developments.",
+          flavor_text:
+            "Sometimes, the cosmos aligns to send a message or bring change.",
+          price: 40,
+        },
+        {
+          name: "The Great Betrayal Unveiled",
+          card_type: "conflict",
+          genre: "political thriller",
+          effect:
+            "A significant betrayal is revealed, shaking the foundations of power and trust.",
+          flavor_text:
+            "Betrayals cut deeper than blades; they strike at the heart of faith.",
+          price: 80,
+        },
+        {
+          name: "The Enigmatic Guardian",
+          card_type: "conflict",
+          genre: "fantasy",
+          effect:
+            "An enigmatic guardian emerges, holding secrets and powerful abilities.",
+          flavor_text:
+            "Some protectors come in shadows; their presence is a mystery to be unraveled.",
+          price: 90,
+        },
+        {
+          name: "The Great Revelation",
+          card_type: "plot twist",
+          genre: "classic",
+          effect:
+            "A major revelation changes the course of events and character motivations.",
+          flavor_text:
+            "In every story, there is a moment when the truth sets everything in motion.",
+          price: 50,
+        },
+        {
+          name: "The Mysterious Stranger's Arrival",
+          card_type: "conflict",
+          genre: "spy",
+          effect:
+            "A mysterious stranger arrives with an agenda that shakes the status quo.",
+          flavor_text:
+            "Strangers bring change, whether for good or ill; their intentions remain a mystery.",
+          price: 60,
+        },
+        {
+          name: "The Great Festival of Lights",
+          card_type: "filler",
+          genre: "classic",
+          effect:
+            "A festival celebrating light and unity adds cultural richness to the story.",
+          flavor_text:
+            "Light dispels darkness, both literally and metaphorically in times of celebration.",
+          price: 20,
+        },
+        {
+          name: "The Astronomical Disaster",
+          card_type: "conflict",
+          genre: "sci-fi",
+          effect:
+            "A catastrophic astronomical event disrupts society and changes the plot direction.",
+          flavor_text:
+            "When stars collide, so too do worlds; chaos follows in their wake.",
+          price: 70,
+        },
+        {
+          name: "The Great Reformation",
+          card_type: "conflict",
+          genre: "political thriller",
+          effect:
+            "A major political and social reform movement reshapes the narrative.",
+          flavor_text:
+            "Reformations are not just about change; they are revolutions of the heart and mind.",
+          price: 80,
+        },
+        {
+          name: "The Enigmatic Protector's Role",
+          card_type: "conflict",
+          genre: "fantasy",
+          effect:
+            "An enigmatic guardian takes on a pivotal role in protecting or influencing characters.",
+          flavor_text:
+            "Some guardians stand quietly, but their influence ripples through all it touches.",
+          price: 90,
+        },
+        {
+          name: "The Great Discovery",
+          card_type: "plot twist",
+          genre: "classic",
+          effect:
+            "A significant discovery alters the course of events and character arcs.",
+          flavor_text:
+            "Discoveries are not just about finding; they are about understanding and changing.",
+          price: 50,
+        },
+        {
+          name: "The Mysterious Guardian's Arrival",
+          card_type: "conflict",
+          genre: "spy",
+          effect:
+            "A mysterious guardian arrives with secrets that threaten or aid the story's direction.",
+          flavor_text:
+            "Guardians come to protect, but their true intentions are shrouded in mystery.",
+          price: 60,
+        },
+        {
+          name: "The Great Celebration",
+          card_type: "filler",
+          genre: "classic",
+          effect:
+            "A grand celebration adds cultural richness and emotional depth to the narrative.",
+          flavor_text:
+            "Celebrations are not just about joy; they are moments of unity and reflection.",
+          price: 20,
+        },
+        {
+          name: "The Great Crisis",
+          card_type: "conflict",
+          genre: "sci-fi",
+          effect:
+            "A major crisis emerges, challenging characters and forcing societal changes.",
+          flavor_text:
+            "Crises are crucibles; they test the mettle of individuals and nations alike.",
+          price: 80,
+        },
+        {
+          name: "The Great Revelation Unveiled",
+          card_type: "plot twist",
+          genre: "political thriller",
+          effect:
+            "A significant revelation changes the direction and motivations in the story.",
+          flavor_text:
+            "Truths that were once hidden now come to light, reshaping destinies.",
+          price: 80,
+        },
+        {
+          name: "The Enigmatic Guardian's Secret",
+          card_type: "conflict",
+          genre: "fantasy",
+          effect:
+            "An enigmatic guardian reveals a crucial secret that alters the story's direction.",
+          flavor_text:
+            "Secrets have power; when they are revealed, so too is their influence felt.",
+          price: 90,
+        },
+        {
+          name: "The Great Discovery Unveiled",
+          card_type: "plot twist",
+          genre: "classic",
+          effect:
+            "A major discovery reshapes the narrative and character motivations.",
+          flavor_text:
+            "Discoveries are moments of clarity; they redefine paths taken and yet to be walked.",
+          price: 50,
+        },
+        {
+          name: "The Mysterious Guardian's Influence",
+          card_type: "conflict",
+          genre: "spy",
+          effect:
+            "A mysterious guardian exerts significant influence, changing the story's direction.",
+          flavor_text:
+            "Influence can be subtle or overt; its impact is always profound and lasting.",
+          price: 60,
+        },
+        {
+          name: "The Great Festival of Unity",
+          card_type: "filler",
+          genre: "classic",
+          effect:
+            "A festival celebrating unity adds cultural richness to the narrative.",
+          flavor_text:
+            "Unity festivals are more than celebrations; they are moments of collective strength and resolve.",
+          price: 20,
+        },
+        {
+          name: "The Great Crisis Unveiled",
+          card_type: "conflict",
+          genre: "sci-fi",
+          effect:
+            "A major crisis emerges, challenging characters and reshaping the narrative direction.",
+          flavor_text:
+            "Crises are turning points; they force choices that define legacies.",
+          price: 80,
+        },
+        {
+          name: "The Great Revelation's Impact",
+          card_type: "plot twist",
+          genre: "political thriller",
+          effect:
+            "A significant revelation reshapes the direction and motivations in the story.",
+          flavor_text:
+            "Revelations are transformative; they change everything, including who we think we know.",
+          price: 80,
+        },
+        {
+          name: "The Enigmatic Guardian's Influence",
+          card_type: "conflict",
+          genre: "fantasy",
+          effect:
+            "An enigmatic guardian exerts significant influence, changing the story's direction and character dynamics.",
+          flavor_text:
+            "Influence can be as powerful as it is mysterious; its impact shapes destinies.",
+          price: 90,
+        },
+        {
+          name: "The Great Discovery's Impact",
+          card_type: "plot twist",
+          genre: "classic",
+          effect:
+            "A major discovery reshapes the narrative and alters character motivations.",
+          flavor_text:
+            "Discoveries are moments of truth; they force characters to reconsider their paths.",
+          price: 50,
+        },
+        {
+          name: "The Mysterious Guardian's Role",
+          card_type: "conflict",
+          genre: "spy",
+          effect:
+            "A mysterious guardian takes on a crucial role, affecting the story's direction and character arcs.",
+          flavor_text:
+            "Guardians come to protect or disrupt; their influence is felt deeply in all they touch.",
+          price: 60,
+        },
+        {
+          name: "The Great Festival of Lights Unveiled",
+          card_type: "filler",
+          genre: "classic",
+          effect:
+            "A festival celebrating light and unity adds cultural richness to the narrative.",
+          flavor_text:
+            "Light festivals are more than celebrations; they illuminate paths forward and bonds between people.",
+          price: 20,
+        },
+        {
+          name: "The Great Crisis's Impact",
+          card_type: "conflict",
+          genre: "sci-fi",
+          effect:
+            "A major crisis emerges, challenging characters and reshaping the narrative direction significantly.",
+          flavor_text:
+            "Crises are moments of truth; they force hard choices that define legacies and futures.",
+          price: 80,
+        },
+        {
+          name: "The Great Revelation's Influence",
+          card_type: "plot twist",
+          genre: "political thriller",
+          effect:
+            "A significant revelation reshapes the direction of events and character motivations.",
+          flavor_text:
+            "Revelations are pivotal; they alter everything in their wake, including who we think we know.",
+          price: 80,
+        },
+        {
+          name: "The Enigmatic Guardian's Role",
+          card_type: "conflict",
+          genre: "fantasy",
+          effect:
+            "An enigmatic guardian takes on a pivotal role in the story, influencing character arcs and outcomes.",
+          flavor_text:
+            "Guardians' roles are as mysterious as they are significant; their influence is felt deeply by all.",
+          price: 90,
+        },
+        {
+          name: "The Great Discovery's Influence",
+          card_type: "plot twist",
+          genre: "classic",
+          effect:
+            "A major discovery reshapes the narrative and alters character motivations significantly.",
+          flavor_text:
+            "Discoveries are transformative; they force characters to question everything and everyone around them.",
+          price: 50,
+        },
+        {
+          name: "The Mysterious Guardian's Impact",
+          card_type: "conflict",
+          genre: "spy",
+          effect:
+            "A mysterious guardian exerts significant influence, changing the story's direction and outcomes.",
+          flavor_text:
+            "Guardians' impacts are as profound as they are unexpected; their presence alters everything in their wake.",
+          price: 60,
+        },
+        {
+          name: "The Great Festival of Unity Unveiled",
+          card_type: "filler",
+          genre: "classic",
+          effect:
+            "A festival celebrating unity adds cultural richness to the narrative and strengthens bonds between characters.",
+          flavor_text:
+            "Unity festivals are moments of collective strength and resolve, illuminating paths forward together.",
+          price: 20,
+        },
+        {
+          name: "The Great Crisis's Influence",
+          card_type: "conflict",
+          genre: "sci-fi",
+          effect:
+            "A major crisis emerges, challenging characters and reshaping the narrative direction profoundly.",
+          flavor_text:
+            "Crises are defining moments; they force hard choices that shape legacies and futures irreversibly.",
+          price: 80,
+        },
+        {
+          name: "The Great Revelation's Impact",
+          card_type: "plot twist",
+          genre: "political thriller",
+          effect:
+            "A significant revelation reshapes the direction of events and character motivations profoundly.",
+          flavor_text:
+            "Revelations are pivotal; they alter everything in their wake, including who we think we know and trust.",
+          price: 80,
+        },
+        {
+          name: "The Enigmatic Guardian's Impact",
+          card_type: "conflict",
+          genre: "fantasy",
+          effect:
+            "An enigmatic guardian exerts significant influence, changing the story's direction and outcomes profoundly.",
+          flavor_text:
+            "Guardians' impacts are as profound as they are unexpected; their presence alters everything in their wake significantly.",
+          price: 90,
+        },
+        {
+          name: "The Great Discovery's Impact",
+          card_type: "plot twist",
+          genre: "classic",
+          effect:
+            "A major discovery reshapes the narrative and character motivations profoundly.",
+          flavor_text:
+            "Discoveries are transformative; they force characters to question everything and everyone around them deeply.",
+          price: 50,
+        },
+        {
+          name: "The Mysterious Guardian's Role",
+          card_type: "conflict",
+          genre: "spy",
+          effect:
+            "A mysterious guardian takes on a crucial role, affecting the story's direction and character arcs profoundly.",
+          flavor_text:
+            "Guardians' roles are as mysterious as they are significant; their influence is felt deeply by all involved.",
+          price: 60,
+        },
+        {
+          name: "The Lost Scroll",
+          card_type: "setting",
+          genre: "fantasy",
+          effect:
+            "Introduce an ancient prophecy that could change the course of the story.",
+          flavor_text:
+            "In a dusty corner of an old library, an ancient scroll reveals hidden truths about the world's fate.",
+          price: 10,
+        },
+        {
+          name: "Sudden Storm",
+          card_type: "conflict",
+          genre: "sci-fi",
+          effect:
+            "A sudden storm hits a key location, causing delays and challenges for characters.",
+          flavor_text:
+            "An unexpected meteorological event disrupts the plans of our heroes.",
+          price: 30,
+        },
+        {
+          name: "Mysterious Stranger",
+          card_type: "conflict",
+          genre: "classic",
+          effect:
+            "A mysterious stranger arrives and challenges a main character's beliefs or actions.",
+          flavor_text:
+            "He appeared out of nowhere, his presence stirring up old memories and suspicions.",
+          price: 50,
+        },
+        {
+          name: "The Secret Agent",
+          card_type: "plot twist",
+          genre: "spy",
+          effect:
+            "Reveal that a key character is actually a secret agent working for an opposing side.",
+          flavor_text:
+            "Trust no one, not even the closest allies. They may be watching and waiting to strike.",
+          price: 80,
+        },
+        {
+          name: "Historical Artifact",
+          card_type: "setting",
+          genre: "political thriller",
+          effect:
+            "A historical artifact is discovered that has political ramifications.",
+          flavor_text:
+            "The past holds the key to future alliances and conflicts.",
+          price: 20,
+        },
+        {
+          name: "Unforeseen Alliance",
+          card_type: "plot twist",
+          genre: "fantasy",
+          effect:
+            "Two unlikely characters form an alliance, changing the dynamics of the story.",
+          flavor_text:
+            "Enemies become friends in the face of a greater threat.",
+          price: 70,
+        },
+        {
+          name: "Hidden Motives",
+          card_type: "conflict",
+          genre: "sci-fi",
+          effect: "A character reveals hidden motives that shake up the plot.",
+          flavor_text:
+            "What you see is not always what it seems in a world of technology and illusion.",
+          price: 40,
+        },
+        {
+          name: "The Oracle's Prediction",
+          card_type: "plot twist",
+          genre: "classic",
+          effect:
+            "An oracle predicts an unexpected future event that alters the story direction.",
+          flavor_text:
+            "Fate is written in the stars, but it can be rewritten by the bravest of hearts.",
+          price: 60,
+        },
+        {
+          name: "Bargain with a Daemon",
+          card_type: "conflict",
+          genre: "fantasy",
+          effect:
+            "A character makes a deal with a daemon, setting up future consequences.",
+          flavor_text:
+            "What is the price of power? It may be higher than you think.",
+          price: 50,
+        },
+        {
+          name: "Technological Breakthrough",
+          card_type: "setting",
+          genre: "sci-fi",
+          effect:
+            "A new technology changes the game and opens up possibilities for the story.",
+          flavor_text:
+            "Innovation can be a double-edged sword. What will you do with it?",
+          price: 30,
+        },
+        {
+          name: "Political Upheaval",
+          card_type: "conflict",
+          genre: "political thriller",
+          effect:
+            "A sudden political event causes an upheaval that impacts the story.",
+          flavor_text:
+            "Power struggles are never truly over; they merely change form.",
+          price: 60,
+        },
+        {
+          name: "The Lost City",
+          card_type: "setting",
+          genre: "fantasy",
+          effect:
+            "A lost city is rediscovered, filled with secrets and danger.",
+          flavor_text:
+            "Adventure awaits in the shadows of time-forgotten ruins.",
+          price: 40,
+        },
+        {
+          name: "The Great Betrayal",
+          card_type: "conflict",
+          genre: "spy",
+          effect:
+            "A significant betrayal from a trusted character shakes up the narrative.",
+          flavor_text:
+            "Betrayals can come from unexpected places, even in the darkest of shadows.",
+          price: 90,
+        },
+        {
+          name: "Cultural Festival",
+          card_type: "filler",
+          genre: "classic",
+          effect:
+            "Introduce a cultural festival that provides background and flavor to the story.",
+          flavor_text:
+            "Celebrations are moments of joy amidst adversity, giving strength and unity to those who partake.",
+          price: 20,
+        },
+        {
+          name: "Asteroid Impact",
+          card_type: "conflict",
+          genre: "sci-fi",
+          effect:
+            "An asteroid impact forces characters to adapt to new challenges.",
+          flavor_text: "When the sky falls, humanity must rise from its ashes.",
+          price: 70,
+        },
+        {
+          name: "The Hero's Journey Begins",
+          card_type: "plot twist",
+          genre: "fantasy",
+          effect:
+            "A young hero embarks on a quest that changes the course of history.",
+          flavor_text:
+            "Every great adventure begins with one small step into the unknown.",
+          price: 80,
+        },
+        {
+          name: "Political Revolution",
+          card_type: "conflict",
+          genre: "political thriller",
+          effect:
+            "A political revolution breaks out, reshaping the story's landscape.",
+          flavor_text:
+            "Change is inevitable; resist it or ride its waves to a new horizon.",
+          price: 50,
+        },
+        {
+          name: "The Enchanted Forest",
+          card_type: "setting",
+          genre: "fantasy",
+          effect: "A mystical forest appears, full of magic and mystery.",
+          flavor_text:
+            "Nature's secrets are whispered to those who listen with an open heart.",
+          price: 30,
+        },
+        {
+          name: "The Spy's Gambit",
+          card_type: "conflict",
+          genre: "spy",
+          effect:
+            "A risky move by a spy creates complications and drama in the story.",
+          flavor_text: "Sometimes, to save the day, you must risk it all.",
+          price: 60,
+        },
+        {
+          name: "Alien Arrival",
+          card_type: "setting",
+          genre: "sci-fi",
+          effect:
+            "An alien race arrives with unknown intentions and consequences.",
+          flavor_text:
+            "The universe is vast, full of wonders and dangers beyond imagination.",
+          price: 40,
+        },
+        {
+          name: "The Lost Heir",
+          card_type: "plot twist",
+          genre: "political thriller",
+          effect:
+            "A lost heir to a kingdom or empire is discovered, creating intrigue.",
+          flavor_text:
+            "Power can be reclaimed by those who have the courage to fight for it.",
+          price: 80,
+        },
+        {
+          name: "The Dark Lord's Return",
+          card_type: "conflict",
+          genre: "fantasy",
+          effect:
+            "An ancient evil returns, threatening all that is good and just.",
+          flavor_text:
+            "Darkness can be overcome, but only with the light of hope shining bright.",
+          price: 90,
+        },
+        {
+          name: "The Great War",
+          card_type: "conflict",
+          genre: "classic",
+          effect:
+            "A major war breaks out, altering the course of history and human lives.",
+          flavor_text:
+            "War is a crucible that refines both heroes and villains alike.",
+          price: 50,
+        },
+        {
+          name: "Technological Disaster",
+          card_type: "conflict",
+          genre: "sci-fi",
+          effect:
+            "A technological disaster strikes, causing chaos and requiring adaptation.",
+          flavor_text:
+            "Progress comes at a price; the cost can be devastating.",
+          price: 70,
+        },
+        {
+          name: "The Great Reveal",
+          card_type: "plot twist",
+          genre: "fantasy",
+          effect:
+            "A significant revelation changes everything for the characters and story.",
+          flavor_text:
+            "Sometimes, all it takes is one moment of truth to turn the tide of fate.",
+          price: 90,
+        },
+        {
+          name: "The Enigmatic Stranger",
+          card_type: "conflict",
+          genre: "spy",
+          effect:
+            "A mysterious stranger arrives with secrets and a hidden agenda.",
+          flavor_text:
+            "Not all visitors come in peace, and not everyone is who they seem.",
+          price: 60,
+        },
+        {
+          name: "The Royal Wedding",
+          card_type: "filler",
+          genre: "classic",
+          effect:
+            "A royal wedding adds cultural richness and emotional depth to the story.",
+          flavor_text: "Love knows no boundaries, not even those of royalty.",
+          price: 20,
+        },
+        {
+          name: "The Great Exodus",
+          card_type: "conflict",
+          genre: "sci-fi",
+          effect:
+            "A mass exodus due to environmental or societal collapse changes the narrative.",
+          flavor_text:
+            "When the ground beneath you crumbles, there is no choice but to move forward.",
+          price: 80,
+        },
+        {
+          name: "The Long-Lost Artifact",
+          card_type: "conflict",
+          genre: "fantasy",
+          effect:
+            "A long-lost artifact resurfaces with the power to alter the world.",
+          flavor_text:
+            "Sometimes, the past holds keys that can unlock the future.",
+          price: 90,
+        },
+        {
+          name: "The Great Upheaval",
+          card_type: "conflict",
+          genre: "political thriller",
+          effect:
+            "A major political upheaval reshapes the power dynamics and story arc.",
+          flavor_text:
+            "When the old order falls, a new one must rise from its ashes.",
+          price: 50,
+        },
+        {
+          name: "The Mysterious Event",
+          card_type: "conflict",
+          genre: "spy",
+          effect:
+            "An unexplained event causes panic and suspicion among characters.",
+          flavor_text:
+            "Suspicion breeds distrust, and trust is the currency of alliances.",
+          price: 60,
+        },
+        {
+          name: "The Great Festival",
+          card_type: "filler",
+          genre: "classic",
+          effect:
+            "A grand festival provides cultural richness and character interaction.",
+          flavor_text:
+            "Festivals are not just celebrations; they are the heartbeats of communities.",
+          price: 20,
+        },
+        {
+          name: "The Astronomical Event",
+          card_type: "setting",
+          genre: "sci-fi",
+          effect:
+            "A rare astronomical event influences characters and plot developments.",
+          flavor_text:
+            "Sometimes, the cosmos aligns to send a message or bring change.",
+          price: 40,
+        },
+        {
+          name: "The Great Betrayal Unveiled",
+          card_type: "conflict",
+          genre: "political thriller",
+          effect:
+            "A significant betrayal is revealed, shaking the foundations of power and trust.",
+          flavor_text:
+            "Betrayals cut deeper than blades; they strike at the heart of faith.",
+          price: 80,
+        },
+        {
+          name: "The Enigmatic Guardian",
+          card_type: "conflict",
+          genre: "fantasy",
+          effect:
+            "An enigmatic guardian emerges, holding secrets and powerful abilities.",
+          flavor_text:
+            "Some protectors come in shadows; their presence is a mystery to be unraveled.",
+          price: 90,
+        },
+        {
+          name: "The Great Revelation",
+          card_type: "plot twist",
+          genre: "classic",
+          effect:
+            "A major revelation changes the course of events and character motivations.",
+          flavor_text:
+            "In every story, there is a moment when the truth sets everything in motion.",
+          price: 50,
+        },
+        {
+          name: "The Mysterious Stranger's Arrival",
+          card_type: "conflict",
+          genre: "spy",
+          effect:
+            "A mysterious stranger arrives with an agenda that shakes the status quo.",
+          flavor_text:
+            "Strangers bring change, whether for good or ill; their intentions remain a mystery.",
+          price: 60,
+        },
+        {
+          name: "The Great Festival of Lights",
+          card_type: "filler",
+          genre: "classic",
+          effect:
+            "A festival celebrating light and unity adds cultural richness to the story.",
+          flavor_text:
+            "Light dispels darkness, both literally and metaphorically in times of celebration.",
+          price: 20,
+        },
+        {
+          name: "The Astronomical Disaster",
+          card_type: "conflict",
+          genre: "sci-fi",
+          effect:
+            "A catastrophic astronomical event disrupts society and changes the plot direction.",
+          flavor_text:
+            "When stars collide, so too do worlds; chaos follows in their wake.",
+          price: 70,
+        },
+        {
+          name: "The Great Reformation",
+          card_type: "conflict",
+          genre: "political thriller",
+          effect:
+            "A major political and social reform movement reshapes the narrative.",
+          flavor_text:
+            "Reformations are not just about change; they are revolutions of the heart and mind.",
+          price: 80,
+        },
+        {
+          name: "The Enigmatic Protector's Role",
+          card_type: "conflict",
+          genre: "fantasy",
+          effect:
+            "An enigmatic guardian takes on a pivotal role in protecting or influencing characters.",
+          flavor_text:
+            "Some guardians stand quietly, but their influence ripples through all it touches.",
+          price: 90,
+        },
+        {
+          name: "The Great Discovery",
+          card_type: "plot twist",
+          genre: "classic",
+          effect:
+            "A significant discovery alters the course of events and character arcs.",
+          flavor_text:
+            "Discoveries are not just about finding; they are about understanding and changing.",
+          price: 50,
+        },
+        {
+          name: "The Mysterious Guardian's Arrival",
+          card_type: "conflict",
+          genre: "spy",
+          effect:
+            "A mysterious guardian arrives with secrets that threaten or aid the story's direction.",
+          flavor_text:
+            "Guardians come to protect, but their true intentions are shrouded in mystery.",
+          price: 60,
+        },
+        {
+          name: "The Great Celebration",
+          card_type: "filler",
+          genre: "classic",
+          effect:
+            "A grand celebration adds cultural richness and emotional depth to the narrative.",
+          flavor_text:
+            "Celebrations are not just about joy; they are moments of unity and reflection.",
+          price: 20,
+        },
+        {
+          name: "The Great Crisis",
+          card_type: "conflict",
+          genre: "sci-fi",
+          effect:
+            "A major crisis emerges, challenging characters and forcing societal changes.",
+          flavor_text:
+            "Crises are crucibles; they test the mettle of individuals and nations alike.",
+          price: 80,
+        },
+        {
+          name: "The Great Revelation Unveiled",
+          card_type: "plot twist",
+          genre: "political thriller",
+          effect:
+            "A significant revelation changes the direction and motivations in the story.",
+          flavor_text:
+            "Truths that were once hidden now come to light, reshaping destinies.",
+          price: 80,
+        },
+        {
+          name: "The Enigmatic Guardian's Secret",
+          card_type: "conflict",
+          genre: "fantasy",
+          effect:
+            "An enigmatic guardian reveals a crucial secret that alters the story's direction.",
+          flavor_text:
+            "Secrets have power; when they are revealed, so too is their influence felt.",
+          price: 90,
+        },
+        {
+          name: "The Great Discovery Unveiled",
+          card_type: "plot twist",
+          genre: "classic",
+          effect:
+            "A major discovery reshapes the narrative and character motivations.",
+          flavor_text:
+            "Discoveries are moments of clarity; they redefine paths taken and yet to be walked.",
+          price: 50,
+        },
+        {
+          name: "The Mysterious Guardian's Influence",
+          card_type: "conflict",
+          genre: "spy",
+          effect:
+            "A mysterious guardian exerts significant influence, changing the story's direction.",
+          flavor_text:
+            "Influence can be subtle or overt; its impact is always profound and lasting.",
+          price: 60,
+        },
+        {
+          name: "The Great Festival of Unity",
+          card_type: "filler",
+          genre: "classic",
+          effect:
+            "A festival celebrating unity adds cultural richness to the narrative.",
+          flavor_text:
+            "Unity festivals are more than celebrations; they are moments of collective strength and resolve.",
+          price: 20,
+        },
+        {
+          name: "The Great Crisis Unveiled",
+          card_type: "conflict",
+          genre: "sci-fi",
+          effect:
+            "A major crisis emerges, challenging characters and reshaping the narrative direction.",
+          flavor_text:
+            "Crises are turning points; they force choices that define legacies.",
+          price: 80,
+        },
+        {
+          name: "The Great Revelation's Impact",
+          card_type: "plot twist",
+          genre: "political thriller",
+          effect:
+            "A significant revelation reshapes the direction and motivations in the story.",
+          flavor_text:
+            "Revelations are transformative; they change everything, including who we think we know.",
+          price: 80,
+        },
+        {
+          name: "The Enigmatic Guardian's Influence",
+          card_type: "conflict",
+          genre: "fantasy",
+          effect:
+            "An enigmatic guardian exerts significant influence, changing the story's direction and character dynamics.",
+          flavor_text:
+            "Influence can be as powerful as it is mysterious; its impact shapes destinies.",
+          price: 90,
+        },
+        {
+          name: "The Great Discovery's Impact",
+          card_type: "plot twist",
+          genre: "classic",
+          effect:
+            "A major discovery reshapes the narrative and alters character motivations.",
+          flavor_text:
+            "Discoveries are moments of truth; they force characters to reconsider their paths.",
+          price: 50,
+        },
+        {
+          name: "The Mysterious Guardian's Role",
+          card_type: "conflict",
+          genre: "spy",
+          effect:
+            "A mysterious guardian takes on a crucial role, affecting the story's direction and character arcs.",
+          flavor_text:
+            "Guardians come to protect or disrupt; their influence is felt deeply in all they touch.",
+          price: 60,
+        },
+        {
+          name: "The Great Festival of Lights Unveiled",
+          card_type: "filler",
+          genre: "classic",
+          effect:
+            "A festival celebrating light and unity adds cultural richness to the narrative.",
+          flavor_text:
+            "Light festivals are more than celebrations; they illuminate paths forward and bonds between people.",
+          price: 20,
+        },
+        {
+          name: "The Great Crisis's Impact",
+          card_type: "conflict",
+          genre: "sci-fi",
+          effect:
+            "A major crisis emerges, challenging characters and reshaping the narrative direction significantly.",
+          flavor_text:
+            "Crises are moments of truth; they force hard choices that define legacies and futures.",
+          price: 80,
+        },
+        {
+          name: "The Great Revelation's Influence",
+          card_type: "plot twist",
+          genre: "political thriller",
+          effect:
+            "A significant revelation reshapes the direction of events and character motivations.",
+          flavor_text:
+            "Revelations are pivotal; they alter everything in their wake, including who we think we know.",
+          price: 80,
+        },
+        {
+          name: "The Enigmatic Guardian's Role",
+          card_type: "conflict",
+          genre: "fantasy",
+          effect:
+            "An enigmatic guardian takes on a pivotal role in the story, influencing character arcs and outcomes.",
+          flavor_text:
+            "Guardians' roles are as mysterious as they are significant; their influence is felt deeply by all.",
+          price: 90,
+        },
+        {
+          name: "The Great Discovery's Influence",
+          card_type: "plot twist",
+          genre: "classic",
+          effect:
+            "A major discovery reshapes the narrative and alters character motivations significantly.",
+          flavor_text:
+            "Discoveries are transformative; they force characters to question everything and everyone around them.",
+          price: 50,
+        },
+        {
+          name: "The Mysterious Guardian's Impact",
+          card_type: "conflict",
+          genre: "spy",
+          effect:
+            "A mysterious guardian exerts significant influence, changing the story's direction and outcomes.",
+          flavor_text:
+            "Guardians' impacts are as profound as they are unexpected; their presence alters everything in their wake.",
+          price: 60,
+        },
+        {
+          name: "The Great Festival of Unity Unveiled",
+          card_type: "filler",
+          genre: "classic",
+          effect:
+            "A festival celebrating unity adds cultural richness to the narrative and strengthens bonds between characters.",
+          flavor_text:
+            "Unity festivals are moments of collective strength and resolve, illuminating paths forward together.",
+          price: 20,
+        },
+        {
+          name: "The Great Crisis's Influence",
+          card_type: "conflict",
+          genre: "sci-fi",
+          effect:
+            "A major crisis emerges, challenging characters and reshaping the narrative direction profoundly.",
+          flavor_text:
+            "Crises are defining moments; they force hard choices that shape legacies and futures irreversibly.",
+          price: 80,
+        },
+        {
+          name: "The Great Revelation's Impact",
+          card_type: "plot twist",
+          genre: "political thriller",
+          effect:
+            "A significant revelation reshapes the direction of events and character motivations profoundly.",
+          flavor_text:
+            "Revelations are pivotal; they alter everything in their wake, including who we think we know and trust.",
+          price: 80,
+        },
+        {
+          name: "The Enigmatic Guardian's Impact",
+          card_type: "conflict",
+          genre: "fantasy",
+          effect:
+            "An enigmatic guardian exerts significant influence, changing the story's direction and outcomes profoundly.",
+          flavor_text:
+            "Guardians' impacts are as profound as they are unexpected; their presence alters everything in their wake significantly.",
+          price: 90,
+        },
+        {
+          name: "The Great Discovery's Impact",
+          card_type: "plot twist",
+          genre: "classic",
+          effect:
+            "A major discovery reshapes the narrative and character motivations profoundly.",
+          flavor_text:
+            "Discoveries are transformative; they force characters to question everything and everyone around them deeply.",
+          price: 50,
+        },
+        {
+          name: "The Mysterious Guardian's Role",
+          card_type: "conflict",
+          genre: "spy",
+          effect:
+            "A mysterious guardian takes on a crucial role, affecting the story's direction and character arcs profoundly.",
+          flavor_text:
+            "Guardians' roles are as mysterious as they are significant; their influence is felt deeply by all involved.",
+          price: 60,
+        },
+      ];
+
+      // Function to create a card element
+      function createCard(card, index) {
+        const template = document.getElementById("cardTemplate");
+        const clone = template.cloneNode(true);
+
+        clone.style.display = "block";
+        let imageFile = "processed_images/card-picture-" + index + ".png"
+        console.log(imageFile)
+
+        // clone.querySelector('.card-image').setAttribute("crossorigin", "anonymous")
+        clone.querySelector('.card-image').src = imageFile
+        clone.querySelector(".card-title").textContent = card.name;
+        clone.querySelector(".card-price").textContent = `${card.price}`;
+        clone.querySelector(".card-type").textContent = `${card.card_type}`;
+        clone.querySelector(".card-genre").textContent = `${card.genre}`;
+        clone.querySelector(".card-effect").textContent = card.effect;
+        clone.querySelector(".card-flavorText").textContent = card.flavor_text;
+
+        return clone;
+      }
+
+      function renderCards() {
+        document.querySelectorAll(".card").forEach((cardElement, index) => {
+          if (index == 0) {
+            return;
+          }
+          html2canvas(cardElement).then((canvas) => {
+            const imgData = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+
+            // Optionally download the image (if you want it saved locally)
+            const link = document.createElement("a");
+            link.href = imgData;
+            link.download = `card-${index}.png`;
+            link.click();
+          });
+        });
+      }
+
+
+      // Append the card to the body
+      var index = 0;
+      var sliceCards = cards.slice(0, 64);
+
+      sliceCards.forEach((cardData) => {
+        document.body.appendChild(createCard(cardData, index));
+        index += 1;
+      });
+
+      setTimeout(renderCards, 5000);
+    </script>
+  </body>
+</html>

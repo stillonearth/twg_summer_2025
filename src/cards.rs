@@ -78,18 +78,6 @@ fn setup_cards_3d(
         ..default()
     });
 
-    // 3D camera for card rendering
-    commands.spawn((
-        Name::new("Card Camera"),
-        Camera3d::default(),
-        Camera {
-            order: 2,
-            clear_color: ClearColorConfig::None,
-            ..default()
-        },
-        Transform::from_xyz(0.0, 15.0, 15.0).looking_at(Vec3::ZERO, Vec3::Y),
-    ));
-
     // Deck area
     commands.spawn((
         Name::new("Deck 1 -- Play Cards"),

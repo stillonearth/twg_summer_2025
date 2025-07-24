@@ -29,6 +29,7 @@ fn main() {
             DefaultPlugins,
             MeshPickingPlugin,
             ui::GameUIPlugin,
+            LaMesaPlugin::<cards::ActivityCard>::default(),
             game_objects::GameObjectsPlugin,
             TiledMapPlugin::default(),
             TiledPhysicsPlugin::<TiledPhysicsAvianBackend>::default(),
@@ -39,7 +40,6 @@ fn main() {
             WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
             navigation::NavigationGridPlugin {},
             JsonAssetPlugin::<cards::ActivityCards>::new(&["json"]),
-            LaMesaPlugin::<cards::ActivityCard>::default(),
             AsyncPlugin::default_settings(),
             CardSystemPlugin,
             GameLogicPlugin,
@@ -54,7 +54,6 @@ fn main() {
                 // debug::debug_draw_system,
                 sprites::animate_sprite,
                 sprites::update_animation_indices,
-                sprites::add_render_layers_to_sprites,
             ),
         )
         .run();
@@ -64,13 +63,24 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((Camera2d, IsDefaultUiCamera));
 
     commands.spawn((
+        Name::new("Camera 2d"),
         Camera2d,
         Camera {
             order: 1,
-            clear_color: ClearColorConfig::None,
             ..default()
         },
-        RenderLayers::layer(LAYER_SPRITES),
+        Transform::from_xyz(0.0, 0.0, 1000.0),
+    ));
+
+    commands.spawn((
+        Name::new("Camera 3d"),
+        Camera3d::default(),
+        Camera {
+            order: 2,
+            ..default()
+        },
+        Pickable::default(),
+        Transform::from_xyz(0.0, 15.0, 15.0).looking_at(Vec3::ZERO, Vec3::Y),
     ));
 
     let map_handle: Handle<TiledMap> = asset_server.load("my_room.tmx");

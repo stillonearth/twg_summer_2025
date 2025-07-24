@@ -1,6 +1,5 @@
 use bevy::{prelude::*, render::view::RenderLayers};
 
-
 pub const SHEET_1_COLUMNS: u32 = 13;
 pub const SHEET_1_ROWS: u32 = 21;
 pub const N_FRAMES_WALK: usize = 8;
@@ -134,27 +133,5 @@ pub fn update_animation_indices(
             character_animation.direction,
         );
         *animation_indices = new_indices;
-    }
-}
-
-pub fn add_render_layers_to_sprites(
-    mut commands: Commands,
-    sprites_without_layers: Query<Entity, (With<Sprite>, Without<RenderLayers>)>,
-    mut has_run: Local<bool>,
-) {
-    if *has_run {
-        return;
-    }
-
-    for entity in sprites_without_layers.iter() {
-        commands
-            .entity(entity)
-            .insert(RenderLayers::layer(LAYER_SPRITES));
-    }
-
-    let count = sprites_without_layers.iter().count();
-
-    if count != 0 {
-        *has_run = true;
     }
 }

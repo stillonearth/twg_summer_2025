@@ -10,7 +10,7 @@ use crane_core::{
     models::{qwen25::Model as Qwen25Model, DType, Device},
     Msg,
 };
-use log::*;
+use log;
 use regex::Regex;
 use std::sync::{Arc, Mutex};
 use std::thread;
@@ -155,12 +155,12 @@ fn setup_ai_model(mut ai_resource: ResMut<AiModelResource>) {
     // Initialize tokenizer
     match AutoTokenizer::from_pretrained(&config.model_path, None) {
         Ok(tokenizer) => {
-            info!("Successfully loaded tokenizer from: {}", config.model_path);
+            log::info!("Successfully loaded tokenizer from: {}", config.model_path);
 
             // Initialize model
             match Qwen25Model::new(&config.model_path, &config.device, &config.dtype) {
                 Ok(model) => {
-                    info!("Successfully loaded AI model");
+                    log::info!("Successfully loaded AI model");
 
                     // Create generation config
                     let gen_config = GenerationConfig {
@@ -212,7 +212,7 @@ fn setup_ai_model(mut ai_resource: ResMut<AiModelResource>) {
                                             id: task.id,
                                             result: llm_result,
                                         }) {
-                                            error!("Failed to send generation result: {e}");
+                                            log::error!("Failed to send generation result: {e}");
                                         }
                                     }
                                 }
@@ -230,15 +230,15 @@ fn setup_ai_model(mut ai_resource: ResMut<AiModelResource>) {
                     ai_resource.async_generation_response_receiver = Some(async_res_rx);
                     ai_resource.is_initialized = true;
 
-                    info!("AI model initialization completed successfully");
+                    log::info!("AI model initialization completed successfully");
                 }
                 Err(e) => {
-                    error!("Failed to load AI model: {e}");
+                    log::error!("Failed to load AI model: {e}");
                 }
             }
         }
         Err(e) => {
-            error!("Failed to load tokenizer: {e}");
+            log::error!("Failed to load tokenizer: {e}");
         }
     }
 }
@@ -263,7 +263,7 @@ fn handle_generation_requests(
                 };
 
                 if let Err(e) = request_sender.send(task) {
-                    error!("Failed to send generation request: {e}");
+                    log::error!("Failed to send generation request: {e}");
                 }
             }
         }
@@ -329,12 +329,12 @@ async fn generate_response(
                         id: request_id,
                         result,
                     }) {
-                        error!("Failed to send async generation result: {e}");
+                        log::error!("Failed to send async generation result: {e}");
                         break;
                     }
                 }
                 StreamerMessage::End => {
-                    info!("Streaming completed for request {request_id}");
+                    log::info!("Streaming completed for request {request_id}");
                     break;
                 }
             }
