@@ -28,29 +28,11 @@ impl Plugin for GameUIPlugin {
 #[derive(Event)]
 pub struct UpdateThoughtsEvent {
     pub text: String,
-    pub clear_after_seconds: Option<f32>, // Optional auto-clear timer
 }
 
 impl UpdateThoughtsEvent {
     pub fn new(text: impl Into<String>) -> Self {
-        Self {
-            text: text.into(),
-            clear_after_seconds: None,
-        }
-    }
-
-    pub fn with_auto_clear(text: impl Into<String>, seconds: f32) -> Self {
-        Self {
-            text: text.into(),
-            clear_after_seconds: Some(seconds),
-        }
-    }
-
-    pub fn clear() -> Self {
-        Self {
-            text: String::new(),
-            clear_after_seconds: None,
-        }
+        Self { text: text.into() }
     }
 }
 
@@ -184,7 +166,7 @@ fn setup_ui(mut commands: Commands) {
                 top_container
                     .spawn((
                         Node {
-                            width: Val::Px(600.0),
+                            width: Val::Px(900.0),
                             min_height: Val::Px(80.0),
                             max_height: Val::Px(150.0),
                             padding: UiRect::all(Val::Px(16.0)),
@@ -395,13 +377,6 @@ fn update_character_thoughts(
     for event in thoughts_events.read() {
         for (mut text, mut thoughts) in &mut thoughts_query {
             *text = Text::new(&event.text);
-
-            // Set up auto-clear timer if specified
-            if let Some(clear_seconds) = event.clear_after_seconds {
-                thoughts.clear_timer = Some(Timer::from_seconds(clear_seconds, TimerMode::Once));
-            } else {
-                thoughts.clear_timer = None;
-            }
         }
     }
 
