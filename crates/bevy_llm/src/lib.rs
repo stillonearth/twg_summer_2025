@@ -16,9 +16,9 @@ use std::sync::{Arc, Mutex};
 use std::thread;
 use tokio::sync::mpsc;
 
-pub struct CraneAiPlugin;
+pub struct LLMPlugin;
 
-impl Plugin for CraneAiPlugin {
+impl Plugin for LLMPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, setup_ai_model)
             .add_systems(

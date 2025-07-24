@@ -5,11 +5,13 @@ use bevy_defer::AsyncPlugin;
 use bevy_ecs_tiled::prelude::*;
 use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
 use bevy_la_mesa::{LaMesaPlugin, LaMesaPluginSettings};
+use bevy_llm::LLMPlugin;
 
 use crate::{
     cards::{ActivityCardsHandle, CardSystemPlugin},
     logic::GameLogicPlugin,
     sprites::LAYER_SPRITES,
+    thoughts::CharacterThoughtsPlugin,
 };
 
 mod cards;
@@ -20,6 +22,7 @@ mod logic;
 mod navigation;
 mod player;
 mod sprites;
+mod thoughts;
 mod ui;
 
 fn main() {
@@ -44,6 +47,7 @@ fn main() {
             CardSystemPlugin,
             GameLogicPlugin,
         ))
+        .add_plugins((LLMPlugin, CharacterThoughtsPlugin))
         .add_systems(Startup, startup)
         .add_systems(
             Update,

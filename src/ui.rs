@@ -1,4 +1,7 @@
-use crate::logic::{GamePhase, GamePhaseState, GameState, Mood, ResourceType};
+use crate::{
+    logic::{GamePhase, GamePhaseState, GameState, Mood, ResourceType},
+    thoughts::ThoughtGeneratedEvent,
+};
 use bevy::{color::palettes::css::GREEN, prelude::*, text::TextBounds};
 
 pub struct GameUIPlugin;
@@ -15,6 +18,7 @@ impl Plugin for GameUIPlugin {
                     update_mood_display,
                     update_resource_bars,
                     update_character_thoughts,
+                    handle_new_thought_generated,
                 ),
             );
     }
@@ -504,5 +508,14 @@ fn update_resource_bars(
                 }
             }
         }
+    }
+}
+
+fn handle_new_thought_generated(
+    mut er_though_generated: EventReader<ThoughtGeneratedEvent>,
+    mut ew_update_thoughts_ui: EventWriter<UpdateThoughtsEvent>,
+) {
+    for response in er_though_generated.read() {
+        ew_update_thoughts_ui.write(UpdateThoughtsEvent::new(response.text.clone()));
     }
 }

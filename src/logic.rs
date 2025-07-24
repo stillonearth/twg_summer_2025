@@ -198,7 +198,7 @@ pub enum TimeOfDay {
     LateNight,    // 0-5
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
 pub enum ResourceType {
     Sleep,
     Health,
