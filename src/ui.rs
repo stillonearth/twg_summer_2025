@@ -1,127 +1,20 @@
 use bevy::prelude::*;
 
+// Import the types from your game logic plugin
+use crate::logic::{GameState, Mood, ResourceType};
+
 pub struct HikikomoriUIPlugin;
 
 impl Plugin for HikikomoriUIPlugin {
     fn build(&self, app: &mut App) {
-        app.init_resource::<GameState>()
-            .add_systems(Startup, setup_ui)
-            .add_systems(
-                Update,
-                (
-                    update_time_display,
-                    update_mood_display,
-                    update_resource_bars,
-                    handle_ui_interactions,
-                ),
-            );
-    }
-}
-
-// Core game state resource
-#[derive(Resource)]
-pub struct GameState {
-    // Time
-    pub current_hour: f32, // 0.0-24.0
-    pub current_day: u32,
-    pub time_speed: f32, // Time multiplier
-
-    // Resources
-    pub sleep: f32,         // 0.0-100.0
-    pub health: f32,        // 0.0-100.0
-    pub mental_health: f32, // 0.0-100.0
-    pub food: f32,          // 0.0-100.0
-
-    // Derived states
-    pub current_mood: Mood,
-    pub time_of_day: TimeOfDay,
-}
-
-impl Default for GameState {
-    fn default() -> Self {
-        Self {
-            current_hour: 10.0,
-            current_day: 1,
-            time_speed: 1.0,
-            sleep: 70.0,
-            health: 80.0,
-            mental_health: 60.0,
-            food: 50.0,
-            current_mood: Mood::Neutral,
-            time_of_day: TimeOfDay::Morning,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum Mood {
-    Depressed,
-    Anxious,
-    Tired,
-    Neutral,
-    Content,
-    Manic,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum TimeOfDay {
-    EarlyMorning, // 5-9
-    Morning,      // 9-12
-    Afternoon,    // 12-17
-    Evening,      // 17-20
-    Night,        // 20-24
-    LateNight,    // 0-5
-}
-
-impl GameState {
-    pub fn update_time(&mut self, delta_time: f32) {
-        self.current_hour += delta_time * self.time_speed * (1.0 / 3600.0); // Convert seconds to hours
-
-        if self.current_hour >= 24.0 {
-            self.current_hour -= 24.0;
-            self.current_day += 1;
-        }
-
-        self.time_of_day = match self.current_hour {
-            h if (5.0..9.0).contains(&h) => TimeOfDay::EarlyMorning,
-            h if (9.0..12.0).contains(&h) => TimeOfDay::Morning,
-            h if (12.0..17.0).contains(&h) => TimeOfDay::Afternoon,
-            h if (17.0..20.0).contains(&h) => TimeOfDay::Evening,
-            h if !(5.0..20.0).contains(&h) => {
-                if h >= 20.0 {
-                    TimeOfDay::Night
-                } else {
-                    TimeOfDay::LateNight
-                }
-            }
-            _ => TimeOfDay::Morning,
-        };
-
-        self.current_mood = self.calculate_mood();
-    }
-
-    fn calculate_mood(&self) -> Mood {
-        let avg_resources = (self.sleep + self.health + self.mental_health + self.food) / 4.0;
-
-        // Factor in specific resource states
-        match () {
-            _ if self.mental_health < 20.0 => Mood::Depressed,
-            _ if self.sleep < 20.0 => Mood::Tired,
-            _ if self.mental_health < 40.0 && self.sleep < 40.0 => Mood::Anxious,
-            _ if avg_resources > 80.0 => Mood::Content,
-            _ if self.mental_health > 90.0 && self.sleep < 30.0 => Mood::Manic,
-            _ => Mood::Neutral,
-        }
-    }
-
-    pub fn get_time_string(&self) -> String {
-        let hour = self.current_hour as u32;
-        let minute = ((self.current_hour % 1.0) * 60.0) as u32;
-        format!("{hour:02}:{minute:02}")
-    }
-
-    pub fn get_day_string(&self) -> String {
-        format!("Day {}", self.current_day)
+        app.add_systems(Startup, setup_ui).add_systems(
+            Update,
+            (
+                update_time_display,
+                update_mood_display,
+                update_resource_bars,
+            ),
+        );
     }
 }
 
@@ -158,7 +51,6 @@ impl UIColors {
     pub fn resource_color(value: f32, good_color: Color, bad_color: Color) -> Color {
         let ratio = (value / 100.0).clamp(0.0, 1.0);
 
-        // Extract RGB components properly
         let bad = bad_color.to_srgba();
         let good = good_color.to_srgba();
 
@@ -185,14 +77,6 @@ pub struct ResourceBar {
 #[derive(Component)]
 pub struct ResourceBarFill;
 
-#[derive(Debug, Clone, Copy)]
-pub enum ResourceType {
-    Sleep,
-    Health,
-    Mental,
-    Food,
-}
-
 pub const LAYER_UI: usize = 0;
 
 // Setup the UI layout
@@ -206,7 +90,6 @@ fn setup_ui(mut commands: Commands) {
                 justify_content: JustifyContent::SpaceBetween,
                 ..default()
             },
-            // RenderLayers::layer(LAYER_UI),
             Name::new("Game UI"),
         ))
         .with_children(|parent| {
@@ -296,40 +179,40 @@ fn setup_ui(mut commands: Commands) {
                     }
                 });
 
-            // Top-right panel: Time display
-            // parent
-            //     .spawn((
-            //         Node {
-            //             width: Val::Px(200.0),
-            //             height: Val::Auto,
-            //             flex_direction: FlexDirection::Column,
-            //             align_items: AlignItems::FlexEnd,
-            //             padding: UiRect::all(Val::Px(16.0)),
-            //             margin: UiRect::all(Val::Px(8.0)),
-            //             ..default()
-            //         },
-            //         // BackgroundColor(UIColors::BACKGROUND.into()),
-            //     ))
-            //     .with_children(|panel| {
-            //         panel.spawn((
-            //             Text::new("10:00"),
-            //             TextFont {
-            //                 font_size: 24.0,
-            //                 ..default()
-            //             },
-            //             TextColor(UIColors::TEXT),
-            //             TimeDisplay,
-            //         ));
+            // Time display panel (uncommented and positioned)
+            parent
+                .spawn((
+                    Node {
+                        width: Val::Px(200.0),
+                        height: Val::Auto,
+                        flex_direction: FlexDirection::Column,
+                        align_items: AlignItems::FlexEnd,
+                        padding: UiRect::all(Val::Px(16.0)),
+                        margin: UiRect::all(Val::Px(8.0)),
+                        ..default()
+                    },
+                    BackgroundColor(UIColors::BACKGROUND),
+                ))
+                .with_children(|panel| {
+                    panel.spawn((
+                        Text::new("10:00"),
+                        TextFont {
+                            font_size: 24.0,
+                            ..default()
+                        },
+                        TextColor(UIColors::TEXT),
+                        TimeDisplay,
+                    ));
 
-            //         panel.spawn((
-            //             Text::new("Day 1"),
-            //             TextFont {
-            //                 font_size: 16.0,
-            //                 ..default()
-            //             },
-            //             TextColor(UIColors::TEXT_DIM),
-            //         ));
-            //     });
+                    panel.spawn((
+                        Text::new("Day 1"),
+                        TextFont {
+                            font_size: 16.0,
+                            ..default()
+                        },
+                        TextColor(UIColors::TEXT_DIM),
+                    ));
+                });
         });
 }
 
@@ -374,12 +257,7 @@ fn update_resource_bars(
 ) {
     if game_state.is_changed() {
         for (resource_bar, children) in &bar_query {
-            let resource_value = match resource_bar.resource_type {
-                ResourceType::Sleep => game_state.sleep,
-                ResourceType::Health => game_state.health,
-                ResourceType::Mental => game_state.mental_health,
-                ResourceType::Food => game_state.food,
-            };
+            let resource_value = game_state.get_resource_value(resource_bar.resource_type);
 
             let (good_color, bad_color) = match resource_bar.resource_type {
                 ResourceType::Sleep => (UIColors::SLEEP_GOOD, UIColors::SLEEP_BAD),
@@ -397,56 +275,4 @@ fn update_resource_bars(
             }
         }
     }
-}
-
-// Handle UI interactions (placeholder for future expansion)
-fn handle_ui_interactions() {
-    // Future: Handle clicking on resource bars for details
-    // Future: Handle time acceleration controls
-    // Future: Handle mood-based UI effects
-}
-
-// Public API for other systems to update game state
-impl GameState {
-    pub fn modify_resource(&mut self, resource_type: ResourceType, amount: f32) {
-        let resource = match resource_type {
-            ResourceType::Sleep => &mut self.sleep,
-            ResourceType::Health => &mut self.health,
-            ResourceType::Mental => &mut self.mental_health,
-            ResourceType::Food => &mut self.food,
-        };
-
-        *resource = (*resource + amount).clamp(0.0, 100.0);
-        self.current_mood = self.calculate_mood();
-    }
-
-    pub fn set_time_speed(&mut self, speed: f32) {
-        self.time_speed = speed.max(0.0);
-    }
-}
-
-// Example usage system (remove this in actual game)
-#[allow(dead_code)]
-pub fn example_game_loop(
-    mut game_state: ResMut<GameState>,
-    time: Res<Time>,
-    input: Res<ButtonInput<KeyCode>>,
-) {
-    // Update time
-    game_state.update_time(time.delta_secs());
-
-    // Example input handling
-    if input.just_pressed(KeyCode::KeyY) {
-        let speed = if game_state.time_speed == 1.0 {
-            10.0
-        } else {
-            1.0
-        };
-        game_state.set_time_speed(speed);
-    }
-
-    // Simulate resource decay over time
-    let decay_rate = time.delta_secs() * 0.1; // Very slow decay for demo
-    game_state.modify_resource(ResourceType::Food, -decay_rate);
-    game_state.modify_resource(ResourceType::Sleep, -decay_rate * 0.5);
 }

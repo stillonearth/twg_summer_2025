@@ -8,6 +8,7 @@ use bevy_la_mesa::{LaMesaPlugin, LaMesaPluginSettings};
 
 use crate::{
     cards::{ActivityCardsHandle, CardSystemPlugin},
+    logic::GameLogicPlugin,
     sprites::LAYER_SPRITES,
 };
 
@@ -15,6 +16,7 @@ mod cards;
 mod collisions;
 mod debug;
 mod game_objects;
+mod logic;
 mod navigation;
 mod player;
 mod sprites;
@@ -40,6 +42,7 @@ fn main() {
             LaMesaPlugin::<cards::ActivityCard>::default(),
             AsyncPlugin::default_settings(),
             CardSystemPlugin,
+            GameLogicPlugin,
         ))
         .add_systems(Startup, startup)
         .add_systems(
@@ -51,7 +54,6 @@ fn main() {
                 // debug::debug_draw_system,
                 sprites::animate_sprite,
                 sprites::update_animation_indices,
-                ui::example_game_loop,
                 sprites::add_render_layers_to_sprites,
             ),
         )
