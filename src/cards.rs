@@ -4,18 +4,33 @@ use bevy::asset::Asset;
 use bevy::color::palettes::css::*;
 use bevy::prelude::*;
 use bevy::reflect::TypePath;
-use bevy_la_mesa::events::{DeckShuffle, DrawToHand, RenderDeck};
-use bevy_la_mesa::CardMetadata;
+use bevy_defer::AsyncCommandsExtension;
+use bevy_defer::AsyncWorld;
+use bevy_la_mesa::events::{
+    AlignCardsInHand, CardPress, DeckShuffle, DiscardCardToDeck, DrawToHand, PlaceCardOnTable,
+    RenderDeck,
+};
+use bevy_la_mesa::{Card, CardMetadata, CardOnTable, Hand, PlayArea};
 use bevy_la_mesa::{DeckArea, HandArea};
 use serde::Deserialize;
+
+// Import your game logic events
+use crate::logic::{CardDrawnEvent, CardSelectedEvent, GamePhase, GamePhaseState};
 
 /// Plugin that handles all card-related functionality
 pub struct CardSystemPlugin;
 
 impl Plugin for CardSystemPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, (setup_cards_3d, setup_ui))
-            .add_systems(Update, (handle_card_buttons, init_cards));
+        app.add_systems(Startup, setup_cards_3d).add_systems(
+            Update,
+            (
+                init_cards,
+                handle_card_draw_phase,
+                handle_card_selection,
+                handle_place_card_on_table,
+            ),
+        );
     }
 }
 
@@ -48,23 +63,6 @@ impl CardMetadata for ActivityCard {
     fn back_image_filename(&self) -> String {
         "cards/Back_1.png".into()
     }
-}
-
-/// Component marker for the shuffle deck button
-#[derive(Component)]
-pub struct ButtonShuffleDeck;
-
-/// Component marker for the draw hand button
-#[derive(Component)]
-pub struct ButtonDrawHand;
-
-/// Button color constants
-mod button_colors {
-    use bevy::prelude::Color;
-
-    pub const NORMAL: Color = Color::srgb(0.15, 0.15, 0.15);
-    pub const HOVERED: Color = Color::srgb(0.25, 0.25, 0.25);
-    pub const PRESSED: Color = Color::srgb(0.35, 0.75, 0.35);
 }
 
 /// Set up lights, camera, deck area, and hand area for card visualization
@@ -100,12 +98,26 @@ fn setup_cards_3d(
         DeckArea { marker: 1 },
     ));
 
-    // Hand area for player 1
+    // Hand Area
     commands.spawn((
         Name::new("HandArea - Player 1"),
         Transform::from_translation(Vec3::new(0.0, -2.2, 5.8))
             .with_rotation(Quat::from_rotation_x(std::f32::consts::PI / 4.0)),
         HandArea { player: 1 },
+    ));
+
+    // Play Area -- Where card comes to
+    commands.spawn((
+        Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
+        MeshMaterial3d(materials.add(Color::srgb_u8(124, 144, 255))),
+        Transform::from_translation(Vec3::new(-5.73, 6.9, 9.2))
+            .with_rotation(Quat::from_rotation_x(std::f32::consts::PI / 4.0)),
+        PlayArea {
+            marker: 1,
+            player: 1,
+        },
+        Visibility::Hidden,
+        Name::new(format!("Play Area 1")),
     ));
 }
 
@@ -127,7 +139,6 @@ fn init_cards(
     };
 
     if let Some(activity_cards) = activity_cards_assets.get(activity_cards_handle.id()) {
-        println!("n activity cards {}", activity_cards.len());
         if let Some((deck_entity, _)) = q_decks.iter().next() {
             ew_render_deck.write(RenderDeck::<ActivityCard> {
                 deck_entity,
@@ -139,133 +150,141 @@ fn init_cards(
     }
 }
 
-/// Handle button interactions for shuffle and draw actions
-fn handle_card_buttons(
-    mut interaction_query: Query<
-        (Entity, &Interaction, &mut BackgroundColor, &mut BorderColor),
-        Changed<Interaction>,
-    >,
-    button_types: Query<(Entity, Option<&ButtonShuffleDeck>, Option<&ButtonDrawHand>)>,
-    decks: Query<(Entity, &DeckArea)>,
+/// Handle the card draw phase - shuffle deck and draw cards
+fn handle_card_draw_phase(
+    mut commands: Commands,
+    phase_state: Res<GamePhaseState>,
+    q_decks: Query<(Entity, &DeckArea)>,
+    q_cards_on_table: Query<(Entity, &Card<ActivityCard>, &CardOnTable)>,
     mut ew_shuffle: EventWriter<DeckShuffle>,
-    mut ew_draw: EventWriter<DrawToHand>,
+    mut ew_card_drawn: EventWriter<CardDrawnEvent>,
+    mut last_turn: Local<u32>,
 ) {
-    let Some((deck_entity, _)) = decks.iter().next() else {
+    // Only trigger when we enter the CardDraw phase
+    if phase_state.current_phase != GamePhase::CardDraw {
+        return;
+    }
+
+    // Prevent triggering multiple times for the same turn
+    if *last_turn == phase_state.turn_number {
+        return;
+    }
+
+    let Some((deck_entity, _)) = q_decks.iter().next() else {
+        warn!("No deck found for card draw");
         return;
     };
 
-    for (entity, interaction, mut bg_color, mut border_color) in interaction_query.iter_mut() {
-        // Find the type of button
-        let Some((_, is_shuffle, is_draw)) = button_types
-            .iter()
-            .find(|(btn_entity, _, _)| *btn_entity == entity)
-        else {
-            continue;
-        };
+    let n_cards_on_table = q_cards_on_table.iter().len();
+    let cards_to_draw = 5 - n_cards_on_table;
 
-        match *interaction {
-            Interaction::Pressed => {
-                *bg_color = button_colors::PRESSED.into();
-                border_color.0 = RED.into();
+    if cards_to_draw <= 0 {
+        warn!("No cards to draw, table is full");
+        return;
+    }
 
-                if is_shuffle.is_some() {
-                    ew_shuffle.write(DeckShuffle {
-                        deck_entity,
-                        duration: 8,
-                    });
-                } else if is_draw.is_some() {
-                    ew_draw.write(DrawToHand {
-                        deck_entity,
-                        num_cards: 5,
-                        player: 1,
-                    });
-                }
-            }
-            Interaction::Hovered => {
-                *bg_color = button_colors::HOVERED.into();
-                border_color.0 = WHITE.into();
-            }
-            Interaction::None => {
-                *bg_color = button_colors::NORMAL.into();
-                border_color.0 = BLACK.into();
-            }
+    *last_turn = phase_state.turn_number;
+
+    // Shuffle the deck first
+    ew_shuffle.write(DeckShuffle {
+        deck_entity,
+        duration: 8,
+    });
+
+    // Draw cards after a delay
+    commands.spawn_task(move || async move {
+        AsyncWorld.sleep(0.5).await;
+
+        // Send draw event
+        AsyncWorld.send_event(DrawToHand {
+            deck_entity,
+            num_cards: cards_to_draw,
+            player: 1,
+        })?;
+
+        // Send phase event
+        AsyncWorld.send_event(CardDrawnEvent {
+            card_count: cards_to_draw,
+        })?;
+
+        Ok(())
+    });
+}
+
+/// Handle card selection when user presses a card
+fn handle_card_selection(
+    mut card_press: EventReader<CardPress>,
+    mut ew_card_selected: EventWriter<CardSelectedEvent>,
+    phase_state: Res<GamePhaseState>,
+    q_cards_in_hand: Query<(Entity, &Card<ActivityCard>, &Hand)>,
+    q_cards_on_table: Query<(Entity, &Card<ActivityCard>, &CardOnTable)>,
+) {
+    // Only handle card selection during the CardSelection phase
+    if phase_state.current_phase != GamePhase::CardSelection {
+        return;
+    }
+
+    for event in card_press.read() {
+        // Check if the pressed card is in hand (not on table)
+        if q_cards_on_table.get(event.entity).is_ok() {
+            continue; // Skip cards already on table
+        }
+
+        if let Ok((_, card, _)) = q_cards_in_hand.get(event.entity) {
+            // Send card selection event with card number as ID
+            ew_card_selected.write(CardSelectedEvent {
+                card_number: card.data.card_number,
+            });
+
+            println!(
+                "Card selected: {} (ID: {})",
+                card.data.name, card.data.card_number
+            );
         }
     }
 }
 
-/// Set up the UI with shuffle and draw buttons
-fn setup_ui(mut commands: Commands) {
-    // Parent UI container
-    commands
-        .spawn((
-            Name::new("Card UI"),
-            Node {
-                position_type: PositionType::Absolute,
-                top: Val::Px(20.0),
-                left: Val::Percent(50.0),
-                align_items: AlignItems::Center,
-                justify_content: JustifyContent::Center,
-                flex_direction: FlexDirection::Row,
-                column_gap: Val::Px(20.0),
-                ..default()
-            },
-        ))
-        .with_children(|child_builder| {
-            // Shuffle button
-            child_builder
-                .spawn((
-                    Button,
-                    Node {
-                        width: Val::Px(350.0),
-                        height: Val::Px(65.0),
-                        border: UiRect::all(Val::Px(5.0)),
-                        justify_content: JustifyContent::Center,
-                        align_items: AlignItems::Center,
-                        ..default()
-                    },
-                    BorderColor(BLACK.into()),
-                    BorderRadius::MAX,
-                    BackgroundColor(button_colors::NORMAL),
-                    ButtonShuffleDeck,
-                ))
-                .with_children(|child_builder| {
-                    child_builder.spawn((
-                        Text::new("Shuffle deck"),
-                        TextFont {
-                            font_size: 33.0,
-                            ..default()
-                        },
-                        TextColor(Color::srgb(0.9, 0.9, 0.9)),
-                    ));
-                });
+/// Handle placing card on table after selection
+pub fn handle_place_card_on_table(
+    mut commands: Commands,
+    mut card_press: EventReader<CardPress>,
+    mut ew_place_card_on_table: EventWriter<PlaceCardOnTable>,
+    phase_state: Res<GamePhaseState>,
+    mut q_cards: ParamSet<(
+        Query<(Entity, &Card<ActivityCard>, &CardOnTable)>,
+        Query<(Entity, &Card<ActivityCard>, &Hand)>,
+    )>,
+) {
+    // Only place cards during CharacterAction phase
+    if phase_state.current_phase != GamePhase::CharacterAction {
+        return;
+    }
 
-            // Draw button
-            child_builder
-                .spawn((
-                    Button,
-                    Node {
-                        width: Val::Px(250.0),
-                        height: Val::Px(65.0),
-                        border: UiRect::all(Val::Px(5.0)),
-                        justify_content: JustifyContent::Center,
-                        align_items: AlignItems::Center,
-                        ..default()
-                    },
-                    BorderColor(BLACK.into()),
-                    BorderRadius::MAX,
-                    BackgroundColor(button_colors::NORMAL),
-                    ButtonDrawHand,
-                ))
-                .with_children(|child_builder| {
-                    // Draw button text
-                    child_builder.spawn((
-                        Text::new("Draw hand"),
-                        TextFont {
-                            font_size: 33.0,
-                            ..default()
-                        },
-                        TextColor(Color::srgb(0.9, 0.9, 0.9)),
-                    ));
-                });
-        });
+    for event in card_press.read() {
+        let p0 = q_cards.p0();
+        let n_cards_on_table = p0.iter().len();
+
+        // Skip if card is already on table
+        if p0.get(event.entity).is_ok() {
+            continue;
+        }
+
+        // Only allow one card on table at a time for now
+        if n_cards_on_table < 1 {
+            ew_place_card_on_table.write(PlaceCardOnTable {
+                card_entity: event.entity,
+                player: 1,
+                marker: n_cards_on_table + 1,
+            });
+
+            println!("Placing card on table during CharacterAction phase");
+
+            // Align remaining cards in hand
+            commands.spawn_task(move || async move {
+                AsyncWorld.sleep(0.5).await;
+                AsyncWorld.send_event(AlignCardsInHand { player: 1 })?;
+                Ok(())
+            });
+        }
+    }
 }

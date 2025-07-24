@@ -28,7 +28,7 @@ fn main() {
         .add_plugins((
             DefaultPlugins,
             MeshPickingPlugin,
-            ui::HikikomoriUIPlugin,
+            ui::GameUIPlugin,
             game_objects::GameObjectsPlugin,
             TiledMapPlugin::default(),
             TiledPhysicsPlugin::<TiledPhysicsAvianBackend>::default(),

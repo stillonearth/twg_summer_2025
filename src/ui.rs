@@ -3,9 +3,9 @@ use bevy::prelude::*;
 // Import the types from your game logic plugin
 use crate::logic::{GameState, Mood, ResourceType};
 
-pub struct HikikomoriUIPlugin;
+pub struct GameUIPlugin;
 
-impl Plugin for HikikomoriUIPlugin {
+impl Plugin for GameUIPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, setup_ui).add_systems(
             Update,
@@ -67,6 +67,9 @@ impl UIColors {
 pub struct TimeDisplay;
 
 #[derive(Component)]
+pub struct DayDisplay;
+
+#[derive(Component)]
 pub struct MoodDisplay;
 
 #[derive(Component)]
@@ -85,142 +88,131 @@ fn setup_ui(mut commands: Commands) {
     commands
         .spawn((
             Node {
-                width: Val::Px(230.0),
-                height: Val::Percent(100.0),
-                justify_content: JustifyContent::SpaceBetween,
+                width: Val::Px(250.0),
+                height: Val::Auto,
+                flex_direction: FlexDirection::Column,
+                padding: UiRect::all(Val::Px(16.0)),
+                margin: UiRect::all(Val::Px(8.0)),
                 ..default()
             },
+            BackgroundColor::from(UIColors::BACKGROUND),
             Name::new("Game UI"),
         ))
-        .with_children(|parent| {
-            // Top-left panel: Resources and mood
-            parent
-                .spawn((
-                    Node {
-                        width: Val::Px(250.0),
-                        height: Val::Auto,
-                        flex_direction: FlexDirection::Column,
-                        padding: UiRect::all(Val::Px(16.0)),
-                        margin: UiRect::all(Val::Px(8.0)),
-                        ..default()
-                    },
-                    BackgroundColor::from(UIColors::BACKGROUND),
-                ))
-                .with_children(|panel| {
-                    // Mood display
-                    panel
-                        .spawn(Node {
-                            margin: UiRect::bottom(Val::Px(16.0)),
+        .with_children(|panel| {
+            // Mood display
+            panel
+                .spawn(Node {
+                    margin: UiRect::bottom(Val::Px(16.0)),
+                    ..default()
+                })
+                .with_children(|mood_container| {
+                    mood_container.spawn((
+                        Text::new("Mood: Neutral"),
+                        TextFont {
+                            font_size: 18.0,
                             ..default()
-                        })
-                        .with_children(|mood_container| {
-                            mood_container.spawn((
-                                Text::new("Mood: Neutral"),
-                                TextFont {
-                                    font_size: 18.0,
-                                    ..default()
-                                },
-                                TextColor(UIColors::TEXT),
-                                MoodDisplay,
-                            ));
-                        });
-
-                    // Resource bars
-                    let resources = [
-                        ("Sleep", ResourceType::Sleep),
-                        ("Health", ResourceType::Health),
-                        ("Mental", ResourceType::Mental),
-                        ("Food", ResourceType::Food),
-                    ];
-
-                    for (label, resource_type) in resources {
-                        panel
-                            .spawn(Node {
-                                margin: UiRect::bottom(Val::Px(8.0)),
-                                display: Display::Block,
-                                ..default()
-                            })
-                            .with_children(|resource_container| {
-                                // Label
-                                resource_container.spawn((
-                                    Text::new(label),
-                                    TextFont {
-                                        font_size: 14.0,
-                                        ..default()
-                                    },
-                                    TextColor(UIColors::TEXT_DIM),
-                                ));
-
-                                // Bar background
-                                resource_container
-                                    .spawn((
-                                        Node {
-                                            width: Val::Px(220.0),
-                                            height: Val::Px(16.0),
-                                            margin: UiRect::top(Val::Px(4.0)),
-                                            ..default()
-                                        },
-                                        BackgroundColor(Color::srgb(0.2, 0.2, 0.2)),
-                                        ResourceBar { resource_type },
-                                    ))
-                                    .with_children(|bar| {
-                                        // Bar fill
-                                        bar.spawn((
-                                            Node {
-                                                width: Val::Percent(70.0), // Will be updated
-                                                height: Val::Percent(100.0),
-                                                ..default()
-                                            },
-                                            BackgroundColor(UIColors::ACCENT),
-                                            ResourceBarFill,
-                                        ));
-                                    });
-                            });
-                    }
+                        },
+                        TextColor(UIColors::TEXT),
+                        MoodDisplay,
+                    ));
                 });
 
-            // Time display panel (uncommented and positioned)
-            parent
-                .spawn((
-                    Node {
-                        width: Val::Px(200.0),
-                        height: Val::Auto,
-                        flex_direction: FlexDirection::Column,
-                        align_items: AlignItems::FlexEnd,
-                        padding: UiRect::all(Val::Px(16.0)),
-                        margin: UiRect::all(Val::Px(8.0)),
+            // Resource bars
+            let resources = [
+                ("Sleep", ResourceType::Sleep),
+                ("Health", ResourceType::Health),
+                ("Mental", ResourceType::Mental),
+                ("Food", ResourceType::Food),
+            ];
+
+            for (label, resource_type) in resources {
+                panel
+                    .spawn(Node {
+                        margin: UiRect::bottom(Val::Px(8.0)),
+                        display: Display::Block,
                         ..default()
-                    },
-                    BackgroundColor(UIColors::BACKGROUND),
-                ))
-                .with_children(|panel| {
-                    panel.spawn((
+                    })
+                    .with_children(|resource_container| {
+                        // Label
+                        resource_container.spawn((
+                            Text::new(label),
+                            TextFont {
+                                font_size: 14.0,
+                                ..default()
+                            },
+                            TextColor(UIColors::TEXT_DIM),
+                        ));
+
+                        // Bar background
+                        resource_container
+                            .spawn((
+                                Node {
+                                    width: Val::Px(220.0),
+                                    height: Val::Px(16.0),
+                                    margin: UiRect::top(Val::Px(4.0)),
+                                    ..default()
+                                },
+                                BackgroundColor(Color::srgb(0.2, 0.2, 0.2)),
+                                ResourceBar { resource_type },
+                            ))
+                            .with_children(|bar| {
+                                // Bar fill
+                                bar.spawn((
+                                    Node {
+                                        width: Val::Percent(70.0), // Will be updated
+                                        height: Val::Percent(100.0),
+                                        ..default()
+                                    },
+                                    BackgroundColor(UIColors::ACCENT),
+                                    ResourceBarFill,
+                                ));
+                            });
+                    });
+            }
+
+            // Time and day display at bottom
+            panel
+                .spawn(Node {
+                    margin: UiRect::top(Val::Px(24.0)),
+                    flex_direction: FlexDirection::Column,
+                    ..default()
+                })
+                .with_children(|time_container| {
+                    time_container.spawn((
                         Text::new("10:00"),
                         TextFont {
-                            font_size: 24.0,
+                            font_size: 20.0,
                             ..default()
                         },
                         TextColor(UIColors::TEXT),
                         TimeDisplay,
                     ));
 
-                    panel.spawn((
+                    time_container.spawn((
                         Text::new("Day 1"),
                         TextFont {
-                            font_size: 16.0,
+                            font_size: 14.0,
                             ..default()
                         },
                         TextColor(UIColors::TEXT_DIM),
+                        DayDisplay,
                     ));
                 });
         });
 }
 
-// Update time display
-fn update_time_display(mut query: Query<&mut Text, With<TimeDisplay>>, game_state: Res<GameState>) {
+// Update time and day display
+fn update_time_display(
+    mut time_query: Query<&mut Text, (With<TimeDisplay>, Without<DayDisplay>)>,
+    mut day_query: Query<&mut Text, (With<DayDisplay>, Without<TimeDisplay>)>,
+    game_state: Res<GameState>,
+) {
     if game_state.is_changed() {
-        for mut text in &mut query {
+        for mut text in &mut time_query {
             *text = Text::new(game_state.get_time_string());
+        }
+        for mut text in &mut day_query {
+            *text = Text::new(game_state.get_day_string());
         }
     }
 }

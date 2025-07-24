@@ -5,16 +5,60 @@ pub struct GameLogicPlugin;
 impl Plugin for GameLogicPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<GameState>()
+            .init_resource::<GamePhaseState>()
             .add_event::<GameStepEvent>()
             .add_event::<ResourceChangedEvent>()
             .add_event::<MoodChangedEvent>()
             .add_event::<TimeChangedEvent>()
             .add_event::<DayChangedEvent>()
-            .add_systems(Update, handle_game_step_events);
+            .add_event::<PhaseChangedEvent>()
+            .add_event::<CardDrawnEvent>()
+            .add_event::<CardSelectedEvent>()
+            .add_event::<ActionCompletedEvent>()
+            .add_event::<CutsceneTriggeredEvent>()
+            .add_systems(
+                Update,
+                (
+                    handle_game_step_events,
+                    handle_phase_transitions,
+                    handle_card_draw,
+                    handle_card_selection,
+                    handle_action_completion,
+                ),
+            );
     }
 }
 
-// Events
+#[derive(Event)]
+pub struct CardSelectedEvent {
+    pub card_number: usize,
+}
+
+// Phase-related Events
+#[derive(Event)]
+pub struct PhaseChangedEvent {
+    pub old_phase: GamePhase,
+    pub new_phase: GamePhase,
+}
+
+#[derive(Event)]
+pub struct CardDrawnEvent {
+    pub card_count: usize,
+}
+
+#[derive(Event)]
+pub struct ActionCompletedEvent {
+    pub action_type: ActionType,
+    pub success: bool,
+}
+
+#[derive(Event)]
+pub struct CutsceneTriggeredEvent {
+    pub cutscene_id: String,
+    pub trigger_reason: CutsceneTrigger,
+}
+
+// Existing Events
 #[derive(Event)]
 pub struct GameStepEvent {
     pub time_delta: f32,
@@ -51,19 +95,67 @@ pub struct DayChangedEvent {
     pub new_day: u32,
 }
 
-// Core game state resource
+// Game Phase System
+#[derive(Resource)]
+pub struct GamePhaseState {
+    pub current_phase: GamePhase,
+    pub turn_number: u32,
+    pub cards_drawn_count: usize,
+    pub selected_card_number: Option<usize>,
+    pub pending_cutscene: Option<String>,
+}
+
+impl Default for GamePhaseState {
+    fn default() -> Self {
+        Self {
+            current_phase: GamePhase::CardDraw,
+            turn_number: 1,
+            cards_drawn_count: 0,
+            selected_card_number: None,
+            pending_cutscene: None,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum GamePhase {
+    CardDraw,
+    CardSelection,
+    CharacterAction,
+    VisualNovelCutscene,
+}
+
+// Card System
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum ActionType {
+    Move,
+    Interact,
+    Rest,
+    Work,
+    Socialize,
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum CutsceneTrigger {
+    CardEffect,
+    MoodChange,
+    TimeOfDay,
+    ResourceThreshold,
+}
+
+// Core game state resource (existing, unchanged)
 #[derive(Resource)]
 pub struct GameState {
     // Time
-    pub current_hour: f32, // 0.0-24.0
+    pub current_hour: f32,
     pub current_day: u32,
-    pub time_speed: f32, // Time multiplier
+    pub time_speed: f32,
 
     // Resources
-    pub sleep: f32,         // 0.0-100.0
-    pub health: f32,        // 0.0-100.0
-    pub mental_health: f32, // 0.0-100.0
-    pub food: f32,          // 0.0-100.0
+    pub sleep: f32,
+    pub health: f32,
+    pub mental_health: f32,
+    pub food: f32,
 
     // Derived states
     pub current_mood: Mood,
@@ -170,7 +262,91 @@ impl GameState {
     }
 }
 
-// Event handler system
+// Phase transition system
+fn handle_phase_transitions(
+    mut phase_state: ResMut<GamePhaseState>,
+    mut phase_changed_events: EventWriter<PhaseChangedEvent>,
+) {
+    // This system would be triggered by UI interactions or automatic progression
+    // For now, it's a placeholder for the phase transition logic
+}
+
+// Card draw phase system
+fn handle_card_draw(
+    mut card_drawn_events: EventReader<CardDrawnEvent>,
+    mut phase_state: ResMut<GamePhaseState>,
+    mut phase_changed_events: EventWriter<PhaseChangedEvent>,
+) {
+    for event in card_drawn_events.read() {
+        phase_state.cards_drawn_count = event.card_count;
+
+        let old_phase = phase_state.current_phase;
+        phase_state.current_phase = GamePhase::CardSelection;
+
+        phase_changed_events.send(PhaseChangedEvent {
+            old_phase,
+            new_phase: phase_state.current_phase,
+        });
+    }
+}
+
+// Card selection phase system
+fn handle_card_selection(
+    mut card_selected_events: EventReader<CardSelectedEvent>,
+    mut phase_state: ResMut<GamePhaseState>,
+    mut phase_changed_events: EventWriter<PhaseChangedEvent>,
+    mut cutscene_events: EventWriter<CutsceneTriggeredEvent>,
+) {
+    for event in card_selected_events.read() {
+        phase_state.selected_card_number = Some(event.card_number);
+
+        // Note: Card effects will be handled by your existing cards plugin
+        // This system just manages the phase transition
+
+        // Check if cutscene should be triggered (this would need to query your cards plugin)
+        // For now, we'll assume no cutscene unless specified
+        let has_cutscene = false; // Your cards plugin would determine this
+
+        // Transition to next phase
+        let old_phase = phase_state.current_phase;
+        phase_state.current_phase = if has_cutscene {
+            GamePhase::VisualNovelCutscene
+        } else {
+            GamePhase::CharacterAction
+        };
+
+        phase_changed_events.send(PhaseChangedEvent {
+            old_phase,
+            new_phase: phase_state.current_phase,
+        });
+    }
+}
+
+// Action completion system
+fn handle_action_completion(
+    mut action_completed_events: EventReader<ActionCompletedEvent>,
+    mut phase_state: ResMut<GamePhaseState>,
+    mut phase_changed_events: EventWriter<PhaseChangedEvent>,
+) {
+    for _event in action_completed_events.read() {
+        // Clear phase state
+        phase_state.selected_card_number = None;
+        phase_state.cards_drawn_count = 0;
+
+        // Increment turn and go back to card draw
+        phase_state.turn_number += 1;
+
+        let old_phase = phase_state.current_phase;
+        phase_state.current_phase = GamePhase::CardDraw;
+
+        phase_changed_events.send(PhaseChangedEvent {
+            old_phase,
+            new_phase: phase_state.current_phase,
+        });
+    }
+}
+
+// Existing event handler system (unchanged)
 fn handle_game_step_events(
     mut game_step_events: EventReader<GameStepEvent>,
     mut resource_changed_events: EventWriter<ResourceChangedEvent>,
@@ -192,7 +368,7 @@ fn handle_game_step_events(
             game_state.current_hour -= 24.0;
             game_state.current_day += 1;
 
-            day_changed_events.write(DayChangedEvent {
+            day_changed_events.send(DayChangedEvent {
                 old_day,
                 new_day: game_state.current_day,
             });
@@ -203,7 +379,7 @@ fn handle_game_step_events(
 
         // Send time changed event if anything changed
         if old_hour != game_state.current_hour || old_time_of_day != game_state.time_of_day {
-            time_changed_events.write(TimeChangedEvent {
+            time_changed_events.send(TimeChangedEvent {
                 old_hour,
                 new_hour: game_state.current_hour,
                 old_time_of_day,
@@ -231,7 +407,7 @@ fn handle_game_step_events(
                     ResourceType::Food => game_state.food = new_value,
                 }
 
-                resource_changed_events.write(ResourceChangedEvent {
+                resource_changed_events.send(ResourceChangedEvent {
                     resource_type,
                     old_value,
                     new_value,
@@ -244,7 +420,7 @@ fn handle_game_step_events(
         game_state.current_mood = game_state.calculate_mood();
 
         if old_mood != game_state.current_mood {
-            mood_changed_events.write(MoodChangedEvent {
+            mood_changed_events.send(MoodChangedEvent {
                 old_mood,
                 new_mood: game_state.current_mood,
             });
@@ -272,5 +448,26 @@ impl GameStepEvent {
             ResourceType::Food => self.food_change += change,
         }
         self
+    }
+}
+
+// Helper functions for phase management
+impl GamePhaseState {
+    pub fn can_progress_to_next_phase(&self) -> bool {
+        match self.current_phase {
+            GamePhase::CardDraw => self.cards_drawn_count > 0,
+            GamePhase::CardSelection => self.selected_card_number.is_some(),
+            GamePhase::CharacterAction => true, // Always can progress after action
+            GamePhase::VisualNovelCutscene => self.pending_cutscene.is_none(),
+        }
+    }
+
+    pub fn get_phase_name(&self) -> &str {
+        match self.current_phase {
+            GamePhase::CardDraw => "Card Draw",
+            GamePhase::CardSelection => "Card Selection",
+            GamePhase::CharacterAction => "Character Action",
+            GamePhase::VisualNovelCutscene => "Cutscene",
+        }
     }
 }
