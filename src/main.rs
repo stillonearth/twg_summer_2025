@@ -1,11 +1,15 @@
 use avian2d::prelude::*;
 use bevy::{input::common_conditions::input_toggle_active, prelude::*, render::view::RenderLayers};
 use bevy_common_assets::json::JsonAssetPlugin;
+use bevy_defer::AsyncPlugin;
 use bevy_ecs_tiled::prelude::*;
 use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
 use bevy_la_mesa::{LaMesaPlugin, LaMesaPluginSettings};
 
-use crate::{cards::ActivityCards, sprites::LAYER_SPRITES};
+use crate::{
+    cards::{ActivityCardsHandle, CardSystemPlugin},
+    sprites::LAYER_SPRITES,
+};
 
 mod cards;
 mod collisions;
@@ -18,23 +22,26 @@ mod ui;
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
-        .add_plugins(ui::HikikomoriUIPlugin)
-        .add_plugins(game_objects::GameObjectsPlugin)
-        .add_plugins(TiledMapPlugin::default())
-        .add_plugins(TiledPhysicsPlugin::<TiledPhysicsAvianBackend>::default())
-        .add_plugins(PhysicsPlugins::default().with_length_unit(100.0))
+        .insert_resource(LaMesaPluginSettings { num_players: 1 })
         .add_plugins((
+            DefaultPlugins,
+            MeshPickingPlugin,
+            ui::HikikomoriUIPlugin,
+            game_objects::GameObjectsPlugin,
+            TiledMapPlugin::default(),
+            TiledPhysicsPlugin::<TiledPhysicsAvianBackend>::default(),
+            PhysicsPlugins::default().with_length_unit(100.0),
             EguiPlugin {
                 enable_multipass_for_primary_context: true,
             },
             WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
+            navigation::NavigationGridPlugin {},
+            JsonAssetPlugin::<cards::ActivityCards>::new(&["json"]),
+            LaMesaPlugin::<cards::ActivityCard>::default(),
+            AsyncPlugin::default_settings(),
+            CardSystemPlugin,
         ))
-        .add_plugins(navigation::NavigationGridPlugin {})
-        .add_plugins(JsonAssetPlugin::<cards::ActivityCards>::new(&["json"]))
-        .add_plugins(LaMesaPlugin::<cards::ActivityCard>::default())
-        .insert_resource(LaMesaPluginSettings { num_players: 1 })
-        .add_systems(Startup, (startup, cards::setup, cards::setup_ui))
+        .add_systems(Startup, startup)
         .add_systems(
             Update,
             (
@@ -46,14 +53,10 @@ fn main() {
                 sprites::update_animation_indices,
                 ui::example_game_loop,
                 sprites::add_render_layers_to_sprites,
-                cards::button_system,
             ),
         )
         .run();
 }
-
-#[derive(Resource, Deref, DerefMut)]
-struct ActivityCardsHandle(Handle<ActivityCards>);
 
 fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
     commands.spawn((Camera2d, IsDefaultUiCamera));
