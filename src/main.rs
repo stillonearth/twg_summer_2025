@@ -29,7 +29,7 @@ fn main() {
     App::new()
         .insert_resource(LaMesaPluginSettings { num_players: 1 })
         .add_plugins((
-            DefaultPlugins,
+            DefaultPlugins.set(ImagePlugin::default_nearest()),
             MeshPickingPlugin,
             ui::GameUIPlugin,
             LaMesaPlugin::<cards::ActivityCard>::default(),
@@ -83,7 +83,7 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
             order: 2,
             ..default()
         },
-        Pickable::default(),
+        // Pickable::default(),
         Transform::from_xyz(0.0, 15.0, 15.0).looking_at(Vec3::ZERO, Vec3::Y),
     ));
 

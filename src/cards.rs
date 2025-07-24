@@ -81,9 +81,11 @@ fn setup_cards_3d(
     // Deck area
     commands.spawn((
         Name::new("Deck 1 -- Play Cards"),
-        Transform::from_translation(Vec3::new(12.0, 0.0, 0.0))
+        Transform::from_translation(Vec3::new(9.2, 0.0, 7.2))
             .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
         DeckArea { marker: 1 },
+        Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
+        MeshMaterial3d(materials.add(Color::srgb_u8(124, 144, 255))),
     ));
 
     // Hand Area
@@ -98,7 +100,7 @@ fn setup_cards_3d(
     commands.spawn((
         Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
         MeshMaterial3d(materials.add(Color::srgb_u8(124, 144, 255))),
-        Transform::from_translation(Vec3::new(-5.73, 6.9, 9.2))
+        Transform::from_translation(Vec3::new(-5.4, 6.7, 9.8))
             .with_rotation(Quat::from_rotation_x(std::f32::consts::PI / 4.0)),
         PlayArea {
             marker: 1,

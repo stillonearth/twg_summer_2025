@@ -136,234 +136,220 @@ pub const LAYER_UI: usize = 0;
 
 // Setup the UI layout
 fn setup_ui(mut commands: Commands) {
-    // Main UI Root - fullscreen container
+    // Left Side Panel - Game state panel (fixed width, non-blocking)
     commands
         .spawn((
             Node {
-                width: Val::Percent(100.0),
+                width: Val::Px(280.0),
                 height: Val::Percent(100.0),
                 flex_direction: FlexDirection::Column,
                 position_type: PositionType::Absolute,
+                left: Val::Px(0.0),
+                top: Val::Px(0.0),
                 ..default()
             },
-            Name::new("UI ROOT"),
+            Name::new("Left Panel Container"),
         ))
-        .with_children(|root| {
-            // Top Center - Character thoughts panel
-            root.spawn((
-                Node {
-                    width: Val::Percent(100.0),
-                    height: Val::Auto,
-                    justify_content: JustifyContent::Center,
-                    align_items: AlignItems::FlexStart,
-                    padding: UiRect::all(Val::Px(16.0)),
-                    ..default()
-                },
-                Name::new("Top Container"),
-            ))
-            .with_children(|top_container| {
-                // Character thoughts panel
-                top_container
-                    .spawn((
-                        Node {
-                            width: Val::Px(900.0),
-                            min_height: Val::Px(80.0),
-                            max_height: Val::Px(150.0),
-                            padding: UiRect::all(Val::Px(16.0)),
-                            justify_content: JustifyContent::Center,
-                            align_items: AlignItems::Center,
-                            border: UiRect::all(Val::Px(2.0)),
-                            ..default()
-                        },
-                        // BackgroundColor::from(UIColors::THOUGHTS_BACKGROUND),
-                        // BorderColor(UIColors::ACCENT.with_alpha(0.3)),
-                        Name::new("Character Thoughts Panel"),
-                    ))
-                    .with_children(|thoughts_panel| {
-                        thoughts_panel.spawn((
-                            Text::new("What am I thinking about..."),
-                            TextFont {
-                                font_size: 16.0,
-                                ..default()
-                            },
-                            TextColor(UIColors::THOUGHTS_TEXT),
-                            Node {
-                                flex_wrap: FlexWrap::Wrap,
-                                justify_content: JustifyContent::Center,
-                                align_items: AlignItems::Center,
-                                ..default()
-                            },
-                            CharacterThoughts::default(),
-                        ));
-                    });
-            });
-
-            // Left Side - Game state panel
-            root.spawn((
-                Node {
-                    width: Val::Percent(100.0),
-                    height: Val::Percent(100.0),
-                    justify_content: JustifyContent::FlexStart,
-                    align_items: AlignItems::FlexStart,
-                    position_type: PositionType::Absolute,
-                    left: Val::Px(0.0),
-                    top: Val::Px(0.0),
-                    ..default()
-                },
-                Name::new("Left Container"),
-            ))
-            .with_children(|left_container| {
-                // Game state panel
-                left_container
-                    .spawn((
-                        Node {
-                            width: Val::Px(280.0),
-                            height: Val::Auto,
+        .with_children(|left_container| {
+            // Game state panel
+            left_container
+                .spawn((
+                    Node {
+                        width: Val::Percent(100.0),
+                        height: Val::Auto,
+                        flex_direction: FlexDirection::Column,
+                        padding: UiRect::all(Val::Px(16.0)),
+                        margin: UiRect::all(Val::Px(8.0)),
+                        border: UiRect::all(Val::Px(1.0)),
+                        ..default()
+                    },
+                    BackgroundColor::from(UIColors::BACKGROUND),
+                    BorderColor(UIColors::ACCENT.with_alpha(0.2)),
+                    Name::new("Game State Panel"),
+                ))
+                .with_children(|panel| {
+                    // Game phase and turn display
+                    panel
+                        .spawn(Node {
+                            margin: UiRect::bottom(Val::Px(16.0)),
                             flex_direction: FlexDirection::Column,
-                            padding: UiRect::all(Val::Px(16.0)),
-                            margin: UiRect::all(Val::Px(8.0)),
-                            border: UiRect::all(Val::Px(1.0)),
                             ..default()
-                        },
-                        BackgroundColor::from(UIColors::BACKGROUND),
-                        BorderColor(UIColors::ACCENT.with_alpha(0.2)),
-                        Name::new("Game State Panel"),
-                    ))
-                    .with_children(|panel| {
-                        // Game phase and turn display
-                        panel
-                            .spawn(Node {
-                                margin: UiRect::bottom(Val::Px(16.0)),
-                                flex_direction: FlexDirection::Column,
-                                ..default()
-                            })
-                            .with_children(|phase_container| {
-                                phase_container.spawn((
-                                    Text::new("Phase: Card Draw"),
-                                    TextFont {
-                                        font_size: 16.0,
-                                        ..default()
-                                    },
-                                    TextColor(UIColors::PHASE_DRAW),
-                                    PhaseDisplay,
-                                ));
-
-                                phase_container.spawn((
-                                    Text::new("Turn 1"),
-                                    TextFont {
-                                        font_size: 12.0,
-                                        ..default()
-                                    },
-                                    TextColor(UIColors::TEXT_DIM),
-                                    Node {
-                                        margin: UiRect::top(Val::Px(2.0)),
-                                        ..default()
-                                    },
-                                    TurnDisplay,
-                                ));
-                            });
-
-                        // Mood display
-                        panel
-                            .spawn(Node {
-                                margin: UiRect::bottom(Val::Px(16.0)),
-                                ..default()
-                            })
-                            .with_children(|mood_container| {
-                                mood_container.spawn((
-                                    Text::new("Mood: Neutral"),
-                                    TextFont {
-                                        font_size: 18.0,
-                                        ..default()
-                                    },
-                                    TextColor(UIColors::TEXT),
-                                    MoodDisplay,
-                                ));
-                            });
-
-                        // Resource bars
-                        let resources = [
-                            ("Sleep", ResourceType::Sleep),
-                            ("Health", ResourceType::Health),
-                            ("Mental", ResourceType::Mental),
-                            ("Food", ResourceType::Food),
-                        ];
-
-                        for (label, resource_type) in resources {
-                            panel
-                                .spawn(Node {
-                                    margin: UiRect::bottom(Val::Px(8.0)),
-                                    display: Display::Block,
+                        })
+                        .with_children(|phase_container| {
+                            phase_container.spawn((
+                                Text::new("Phase: Card Draw"),
+                                TextFont {
+                                    font_size: 16.0,
                                     ..default()
-                                })
-                                .with_children(|resource_container| {
-                                    // Label
-                                    resource_container.spawn((
-                                        Text::new(label),
-                                        TextFont {
-                                            font_size: 14.0,
-                                            ..default()
-                                        },
-                                        TextColor(UIColors::TEXT_DIM),
-                                    ));
+                                },
+                                TextColor(UIColors::PHASE_DRAW),
+                                PhaseDisplay,
+                            ));
 
-                                    // Bar background
-                                    resource_container
-                                        .spawn((
-                                            Node {
-                                                width: Val::Px(240.0),
-                                                height: Val::Px(16.0),
-                                                margin: UiRect::top(Val::Px(4.0)),
-                                                ..default()
-                                            },
-                                            BackgroundColor(Color::srgb(0.2, 0.2, 0.2)),
-                                            ResourceBar { resource_type },
-                                        ))
-                                        .with_children(|bar| {
-                                            // Bar fill
-                                            bar.spawn((
-                                                Node {
-                                                    width: Val::Percent(70.0), // Will be updated
-                                                    height: Val::Percent(100.0),
-                                                    ..default()
-                                                },
-                                                BackgroundColor(UIColors::ACCENT),
-                                                ResourceBarFill,
-                                            ));
-                                        });
-                                });
-                        }
+                            phase_container.spawn((
+                                Text::new("Turn 1"),
+                                TextFont {
+                                    font_size: 12.0,
+                                    ..default()
+                                },
+                                TextColor(UIColors::TEXT_DIM),
+                                Node {
+                                    margin: UiRect::top(Val::Px(2.0)),
+                                    ..default()
+                                },
+                                TurnDisplay,
+                            ));
+                        });
 
-                        // Time and day display at bottom
+                    // Mood display
+                    panel
+                        .spawn(Node {
+                            margin: UiRect::bottom(Val::Px(16.0)),
+                            ..default()
+                        })
+                        .with_children(|mood_container| {
+                            mood_container.spawn((
+                                Text::new("Mood: Neutral"),
+                                TextFont {
+                                    font_size: 18.0,
+                                    ..default()
+                                },
+                                TextColor(UIColors::TEXT),
+                                MoodDisplay,
+                            ));
+                        });
+
+                    // Resource bars
+                    let resources = [
+                        ("Sleep", ResourceType::Sleep),
+                        ("Health", ResourceType::Health),
+                        ("Mental", ResourceType::Mental),
+                        ("Food", ResourceType::Food),
+                    ];
+
+                    for (label, resource_type) in resources {
                         panel
                             .spawn(Node {
-                                margin: UiRect::top(Val::Px(24.0)),
-                                flex_direction: FlexDirection::Column,
+                                margin: UiRect::bottom(Val::Px(8.0)),
+                                display: Display::Block,
                                 ..default()
                             })
-                            .with_children(|time_container| {
-                                time_container.spawn((
-                                    Text::new("10:00"),
-                                    TextFont {
-                                        font_size: 20.0,
-                                        ..default()
-                                    },
-                                    TextColor(UIColors::TEXT),
-                                    TimeDisplay,
-                                ));
-
-                                time_container.spawn((
-                                    Text::new("Day 1"),
+                            .with_children(|resource_container| {
+                                // Label
+                                resource_container.spawn((
+                                    Text::new(label),
                                     TextFont {
                                         font_size: 14.0,
                                         ..default()
                                     },
                                     TextColor(UIColors::TEXT_DIM),
-                                    DayDisplay,
                                 ));
+
+                                // Bar background
+                                resource_container
+                                    .spawn((
+                                        Node {
+                                            width: Val::Px(240.0), // Reduced width for 200px container
+                                            height: Val::Px(16.0),
+                                            margin: UiRect::top(Val::Px(4.0)),
+                                            ..default()
+                                        },
+                                        BackgroundColor(Color::srgb(0.2, 0.2, 0.2)),
+                                        ResourceBar { resource_type },
+                                    ))
+                                    .with_children(|bar| {
+                                        // Bar fill
+                                        bar.spawn((
+                                            Node {
+                                                width: Val::Percent(70.0), // Will be updated
+                                                height: Val::Percent(100.0),
+                                                ..default()
+                                            },
+                                            BackgroundColor(UIColors::ACCENT),
+                                            ResourceBarFill,
+                                        ));
+                                    });
                             });
-                    });
-            });
+                    }
+
+                    // Time and day display at bottom
+                    panel
+                        .spawn(Node {
+                            margin: UiRect::top(Val::Px(24.0)),
+                            flex_direction: FlexDirection::Column,
+                            ..default()
+                        })
+                        .with_children(|time_container| {
+                            time_container.spawn((
+                                Text::new("10:00"),
+                                TextFont {
+                                    font_size: 20.0,
+                                    ..default()
+                                },
+                                TextColor(UIColors::TEXT),
+                                TimeDisplay,
+                            ));
+
+                            time_container.spawn((
+                                Text::new("Day 1"),
+                                TextFont {
+                                    font_size: 14.0,
+                                    ..default()
+                                },
+                                TextColor(UIColors::TEXT_DIM),
+                                DayDisplay,
+                            ));
+                        });
+                });
+        });
+
+    // Top Center Panel - Character thoughts (limited height, non-blocking)
+    commands
+        .spawn((
+            Node {
+                width: Val::Auto,
+                height: Val::Px(150.0), // Limited height
+                position_type: PositionType::Absolute,
+                left: Val::Px(300.0), // Start after left panel
+                top: Val::Px(20.0),
+                justify_content: JustifyContent::Center,
+                align_items: AlignItems::FlexStart,
+                ..default()
+            },
+            Name::new("Top Panel Container"),
+        ))
+        .with_children(|top_container| {
+            // Character thoughts panel
+            top_container
+                .spawn((
+                    Node {
+                        width: Val::Px(900.0), // Reduced width since left panel is smaller
+                        min_height: Val::Px(80.0),
+                        max_height: Val::Px(130.0),
+                        padding: UiRect::all(Val::Px(16.0)),
+                        justify_content: JustifyContent::Center,
+                        align_items: AlignItems::Center,
+                        ..default()
+                    },
+                    Name::new("Character Thoughts Panel"),
+                ))
+                .with_children(|thoughts_panel| {
+                    thoughts_panel.spawn((
+                        Text::new("What am I thinking about..."),
+                        TextFont {
+                            font_size: 16.0,
+                            ..default()
+                        },
+                        TextColor(UIColors::THOUGHTS_TEXT),
+                        Node {
+                            flex_wrap: FlexWrap::Wrap,
+                            justify_content: JustifyContent::Center,
+                            align_items: AlignItems::Center,
+                            ..default()
+                        },
+                        CharacterThoughts::default(),
+                    ));
+                });
         });
 }
 
