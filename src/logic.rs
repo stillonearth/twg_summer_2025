@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use crate::cards::ActivityCard;
+
 pub struct GameLogicPlugin;
 
 impl Plugin for GameLogicPlugin {
@@ -29,10 +31,8 @@ impl Plugin for GameLogicPlugin {
     }
 }
 
-#[derive(Event)]
-pub struct CardSelectedEvent {
-    pub card_number: usize,
-}
+#[derive(Event, Deref)]
+pub struct CardSelectedEvent(pub ActivityCard);
 
 // Phase-related Events
 #[derive(Event)]
@@ -47,10 +47,7 @@ pub struct CardDrawnEvent {
 }
 
 #[derive(Event)]
-pub struct ActionCompletedEvent {
-    pub action_type: ActionType,
-    pub success: bool,
-}
+pub struct ActionCompletedEvent {}
 
 #[derive(Event)]
 pub struct CutsceneTriggeredEvent {
@@ -123,16 +120,6 @@ pub enum GamePhase {
     CardSelection,
     CharacterAction,
     VisualNovelCutscene,
-}
-
-// Card System
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum ActionType {
-    Move,
-    Interact,
-    Rest,
-    Work,
-    Socialize,
 }
 
 #[derive(Debug, Clone, PartialEq)]

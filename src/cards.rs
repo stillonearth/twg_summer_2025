@@ -27,7 +27,6 @@ impl Plugin for CardSystemPlugin {
             (
                 init_cards,
                 handle_card_draw_phase,
-                handle_card_selection,
                 handle_place_card_on_table,
             ),
         );
@@ -57,7 +56,7 @@ impl CardMetadata for ActivityCard {
     type Output = ActivityCard;
 
     fn front_image_filename(&self) -> String {
-        format!("cards/card-{}.png", self.card_number)
+        format!("cards/card-{}.png", self.card_number - 1)
     }
 
     fn back_image_filename(&self) -> String {
@@ -201,44 +200,12 @@ fn handle_card_draw_phase(
     });
 }
 
-/// Handle card selection when user presses a card
-fn handle_card_selection(
-    mut card_press: EventReader<CardPress>,
-    mut ew_card_selected: EventWriter<CardSelectedEvent>,
-    phase_state: Res<GamePhaseState>,
-    q_cards_in_hand: Query<(Entity, &Card<ActivityCard>, &Hand)>,
-    q_cards_on_table: Query<(Entity, &Card<ActivityCard>, &CardOnTable)>,
-) {
-    // Only handle card selection during the CardSelection phase
-    if phase_state.current_phase != GamePhase::CardSelection {
-        return;
-    }
-
-    for event in card_press.read() {
-        // Check if the pressed card is in hand (not on table)
-        if q_cards_on_table.get(event.entity).is_ok() {
-            continue; // Skip cards already on table
-        }
-
-        if let Ok((_, card, _)) = q_cards_in_hand.get(event.entity) {
-            // Send card selection event with card number as ID
-            ew_card_selected.write(CardSelectedEvent {
-                card_number: card.data.card_number,
-            });
-
-            println!(
-                "Card selected: {} (ID: {})",
-                card.data.name, card.data.card_number
-            );
-        }
-    }
-}
-
 /// Handle placing card on table after selection
 pub fn handle_place_card_on_table(
     mut commands: Commands,
     mut card_press: EventReader<CardPress>,
     mut ew_place_card_on_table: EventWriter<PlaceCardOnTable>,
+    mut ew_card_selected: EventWriter<CardSelectedEvent>,
     phase_state: Res<GamePhaseState>,
     mut q_cards: ParamSet<(
         Query<(Entity, &Card<ActivityCard>, &CardOnTable)>,
@@ -246,7 +213,7 @@ pub fn handle_place_card_on_table(
     )>,
 ) {
     // Only place cards during CharacterAction phase
-    if phase_state.current_phase != GamePhase::CharacterAction {
+    if phase_state.current_phase != GamePhase::CardSelection {
         return;
     }
 
@@ -259,6 +226,12 @@ pub fn handle_place_card_on_table(
             continue;
         }
 
+        let p1 = q_cards.p1();
+        if let Ok((_, card, _)) = p1.get(event.entity) {
+            // Send card selection event with card number as ID
+            ew_card_selected.write(CardSelectedEvent(card.data.clone()));
+        }
+
         // Only allow one card on table at a time for now
         if n_cards_on_table < 1 {
             ew_place_card_on_table.write(PlaceCardOnTable {
@@ -266,8 +239,6 @@ pub fn handle_place_card_on_table(
                 player: 1,
                 marker: n_cards_on_table + 1,
             });
-
-            println!("Placing card on table during CharacterAction phase");
 
             // Align remaining cards in hand
             commands.spawn_task(move || async move {

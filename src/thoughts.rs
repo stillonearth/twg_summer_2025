@@ -1,7 +1,10 @@
-use crate::logic::{
-    CardSelectedEvent, DayChangedEvent, GamePhase, GamePhaseState, GameState, Mood,
-    MoodChangedEvent, PhaseChangedEvent, ResourceChangedEvent, ResourceType, TimeChangedEvent,
-    TimeOfDay,
+use crate::{
+    cards::ActivityCard,
+    logic::{
+        CardSelectedEvent, DayChangedEvent, GamePhase, GamePhaseState, GameState, Mood,
+        MoodChangedEvent, PhaseChangedEvent, ResourceChangedEvent, ResourceType, TimeChangedEvent,
+        TimeOfDay,
+    },
 };
 use bevy::prelude::*;
 use bevy_llm::*;
@@ -77,7 +80,7 @@ pub struct ActionEntry {
 
 #[derive(Clone, Debug)]
 pub enum ActionType {
-    CardPlayed(String),        // Card name
+    CardPlayed(ActivityCard),  // Card name
     ObjectInteraction(String), // Object name
     ResourceCrisis(ResourceType),
     MoodChange(Mood, Mood), // From, To
@@ -105,13 +108,14 @@ pub struct ThoughtContext {
 
 #[derive(Clone, Debug)]
 pub enum ThoughtType {
-    CardPlayed(String),           // Card name
+    CardPlayed(ActivityCard),     // Card name
     ObjectInteraction(String),    // Object name
     ResourceCrisis(ResourceType), // Which resource is low
     MoodChange(Mood, Mood),       // From mood, to mood
-    TimeChange(TimeOfDay),        // New time of day
-    PhaseChange(GamePhase),       // New game phase
-    General,                      // General ambient thought
+    TimeChange(TimeOfDay),
+    // New time of day
+    PhaseChange(GamePhase), // New game phase
+    General,                // General ambient thought
 }
 
 #[derive(Clone, Debug)]
@@ -300,8 +304,11 @@ fn generate_thought_prompt(context: &ThoughtContext) -> String {
     );
 
     let specific_prompt = match &context.thought_type {
-        ThoughtType::CardPlayed(card_name) => {
-            format!("I just chose '{}'. What am I thinking?", card_name)
+        ThoughtType::CardPlayed(card) => {
+            format!(
+                "I just chose '{} : {}'. What am I thinking?",
+                card.name, card.description
+            )
         }
         ThoughtType::ObjectInteraction(object) => {
             format!("I'm looking at the {}. What crosses my mind?", object)
@@ -466,20 +473,19 @@ fn listen_for_card_selections(
     game_state: Res<GameState>,
 ) {
     for event in card_events.read() {
-        // For now, we'll use the card number. In a real implementation,
-        // you'd want to resolve this to the actual card name
-        let card_name = format!("Card {}", event.card_number);
+        let card = event.0.clone();
 
-        // Log the card selection
+        println!("selected card {}", card.name);
+
         action_log.log_action(
-            ActionType::CardPlayed(card_name.clone()),
-            format!("Selected card: {}", card_name),
+            ActionType::CardPlayed(card.clone()),
+            format!("Selected card: {}", card.name),
             &game_state,
         );
 
         // Generate thought about the card choice
         thought_events.write(GenerateThoughtEvent {
-            thought_type: ThoughtType::CardPlayed(card_name),
+            thought_type: ThoughtType::CardPlayed(card.clone()),
             context: None,
         });
     }

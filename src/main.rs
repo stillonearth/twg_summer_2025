@@ -29,7 +29,15 @@ fn main() {
     App::new()
         .insert_resource(LaMesaPluginSettings { num_players: 1 })
         .add_plugins((
-            DefaultPlugins.set(ImagePlugin::default_nearest()),
+            DefaultPlugins
+                .set(ImagePlugin::default_nearest())
+                .set(WindowPlugin {
+                    primary_window: Some(Window {
+                        resizable: false,
+                        ..default()
+                    }),
+                    ..default()
+                }),
             MeshPickingPlugin,
             ui::GameUIPlugin,
             LaMesaPlugin::<cards::ActivityCard>::default(),
