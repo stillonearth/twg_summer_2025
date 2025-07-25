@@ -1,6 +1,7 @@
 use bevy::prelude::*;
+use bevy_novel::{events::EventStartScenario, rpy_asset_loader::Rpy};
 
-use crate::cards::ActivityCard;
+use crate::{cards::ActivityCard, cutscene::ScenarioHandle};
 
 pub struct GameLogicPlugin;
 
@@ -17,7 +18,8 @@ impl Plugin for GameLogicPlugin {
             .add_event::<CardDrawnEvent>()
             .add_event::<CardSelectedEvent>()
             .add_event::<ActionCompletedEvent>()
-            .add_event::<CutsceneTriggeredEvent>()
+            .add_event::<CutsceneStartEvent>()
+            .add_event::<CutsceneEndEvent>()
             .add_systems(
                 Update,
                 (
@@ -26,6 +28,9 @@ impl Plugin for GameLogicPlugin {
                     handle_card_draw,
                     handle_card_selection,
                     handle_action_completion,
+                    handle_character_action_phase,
+                    handle_cutscene_trigger,
+                    handle_cutscene_end,
                 ),
             );
     }
@@ -34,7 +39,9 @@ impl Plugin for GameLogicPlugin {
 #[derive(Event, Deref)]
 pub struct CardSelectedEvent(pub ActivityCard);
 
-// Phase-related Events
+#[derive(Event)]
+pub struct CutsceneEndEvent;
+
 #[derive(Event)]
 pub struct PhaseChangedEvent {
     pub old_phase: GamePhase,
@@ -50,7 +57,7 @@ pub struct CardDrawnEvent {
 pub struct ActionCompletedEvent {}
 
 #[derive(Event)]
-pub struct CutsceneTriggeredEvent {
+pub struct CutsceneStartEvent {
     pub cutscene_id: String,
     pub trigger_reason: CutsceneTrigger,
 }
@@ -92,39 +99,44 @@ pub struct DayChangedEvent {
     pub new_day: u32,
 }
 
-// Game Phase System
+// Game Phase System - Removed VisualNovelCutscene
 #[derive(Resource)]
 pub struct GamePhaseState {
     pub current_phase: GamePhase,
+    pub previous_phase: Option<GamePhase>, // Track phase before cutscene
     pub turn_number: u32,
     pub cards_drawn_count: usize,
     pub selected_card_number: Option<usize>,
     pub pending_cutscene: Option<String>,
+    pub cutscene_active: bool, // Track if cutscene is running
 }
 
 impl Default for GamePhaseState {
     fn default() -> Self {
         Self {
             current_phase: GamePhase::CardDraw,
+            previous_phase: None,
             turn_number: 1,
             cards_drawn_count: 0,
             selected_card_number: None,
             pending_cutscene: None,
+            cutscene_active: false,
         }
     }
 }
 
+// Removed VisualNovelCutscene from enum
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum GamePhase {
     CardDraw,
     CardSelection,
     CharacterAction,
-    VisualNovelCutscene,
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum CutsceneTrigger {
     CardEffect,
+    CharacterAction,
     MoodChange,
     TimeOfDay,
     ResourceThreshold,
@@ -235,10 +247,6 @@ impl GameState {
         format!("Day {}", self.current_day)
     }
 
-    pub fn set_time_speed(&mut self, speed: f32) {
-        self.time_speed = speed.max(0.0);
-    }
-
     pub fn get_resource_value(&self, resource_type: ResourceType) -> f32 {
         match resource_type {
             ResourceType::Sleep => self.sleep,
@@ -265,6 +273,11 @@ fn handle_card_draw(
     mut phase_changed_events: EventWriter<PhaseChangedEvent>,
 ) {
     for event in card_drawn_events.read() {
+        // Don't transition if cutscene is active
+        if phase_state.cutscene_active {
+            continue;
+        }
+
         phase_state.cards_drawn_count = event.card_count;
 
         let old_phase = phase_state.current_phase;
@@ -282,30 +295,107 @@ fn handle_card_selection(
     mut card_selected_events: EventReader<CardSelectedEvent>,
     mut phase_state: ResMut<GamePhaseState>,
     mut phase_changed_events: EventWriter<PhaseChangedEvent>,
-    mut cutscene_events: EventWriter<CutsceneTriggeredEvent>,
+    mut cutscene_events: EventWriter<CutsceneStartEvent>,
 ) {
     for event in card_selected_events.read() {
+        // Don't transition if cutscene is active
+        if phase_state.cutscene_active {
+            continue;
+        }
+
         phase_state.selected_card_number = Some(event.card_number);
 
-        // Note: Card effects will be handled by your existing cards plugin
-        // This system just manages the phase transition
-
-        // Check if cutscene should be triggered (this would need to query your cards plugin)
-        // For now, we'll assume no cutscene unless specified
+        // Check if cutscene should be triggered
         let has_cutscene = false; // Your cards plugin would determine this
 
-        // Transition to next phase
-        let old_phase = phase_state.current_phase;
-        phase_state.current_phase = if has_cutscene {
-            GamePhase::VisualNovelCutscene
+        if has_cutscene {
+            // Trigger cutscene instead of transitioning
+            cutscene_events.write(CutsceneStartEvent {
+                cutscene_id: "card_action".to_string(),
+                trigger_reason: CutsceneTrigger::CardEffect,
+            });
         } else {
-            GamePhase::CharacterAction
-        };
+            // Normal transition to character action
+            let old_phase = phase_state.current_phase;
+            phase_state.current_phase = GamePhase::CharacterAction;
 
-        phase_changed_events.write(PhaseChangedEvent {
-            old_phase,
-            new_phase: phase_state.current_phase,
-        });
+            phase_changed_events.write(PhaseChangedEvent {
+                old_phase,
+                new_phase: phase_state.current_phase,
+            });
+        }
+    }
+}
+
+// Updated cutscene trigger - doesn't change phase, just sets cutscene state
+fn handle_cutscene_trigger(
+    mut cutscene_events: EventReader<CutsceneStartEvent>,
+    mut phase_state: ResMut<GamePhaseState>,
+    mut novel_events: EventWriter<EventStartScenario>,
+    scenario: Res<ScenarioHandle>,
+    rpy_assets: Res<Assets<Rpy>>,
+) {
+    for event in cutscene_events.read() {
+        // Store the cutscene ID and mark cutscene as active
+        phase_state.pending_cutscene = Some(event.cutscene_id.clone());
+        phase_state.previous_phase = Some(phase_state.current_phase);
+        phase_state.cutscene_active = true;
+
+        info!(
+            "Starting cutscene: {} during {:?} phase",
+            event.cutscene_id, phase_state.current_phase
+        );
+
+        // Start the visual novel cutscene
+        if let Some(rpy) = rpy_assets.get(scenario.id()) {
+            novel_events.write(EventStartScenario { ast: rpy.0.clone() });
+        }
+    }
+}
+
+// Updated cutscene end - resumes previous phase
+fn handle_cutscene_end(
+    mut cutscene_end_events: EventReader<CutsceneEndEvent>,
+    mut phase_state: ResMut<GamePhaseState>,
+    mut phase_changed_events: EventWriter<PhaseChangedEvent>,
+    mut action_completed_events: EventWriter<ActionCompletedEvent>,
+) {
+    for _event in cutscene_end_events.read() {
+        if !phase_state.cutscene_active {
+            continue;
+        }
+
+        info!("Cutscene ended, resuming game phase");
+
+        // Clear cutscene state
+        phase_state.cutscene_active = false;
+        phase_state.pending_cutscene = None;
+
+        // Determine what to do based on the previous phase and current state
+        match phase_state.current_phase {
+            GamePhase::CardSelection => {
+                // If we were in card selection and had a cutscene,
+                // now proceed to character action
+                if phase_state.selected_card_number.is_some() {
+                    let old_phase = phase_state.current_phase;
+                    phase_state.current_phase = GamePhase::CharacterAction;
+
+                    phase_changed_events.write(PhaseChangedEvent {
+                        old_phase,
+                        new_phase: phase_state.current_phase,
+                    });
+                }
+            }
+            GamePhase::CharacterAction => {
+                // If we were in character action, complete the action
+                action_completed_events.write(ActionCompletedEvent {});
+            }
+            GamePhase::CardDraw => {
+                // Nothing special needed for card draw phase
+            }
+        }
+
+        phase_state.previous_phase = None;
     }
 }
 
@@ -316,6 +406,11 @@ fn handle_action_completion(
     mut phase_changed_events: EventWriter<PhaseChangedEvent>,
 ) {
     for _event in action_completed_events.read() {
+        // Don't transition if cutscene is active
+        if phase_state.cutscene_active {
+            continue;
+        }
+
         // Clear phase state
         phase_state.selected_card_number = None;
         phase_state.cards_drawn_count = 0;
@@ -330,6 +425,26 @@ fn handle_action_completion(
             old_phase,
             new_phase: phase_state.current_phase,
         });
+    }
+}
+
+fn handle_character_action_phase(
+    mut phase_changed_events: EventReader<PhaseChangedEvent>,
+    mut action_completed_events: EventWriter<ActionCompletedEvent>,
+    mut ew_start_start: EventWriter<CutsceneStartEvent>,
+) {
+    for event in phase_changed_events.read() {
+        if event.new_phase == GamePhase::CharacterAction {
+            info!("Entered Character Action phase");
+
+            // For now, immediately complete the action
+            // action_completed_events.write(ActionCompletedEvent {});
+            //
+            ew_start_start.write(CutsceneStartEvent {
+                cutscene_id: "test".to_string(),
+                trigger_reason: CutsceneTrigger::CharacterAction,
+            });
+        }
     }
 }
 
@@ -417,16 +532,6 @@ fn handle_game_step_events(
 
 // Helper functions for other systems to create events
 impl GameStepEvent {
-    pub fn new(time_delta: f32) -> Self {
-        Self {
-            time_delta,
-            sleep_change: 0.0,
-            health_change: 0.0,
-            mental_health_change: 0.0,
-            food_change: 0.0,
-        }
-    }
-
     pub fn with_resource_change(mut self, resource_type: ResourceType, change: f32) -> Self {
         match resource_type {
             ResourceType::Sleep => self.sleep_change += change,
@@ -445,7 +550,10 @@ impl GamePhaseState {
             GamePhase::CardDraw => "Card Draw",
             GamePhase::CardSelection => "Card Selection",
             GamePhase::CharacterAction => "Character Action",
-            GamePhase::VisualNovelCutscene => "Cutscene",
         }
+    }
+
+    pub fn is_cutscene_active(&self) -> bool {
+        self.cutscene_active
     }
 }

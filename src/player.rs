@@ -1,3 +1,4 @@
+use crate::logic::{CutsceneEndEvent, CutsceneStartEvent};
 use crate::navigation::{GridPos, MovePlayerCommand, TileSize};
 use crate::sprites::{
     get_animation_indices, AnimatedCharacterSprite, AnimatedCharacterType, AnimationDirection,
@@ -5,12 +6,31 @@ use crate::sprites::{
     SHEET_1_COLUMNS, SHEET_1_ROWS,
 };
 use avian2d::prelude::*;
-use bevy::prelude::*; // Add your navigation imports
+use bevy::prelude::*;
 
 const MOVE_SPEED: f32 = 200.;
 
+pub struct PlayerPlugin;
+
+impl Plugin for PlayerPlugin {
+    fn build(&self, app: &mut App) {
+        app.add_systems(
+            Update,
+            (
+                move_player_from_command,
+                move_player_along_path,
+                handle_cutscene_start,
+                handle_cutscene_end,
+            ),
+        );
+    }
+}
+
 #[derive(Default, Clone, Component)]
 pub struct PlayerMarker;
+
+#[derive(Default, Clone, Component)]
+pub struct NonVisualNovelElement;
 
 #[derive(Component, Default)]
 pub struct PlayerMovement {
@@ -158,4 +178,28 @@ pub fn spawn_player_sprite(
         Collider::circle(10.),
         LockedAxes::ROTATION_LOCKED,
     ));
+}
+
+fn handle_cutscene_start(
+    mut commands: Commands,
+    mut er_cutscene_start: EventReader<CutsceneStartEvent>,
+    q_players: Query<(Entity, &PlayerMarker)>,
+) {
+    for _ in er_cutscene_start.read() {
+        for (entity, _) in q_players.iter() {
+            commands.entity(entity).insert(Visibility::Hidden);
+        }
+    }
+}
+
+fn handle_cutscene_end(
+    mut commands: Commands,
+    mut er_cutscene_start: EventReader<CutsceneEndEvent>,
+    q_players: Query<(Entity, &PlayerMarker)>,
+) {
+    for _ in er_cutscene_start.read() {
+        for (entity, _) in q_players.iter() {
+            commands.entity(entity).insert(Visibility::Inherited);
+        }
+    }
 }

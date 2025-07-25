@@ -1,0 +1,32 @@
+<template>
+    <node
+        padding="10px"
+        align_self="center"
+        justify_self="center"
+        flex_direction="column"
+        >
+            <image
+                src="logo.png"
+                width="400px"
+            />
+
+            <text font_size="25">{user_wallet_address}</text>
+
+            <button
+                background="#002"
+                justify_content="center"
+                hover:background="#618"
+                pressed:background="#955"
+                border="2px"
+                border_color="#FFF"
+                delay="200ms"
+                ease="cubic_in"
+                border_radius="4px"
+                padding="10px"
+                margin:top="20px"
+                on_press="start_game"
+            >
+                <text font_size="25">START GAME</text>
+            </button>
+    </node>
+</template>

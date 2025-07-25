@@ -14,6 +14,8 @@ use bevy_la_mesa::{Card, CardMetadata, CardOnTable, Hand, PlayArea};
 use bevy_la_mesa::{DeckArea, HandArea};
 use serde::Deserialize;
 
+use crate::logic::CutsceneEndEvent;
+use crate::logic::CutsceneStartEvent;
 // Import your game logic events
 use crate::logic::{CardDrawnEvent, CardSelectedEvent, GamePhase, GamePhaseState};
 
@@ -22,12 +24,14 @@ pub struct CardSystemPlugin;
 
 impl Plugin for CardSystemPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, setup_cards_3d).add_systems(
+        app.add_systems(Startup, setup).add_systems(
             Update,
             (
                 init_cards,
                 handle_card_draw_phase,
                 handle_place_card_on_table,
+                handle_cutscene_start,
+                handle_cutscene_end,
             ),
         );
     }
@@ -65,7 +69,7 @@ impl CardMetadata for ActivityCard {
 }
 
 /// Set up lights, camera, deck area, and hand area for card visualization
-fn setup_cards_3d(
+fn setup(
     mut commands: Commands,
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -84,6 +88,7 @@ fn setup_cards_3d(
             .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
         DeckArea { marker: 1 },
         Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
+        Visibility::Hidden,
         MeshMaterial3d(materials.add(Color::srgb_u8(124, 144, 255))),
     ));
 
@@ -246,6 +251,30 @@ pub fn handle_place_card_on_table(
                 AsyncWorld.send_event(AlignCardsInHand { player: 1 })?;
                 Ok(())
             });
+        }
+    }
+}
+
+fn handle_cutscene_start(
+    mut commands: Commands,
+    mut er_cutscene_start: EventReader<CutsceneStartEvent>,
+    q_cards: Query<(Entity, &Card<ActivityCard>)>,
+) {
+    for _ in er_cutscene_start.read() {
+        for (entity, _) in q_cards.iter() {
+            commands.entity(entity).insert(Visibility::Hidden);
+        }
+    }
+}
+
+fn handle_cutscene_end(
+    mut commands: Commands,
+    mut er_cutscene_start: EventReader<CutsceneEndEvent>,
+    q_cards: Query<(Entity, &Card<ActivityCard>)>,
+) {
+    for _ in er_cutscene_start.read() {
+        for (entity, _) in q_cards.iter() {
+            commands.entity(entity).insert(Visibility::Inherited);
         }
     }
 }

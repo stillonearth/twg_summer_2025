@@ -1,8 +1,11 @@
 use crate::{
-    logic::{GamePhase, GamePhaseState, GameState, Mood, ResourceType},
+    logic::{
+        CutsceneEndEvent, CutsceneStartEvent, GamePhase, GamePhaseState, GameState, Mood,
+        ResourceType,
+    },
     thoughts::ThoughtGeneratedEvent,
 };
-use bevy::{color::palettes::css::GREEN, prelude::*, text::TextBounds};
+use bevy::prelude::*;
 
 pub struct GameUIPlugin;
 
@@ -19,6 +22,8 @@ impl Plugin for GameUIPlugin {
                     update_resource_bars,
                     update_character_thoughts,
                     handle_new_thought_generated,
+                    handle_cutscene_start,
+                    handle_cutscene_end,
                 ),
             );
     }
@@ -79,7 +84,6 @@ impl UIColors {
             GamePhase::CardDraw => Self::PHASE_DRAW,
             GamePhase::CardSelection => Self::PHASE_SELECT,
             GamePhase::CharacterAction => Self::PHASE_ACTION,
-            GamePhase::VisualNovelCutscene => Self::PHASE_CUTSCENE,
         }
     }
 
@@ -98,6 +102,10 @@ impl UIColors {
 }
 
 // UI component markers
+
+#[derive(Component)]
+pub struct UIRoot;
+
 #[derive(Component)]
 pub struct PhaseDisplay;
 
@@ -139,6 +147,7 @@ fn setup_ui(mut commands: Commands) {
     // Left Side Panel - Game state panel (fixed width, non-blocking)
     commands
         .spawn((
+            UIRoot,
             Node {
                 width: Val::Px(280.0),
                 height: Val::Percent(100.0),
@@ -306,6 +315,7 @@ fn setup_ui(mut commands: Commands) {
     // Top Center Panel - Character thoughts (limited height, non-blocking)
     commands
         .spawn((
+            UIRoot,
             Node {
                 width: Val::Auto,
                 height: Val::Px(150.0), // Limited height
@@ -387,12 +397,7 @@ fn update_phase_display(
     if phase_state.is_changed() {
         // Update phase display
         for (mut text, mut text_color) in &mut phase_query {
-            let phase_str = match phase_state.current_phase {
-                GamePhase::CardDraw => "Card Draw",
-                GamePhase::CardSelection => "Card Selection",
-                GamePhase::CharacterAction => "Character Action",
-                GamePhase::VisualNovelCutscene => "Cutscene",
-            };
+            let phase_str = phase_state.get_phase_name();
             *text = Text::new(format!("Phase: {phase_str}"));
             *text_color = TextColor(UIColors::phase_color(&phase_state.current_phase));
         }
@@ -478,5 +483,29 @@ fn handle_new_thought_generated(
 ) {
     for response in er_though_generated.read() {
         ew_update_thoughts_ui.write(UpdateThoughtsEvent::new(response.text.clone()));
+    }
+}
+
+fn handle_cutscene_start(
+    mut commands: Commands,
+    mut er_cutscene_start: EventReader<CutsceneStartEvent>,
+    q_ui_roots: Query<(Entity, &UIRoot)>,
+) {
+    for _ in er_cutscene_start.read() {
+        for (entity, _) in q_ui_roots.iter() {
+            commands.entity(entity).insert(Visibility::Hidden);
+        }
+    }
+}
+
+fn handle_cutscene_end(
+    mut commands: Commands,
+    mut er_cutscene_start: EventReader<CutsceneEndEvent>,
+    q_ui_roots: Query<(Entity, &UIRoot)>,
+) {
+    for _ in er_cutscene_start.read() {
+        for (entity, _) in q_ui_roots.iter() {
+            commands.entity(entity).insert(Visibility::Inherited);
+        }
     }
 }

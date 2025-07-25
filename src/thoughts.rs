@@ -455,13 +455,6 @@ fn listen_for_phase_changes(
                     context: Some("Here I go again, doing the same things...".to_string()),
                 });
             }
-            GamePhase::VisualNovelCutscene => {
-                // Something important happened
-                // thought_events.write(GenerateThoughtEvent {
-                //     thought_type: ThoughtType::PhaseChange(event.new_phase),
-                //     context: Some("Something significant is happening".to_string()),
-                // });
-            }
         }
     }
 }
@@ -474,8 +467,6 @@ fn listen_for_card_selections(
 ) {
     for event in card_events.read() {
         let card = event.0.clone();
-
-        println!("selected card {}", card.name);
 
         action_log.log_action(
             ActionType::CardPlayed(card.clone()),
