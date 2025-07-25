@@ -1,8 +1,6 @@
 use crate::{
-    logic::{
-        CutsceneEndEvent, CutsceneStartEvent, GamePhase, GamePhaseState, GameState, Mood,
-        ResourceType,
-    },
+    cards::{Mood, ResourceType},
+    logic::{CutsceneEndEvent, CutsceneStartEvent, GamePhase, GamePhaseState, GameState},
     thoughts::ThoughtGeneratedEvent,
 };
 use bevy::prelude::*;

@@ -1,22 +1,18 @@
-use std::collections::HashMap;
-
-use bevy::asset::Asset;
 use bevy::color::palettes::css::*;
 use bevy::prelude::*;
-use bevy::reflect::TypePath;
 use bevy_defer::AsyncCommandsExtension;
 use bevy_defer::AsyncWorld;
 use bevy_la_mesa::events::{
     AlignCardsInHand, CardPress, DeckShuffle, DiscardCardToDeck, DrawToHand, PlaceCardOnTable,
     RenderDeck,
 };
-use bevy_la_mesa::{Card, CardMetadata, CardOnTable, Hand, PlayArea};
+use bevy_la_mesa::CardMetadata;
+use bevy_la_mesa::{Card, CardOnTable, Hand, PlayArea};
 use bevy_la_mesa::{DeckArea, HandArea};
-use serde::Deserialize;
+use serde::{de::Error, Deserialize, Deserializer, Serialize};
 
 use crate::logic::CutsceneEndEvent;
 use crate::logic::CutsceneStartEvent;
-// Import your game logic events
 use crate::logic::{CardDrawnEvent, CardSelectedEvent, GamePhase, GamePhaseState};
 
 /// Plugin that handles all card-related functionality
@@ -34,37 +30,6 @@ impl Plugin for CardSystemPlugin {
                 handle_cutscene_end,
             ),
         );
-    }
-}
-
-/// Resource for storing the handle to the activity cards asset
-#[derive(Resource, Deref, DerefMut)]
-pub struct ActivityCardsHandle(pub Handle<ActivityCards>);
-
-#[derive(Clone, Debug, Default, Deserialize)]
-pub struct ActivityCard {
-    pub card_number: usize,
-    pub name: String,
-    pub description: String,
-    pub category: String,
-    pub resource_effects: HashMap<String, f32>,
-    pub time_cost: f32,
-    pub card_type: String,
-    pub availability: String,
-}
-
-#[derive(Deserialize, Asset, TypePath, Deref, DerefMut)]
-pub struct ActivityCards(pub Vec<ActivityCard>);
-
-impl CardMetadata for ActivityCard {
-    type Output = ActivityCard;
-
-    fn front_image_filename(&self) -> String {
-        format!("cards/card-{}.png", self.card_number - 1)
-    }
-
-    fn back_image_filename(&self) -> String {
-        "cards/Back_1.png".into()
     }
 }
 
@@ -198,9 +163,9 @@ fn handle_card_draw_phase(
         })?;
 
         // Send phase event
-        AsyncWorld.send_event(CardDrawnEvent {
-            card_count: cards_to_draw,
-        })?;
+        // AsyncWorld.send_event(CardDrawnEvent {
+        //     card_count: cards_to_draw,
+        // })?;
 
         Ok(())
     });
@@ -277,5 +242,207 @@ fn handle_cutscene_end(
         for (entity, _) in q_cards.iter() {
             commands.entity(entity).insert(Visibility::Inherited);
         }
+    }
+}
+
+// Card-related types and definitions
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct ActivityCard {
+    pub card_number: u32,
+    pub name: String,
+    pub description: String,
+    pub category: String,
+    pub conditions: CardConditions,
+    pub costs: CardCosts,
+    pub effects: ResourceEffects,
+    pub status_effects: Vec<StatusEffectApplication>,
+    pub card_type: CardType,
+    pub availability: CardAvailability,
+    pub flavor_text: String,
+    pub one_time_use: bool,
+    pub cooldown: Option<u32>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct CardConditions {
+    pub min_sleep: Option<f32>,
+    pub min_health: Option<f32>,
+    pub min_mental: Option<f32>,
+    pub min_food: Option<f32>,
+    pub max_sleep: Option<f32>,
+    pub max_health: Option<f32>,
+    pub max_mental: Option<f32>,
+    pub max_food: Option<f32>,
+    pub required_mood: Option<Mood>,
+    pub forbidden_mood: Option<Mood>,
+    pub time_of_day: Option<Vec<TimeOfDay>>,
+    pub day_range: Option<(u32, u32)>,
+    pub required_objects: Option<Vec<String>>,
+    pub crisis_level: Option<CrisisLevel>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct CardCosts {
+    pub sleep_cost: f32,
+    pub health_cost: f32,
+    pub mental_cost: f32,
+    pub food_cost: f32,
+    pub time_cost: f32,
+    pub additional_costs: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct ResourceEffects {
+    pub sleep: f32,
+    pub health: f32,
+    pub mental: f32,
+    pub food: f32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StatusEffectApplication {
+    pub effect: StatusEffect,
+    pub duration: u32,
+    pub intensity: f32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum CardType {
+    BasicNeed,
+    Entertainment,
+    Social,
+    Crisis,
+    TimeSpecific,
+    Delusion,
+    LLMGenerated,
+    ThoughtCard,
+    MemoryCard,
+    ImpulseCard,
+    ComboCard,
+}
+
+impl Default for CardType {
+    fn default() -> Self {
+        CardType::BasicNeed
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum CardAvailability {
+    Always,
+    ConditionalOnly,
+    CrisisOnly,
+    LLMOnly,
+    OneTime,
+    DailyReset,
+}
+
+impl Default for CardAvailability {
+    fn default() -> Self {
+        CardAvailability::Always
+    }
+}
+
+#[derive(Debug, Clone, Serialize, PartialEq)]
+pub enum StatusEffect {
+    Insomnia(u32),
+    Sick(u32),
+    Motivated(u32),
+    Overwhelmed(u32),
+    Addicted(String, u32),
+    Exhausted(u32),
+    Anxious(u32),
+    Depressed(u32),
+    Manic(u32),
+    Stable(u32),
+    Focused(u32),
+    Hungry(u32),
+}
+
+impl<'de> Deserialize<'de> for StatusEffect {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+
+        // Parse the string and create the appropriate enum variant with default duration
+        match s.as_str() {
+            "Insomnia" => Ok(StatusEffect::Insomnia(0)),
+            "Sick" => Ok(StatusEffect::Sick(0)),
+            "Motivated" => Ok(StatusEffect::Motivated(0)),
+            "Overwhelmed" => Ok(StatusEffect::Overwhelmed(0)),
+            "Exhausted" => Ok(StatusEffect::Exhausted(0)),
+            "Anxious" => Ok(StatusEffect::Anxious(0)),
+            "Depressed" => Ok(StatusEffect::Depressed(0)),
+            "Manic" => Ok(StatusEffect::Manic(0)),
+            "Stable" => Ok(StatusEffect::Stable(0)),
+            "Focused" => Ok(StatusEffect::Focused(0)),
+            "Hungry" => Ok(StatusEffect::Hungry(0)),
+            s if s.starts_with("Addicted") => {
+                // Handle "Addicted" or "Addicted(substance)" format
+                Ok(StatusEffect::Addicted("generic".to_string(), 0))
+            }
+            _ => Err(serde::de::Error::custom(format!(
+                "Unknown status effect: {}",
+                s
+            ))),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+pub enum Mood {
+    Depressed,
+    Anxious,
+    Tired,
+    Neutral,
+    Content,
+    Manic,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
+pub enum TimeOfDay {
+    EarlyMorning, // 5-9
+    Morning,      // 9-12
+    Afternoon,    // 12-17
+    Evening,      // 17-20
+    Night,        // 20-24
+    LateNight,    // 0-5
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+pub enum CrisisLevel {
+    None,
+    Mild,
+    Moderate,
+    Severe,
+    Critical,
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Hash)]
+pub enum ResourceType {
+    Sleep,
+    Health,
+    Mental,
+    Food,
+}
+
+#[derive(Deserialize, Asset, TypePath, Deref, DerefMut)]
+pub struct ActivityCards(pub Vec<ActivityCard>);
+
+/// Resource for storing the handle to the activity cards asset
+#[derive(Resource, Deref, DerefMut)]
+pub struct ActivityCardsHandle(pub Handle<ActivityCards>);
+
+impl CardMetadata for ActivityCard {
+    type Output = ActivityCard;
+
+    fn front_image_filename(&self) -> String {
+        format!("cards/card-{}.png", self.card_number - 1)
+    }
+
+    fn back_image_filename(&self) -> String {
+        "cards/Back_1.png".into()
     }
 }

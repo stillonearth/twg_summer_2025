@@ -15,7 +15,7 @@ use bevy_llm::LLMPlugin;
 use bevy_novel::{NovelBackground, NovelImage, NovelPlugin, NovelText};
 
 use crate::{
-    cards::{ActivityCardsHandle, CardSystemPlugin},
+    cards::{ActivityCard, ActivityCards, ActivityCardsHandle, CardSystemPlugin},
     cutscene::CutscenePlugin,
     logic::{CutsceneEndEvent, CutsceneStartEvent, GameLogicPlugin},
     menu::GameMenuPlugin,
@@ -51,7 +51,7 @@ fn main() {
                     ..default()
                 }),
             MeshPickingPlugin,
-            LaMesaPlugin::<cards::ActivityCard>::default(),
+            LaMesaPlugin::<ActivityCard>::default(),
             game_objects::GameObjectsPlugin,
             TiledMapPlugin::default(),
             TiledPhysicsPlugin::<TiledPhysicsAvianBackend>::default(),
@@ -61,7 +61,7 @@ fn main() {
             },
             WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
             navigation::NavigationGridPlugin {},
-            JsonAssetPlugin::<cards::ActivityCards>::new(&["json"]),
+            JsonAssetPlugin::<ActivityCards>::new(&["json"]),
             AsyncPlugin::default_settings(),
             LLMPlugin,
             HuiPlugin,
