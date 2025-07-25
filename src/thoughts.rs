@@ -455,6 +455,7 @@ fn listen_for_phase_changes(
                     context: Some("Here I go again, doing the same things...".to_string()),
                 });
             }
+            GamePhase::TurnOver => {}
         }
     }
 }

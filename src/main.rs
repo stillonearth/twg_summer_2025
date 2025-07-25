@@ -1,5 +1,7 @@
 #![feature(let_chains)]
 
+use std::f32::consts::FRAC_PI_2;
+
 use avian2d::prelude::*;
 use bevy::{input::common_conditions::input_toggle_active, prelude::*, render::view::RenderLayers};
 use bevy_common_assets::json::JsonAssetPlugin;
@@ -99,8 +101,10 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
             order: 1,
             ..default()
         },
-        // Pickable::default(),
-        Transform::from_xyz(0.0, 15.0, 15.0).looking_at(Vec3::ZERO, Vec3::Y),
+        Transform::from_xyz(0.0, 25.0, 0.0)
+            .looking_at(Vec3::ZERO, Vec3::Y)
+            .with_rotation(Quat::from_rotation_z(0.0))
+            .with_rotation(Quat::from_rotation_x(-FRAC_PI_2)),
     ));
 
     let map_handle: Handle<TiledMap> = asset_server.load("my_room.tmx");
@@ -123,8 +127,6 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let activity_cards_handle = ActivityCardsHandle(asset_server.load("cards.json"));
     commands.insert_resource(activity_cards_handle);
 }
-
-// handle hide map for bevy_ecs_tilemap
 
 fn handle_cutscene_start(
     mut commands: Commands,

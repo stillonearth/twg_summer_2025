@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_la_mesa::{events::DiscardCardToDeck, Card, CardOnTable, DeckArea, Hand};
 use bevy_novel::{events::EventStartScenario, rpy_asset_loader::Rpy};
 
 use crate::{cards::ActivityCard, cutscene::ScenarioHandle};
@@ -18,6 +19,7 @@ impl Plugin for GameLogicPlugin {
             .add_event::<CardDrawnEvent>()
             .add_event::<CardSelectedEvent>()
             .add_event::<ActionCompletedEvent>()
+            .add_event::<TurnOverEvent>()
             .add_event::<CutsceneStartEvent>()
             .add_event::<CutsceneEndEvent>()
             .add_systems(
@@ -28,9 +30,11 @@ impl Plugin for GameLogicPlugin {
                     handle_card_draw,
                     handle_card_selection,
                     handle_action_completion,
+                    handle_turn_over,
                     handle_character_action_phase,
                     handle_cutscene_trigger,
                     handle_cutscene_end,
+                    handle_turn_over_completion,
                 ),
             );
     }
@@ -41,6 +45,9 @@ pub struct CardSelectedEvent(pub ActivityCard);
 
 #[derive(Event)]
 pub struct CutsceneEndEvent;
+
+#[derive(Event)]
+pub struct TurnOverEvent;
 
 #[derive(Event)]
 pub struct PhaseChangedEvent {
@@ -99,7 +106,7 @@ pub struct DayChangedEvent {
     pub new_day: u32,
 }
 
-// Game Phase System - Removed VisualNovelCutscene
+// Game Phase System - Added TurnOver phase
 #[derive(Resource)]
 pub struct GamePhaseState {
     pub current_phase: GamePhase,
@@ -125,12 +132,13 @@ impl Default for GamePhaseState {
     }
 }
 
-// Removed VisualNovelCutscene from enum
+// Added TurnOver to the enum
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum GamePhase {
     CardDraw,
     CardSelection,
     CharacterAction,
+    TurnOver,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -140,6 +148,7 @@ pub enum CutsceneTrigger {
     MoodChange,
     TimeOfDay,
     ResourceThreshold,
+    TurnEnd,
 }
 
 // Core game state resource (existing, unchanged)
@@ -393,13 +402,16 @@ fn handle_cutscene_end(
             GamePhase::CardDraw => {
                 // Nothing special needed for card draw phase
             }
+            GamePhase::TurnOver => {
+                // If cutscene happened during turn over, continue turn over processing
+            }
         }
 
         phase_state.previous_phase = None;
     }
 }
 
-// Action completion system
+// Action completion system - now transitions to TurnOver instead of CardDraw
 fn handle_action_completion(
     mut action_completed_events: EventReader<ActionCompletedEvent>,
     mut phase_state: ResMut<GamePhaseState>,
@@ -411,13 +423,132 @@ fn handle_action_completion(
             continue;
         }
 
-        // Clear phase state
+        info!("Action completed, transitioning to TurnOver phase");
+
+        let old_phase = phase_state.current_phase;
+        phase_state.current_phase = GamePhase::TurnOver;
+
+        phase_changed_events.write(PhaseChangedEvent {
+            old_phase,
+            new_phase: phase_state.current_phase,
+        });
+    }
+}
+
+// New TurnOver phase handler
+fn handle_turn_over(
+    mut phase_changed_events: EventReader<PhaseChangedEvent>,
+    mut turn_over_events: EventWriter<TurnOverEvent>,
+    mut cutscene_events: EventWriter<CutsceneStartEvent>,
+    phase_state: Res<GamePhaseState>,
+    game_state: Res<GameState>,
+) {
+    for event in phase_changed_events.read() {
+        if event.new_phase == GamePhase::TurnOver {
+            info!(
+                "Entered TurnOver phase for turn {}",
+                phase_state.turn_number
+            );
+
+            // Check for end-of-turn triggers
+            let should_trigger_cutscene =
+                check_turn_end_cutscene_triggers(&game_state, &phase_state);
+
+            if let Some(cutscene_id) = should_trigger_cutscene {
+                // Trigger end-of-turn cutscene
+                cutscene_events.write(CutsceneStartEvent {
+                    cutscene_id,
+                    trigger_reason: CutsceneTrigger::TurnEnd,
+                });
+            } else {
+                // No cutscene needed, proceed with turn over
+                turn_over_events.write(TurnOverEvent);
+            }
+        }
+    }
+}
+
+// Helper function to check for turn-end cutscene triggers
+fn check_turn_end_cutscene_triggers(
+    game_state: &GameState,
+    phase_state: &GamePhaseState,
+) -> Option<String> {
+    // Example conditions for triggering end-of-turn cutscenes
+
+    // Check for critical resource levels
+    if game_state.health < 10.0 {
+        return Some("critical_health".to_string());
+    }
+
+    if game_state.mental_health < 10.0 {
+        return Some("mental_breakdown".to_string());
+    }
+
+    // Check for special days or turn milestones
+    if phase_state.turn_number % 10 == 0 {
+        return Some("turn_milestone".to_string());
+    }
+
+    // Check for time-based triggers
+    if game_state.current_hour >= 22.0 && game_state.time_of_day == TimeOfDay::Night {
+        return Some("late_night_reflection".to_string());
+    }
+
+    // Check for mood-based triggers
+    match game_state.current_mood {
+        Mood::Depressed => Some("depression_cutscene".to_string()),
+        Mood::Manic => Some("manic_episode".to_string()),
+        _ => None,
+    }
+}
+
+// TurnOver event handler - processes end of turn and starts new turn
+fn handle_turn_over_completion(
+    mut turn_over_events: EventReader<TurnOverEvent>,
+    mut phase_state: ResMut<GamePhaseState>,
+    mut phase_changed_events: EventWriter<PhaseChangedEvent>,
+    mut game_step_events: EventWriter<GameStepEvent>,
+    q_decks: Query<(Entity, &DeckArea)>,
+    mut q_cards: ParamSet<(
+        Query<(Entity, &Card<ActivityCard>, &CardOnTable)>,
+        Query<(Entity, &Card<ActivityCard>, &Hand)>,
+    )>,
+    mut ew_discard_card_to_deck: EventWriter<DiscardCardToDeck>,
+) {
+    for _event in turn_over_events.read() {
+        // Don't process if cutscene is active
+        if phase_state.cutscene_active {
+            continue;
+        }
+
+        let main_deck_entity = q_decks.iter().find(|(_, deck)| deck.marker == 1).unwrap().0;
+        for (entity, _, _) in q_cards.p1().iter() {
+            ew_discard_card_to_deck.write(DiscardCardToDeck {
+                card_entity: entity,
+                deck_entity: main_deck_entity,
+            });
+        }
+
+        for (entity, _, _) in q_cards.p0().iter() {
+            ew_discard_card_to_deck.write(DiscardCardToDeck {
+                card_entity: entity,
+                deck_entity: main_deck_entity,
+            });
+        }
+
+        info!("Processing turn over, starting new turn");
+
+        // Clear phase state from previous turn
         phase_state.selected_card_number = None;
         phase_state.cards_drawn_count = 0;
 
-        // Increment turn and go back to card draw
+        // Increment turn number
         phase_state.turn_number += 1;
 
+        // Apply passive effects (time passage, resource decay, etc.)
+        apply_turn_end_effects(&mut game_step_events);
+
+        // Transition to card draw for new turn
         let old_phase = phase_state.current_phase;
         phase_state.current_phase = GamePhase::CardDraw;
 
@@ -425,7 +556,24 @@ fn handle_action_completion(
             old_phase,
             new_phase: phase_state.current_phase,
         });
+
+        info!("Started turn {}", phase_state.turn_number);
     }
+}
+
+// Helper function to apply passive effects at turn end
+fn apply_turn_end_effects(game_step_events: &mut EventWriter<GameStepEvent>) {
+    // Apply passive time and resource changes
+    let time_passage = 3600.0; // 1 hour per turn
+    let base_resource_decay = -5.0;
+
+    game_step_events.write(GameStepEvent {
+        time_delta: time_passage,
+        sleep_change: base_resource_decay,
+        health_change: base_resource_decay * 0.5,
+        mental_health_change: base_resource_decay * 0.8,
+        food_change: base_resource_decay * 1.2,
+    });
 }
 
 fn handle_character_action_phase(
@@ -440,10 +588,10 @@ fn handle_character_action_phase(
             // For now, immediately complete the action
             // action_completed_events.write(ActionCompletedEvent {});
             //
-            ew_start_start.write(CutsceneStartEvent {
-                cutscene_id: "test".to_string(),
-                trigger_reason: CutsceneTrigger::CharacterAction,
-            });
+            // ew_start_start.write(CutsceneStartEvent {
+            //     cutscene_id: "test".to_string(),
+            //     trigger_reason: CutsceneTrigger::CharacterAction,
+            // });
         }
     }
 }
@@ -550,6 +698,7 @@ impl GamePhaseState {
             GamePhase::CardDraw => "Card Draw",
             GamePhase::CardSelection => "Card Selection",
             GamePhase::CharacterAction => "Character Action",
+            GamePhase::TurnOver => "Turn Over",
         }
     }
 

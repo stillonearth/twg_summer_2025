@@ -84,34 +84,35 @@ fn setup(
     // Deck area
     commands.spawn((
         Name::new("Deck 1 -- Play Cards"),
-        Transform::from_translation(Vec3::new(9.2, 0.0, 7.2))
+        Transform::from_translation(Vec3::new(14.0, 0.0, 7.5))
             .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
         DeckArea { marker: 1 },
         Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
-        Visibility::Hidden,
         MeshMaterial3d(materials.add(Color::srgb_u8(124, 144, 255))),
+        Visibility::Hidden,
     ));
 
     // Hand Area
     commands.spawn((
         Name::new("HandArea - Player 1"),
-        Transform::from_translation(Vec3::new(0.0, -2.2, 5.8))
-            .with_rotation(Quat::from_rotation_x(std::f32::consts::PI / 4.0)),
+        Transform::from_translation(Vec3::new(-5.0, 8.5, 5.0)),
         HandArea { player: 1 },
+        Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
+        MeshMaterial3d(materials.add(Color::srgb_u8(124, 144, 255))),
+        Visibility::Hidden,
     ));
 
     // Play Area -- Where card comes to
     commands.spawn((
         Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
         MeshMaterial3d(materials.add(Color::srgb_u8(124, 144, 255))),
-        Transform::from_translation(Vec3::new(-5.4, 6.7, 9.8))
-            .with_rotation(Quat::from_rotation_x(std::f32::consts::PI / 4.0)),
+        Transform::from_translation(Vec3::new(-5.6, 15.1, 2.15)),
         PlayArea {
             marker: 1,
             player: 1,
         },
-        Visibility::Hidden,
         Name::new(format!("Play Area 1")),
+        Visibility::Hidden,
     ));
 }
 

@@ -66,7 +66,7 @@ impl UIColors {
     pub const PHASE_DRAW: Color = Color::srgb(0.3, 0.8, 0.9);
     pub const PHASE_SELECT: Color = Color::srgb(0.9, 0.7, 0.3);
     pub const PHASE_ACTION: Color = Color::srgb(0.7, 0.9, 0.4);
-    pub const PHASE_CUTSCENE: Color = Color::srgb(0.9, 0.4, 0.8);
+    pub const PHASE_TURN_OVER: Color = Color::srgb(0.9, 0.4, 0.8);
 
     pub fn mood_color(mood: &Mood) -> Color {
         match mood {
@@ -84,6 +84,7 @@ impl UIColors {
             GamePhase::CardDraw => Self::PHASE_DRAW,
             GamePhase::CardSelection => Self::PHASE_SELECT,
             GamePhase::CharacterAction => Self::PHASE_ACTION,
+            GamePhase::TurnOver => Self::PHASE_TURN_OVER,
         }
     }
 
