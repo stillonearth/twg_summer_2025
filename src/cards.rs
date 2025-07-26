@@ -163,9 +163,9 @@ fn handle_card_draw_phase(
         })?;
 
         // Send phase event
-        // AsyncWorld.send_event(CardDrawnEvent {
-        //     card_count: cards_to_draw,
-        // })?;
+        AsyncWorld.send_event(CardDrawnEvent {
+            card_count: cards_to_draw,
+        })?;
 
         Ok(())
     });

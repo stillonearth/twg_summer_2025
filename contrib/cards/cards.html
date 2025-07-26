@@ -71,7 +71,7 @@
 
             .card-image-container {
                 width: 100%;
-                height: 120px;
+                height: 200px;
                 position: relative;
                 background: linear-gradient(45deg, #667eea, #764ba2);
                 border-bottom: 2px solid #d4af37;
@@ -376,7 +376,6 @@
                 id="statusEffects"
                 style="display: none"
             >
-                <div class="status-effects-header">Status Effects</div>
                 <div id="statusEffectsList">
                     <!-- Status effects will be populated here -->
                 </div>
@@ -825,11 +824,6 @@
                 // Handle additional costs
                 const additionalCostsElement =
                     clone.querySelector("#additionalCosts");
-                const additionalCosts = createAdditionalCosts(card.costs);
-                if (additionalCosts) {
-                    additionalCostsElement.appendChild(additionalCosts);
-                    additionalCostsElement.style.display = "block";
-                }
 
                 // Create and replace effects
                 const effectsContainer = clone.querySelector(

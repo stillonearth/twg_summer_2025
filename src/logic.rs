@@ -29,8 +29,6 @@ impl Plugin for GameLogicPlugin {
             .add_event::<StatusEffectExpiredEvent>()
             .add_event::<CrisisLevelChangedEvent>()
             .add_event::<EndGameEvent>()
-            .add_event::<LLMActionEvent>()
-            .add_event::<LLMResponseEvent>()
             .add_systems(
                 Update,
                 (
@@ -38,9 +36,9 @@ impl Plugin for GameLogicPlugin {
                     handle_phase_transitions,
                     handle_card_draw,
                     handle_card_selection,
+                    handle_character_action_phase,
                     handle_action_completion,
                     handle_turn_over,
-                    handle_character_action_phase,
                     handle_cutscene_trigger,
                     handle_cutscene_end,
                     handle_turn_over_completion,
@@ -48,7 +46,6 @@ impl Plugin for GameLogicPlugin {
                     handle_status_effect_tick,
                     handle_crisis_level_changes,
                     handle_end_game_check,
-                    handle_llm_character_action,
                     handle_daily_reset,
                 )
                     .chain(),
@@ -87,16 +84,6 @@ pub struct EndGameEvent {
     pub result: EndGameResult,
 }
 
-#[derive(Event)]
-pub struct LLMActionEvent {
-    pub request: LLMActionRequest,
-}
-
-#[derive(Event)]
-pub struct LLMResponseEvent {
-    pub response: LLMActionResponse,
-}
-
 #[derive(Event, Deref)]
 pub struct CardSelectedEvent(pub ActivityCard);
 
@@ -114,7 +101,7 @@ pub struct PhaseChangedEvent {
 
 #[derive(Event)]
 pub struct CardDrawnEvent {
-    pub cards: Vec<ActivityCard>,
+    pub card_count: usize,
 }
 
 #[derive(Event)]
@@ -176,26 +163,9 @@ pub struct ActiveStatusEffect {
 #[derive(Debug, Clone)]
 pub struct PlayerAction {
     pub turn: u32,
-    pub card_played: u32,
     pub resources_before: (f32, f32, f32, f32),
     pub resources_after: (f32, f32, f32, f32),
     pub timestamp: f32,
-}
-
-#[derive(Debug, Clone)]
-pub struct LLMActionRequest {
-    pub current_state: GameState,
-    pub recent_actions: Vec<PlayerAction>,
-    pub available_cards: Vec<ActivityCard>,
-    pub context: String,
-}
-
-#[derive(Debug, Clone)]
-pub struct LLMActionResponse {
-    pub selected_card: Option<u32>,
-    pub generated_cards: Vec<ActivityCard>,
-    pub character_thoughts: String,
-    pub urgency_level: f32,
 }
 
 #[derive(Debug, Clone)]
@@ -232,7 +202,6 @@ pub enum GamePhase {
 #[derive(Debug, Clone, PartialEq)]
 pub enum CutsceneTrigger {
     CardEffect,
-    CharacterAction,
     MoodChange,
     TimeOfDay,
     ResourceThreshold,
@@ -268,7 +237,6 @@ pub struct GameState {
     pub action_history: Vec<PlayerAction>,
     pub available_objects: Vec<String>,
     pub negative_card_count: u32,
-    pub llm_generated_cards: Vec<ActivityCard>,
 }
 
 impl Default for GameState {
@@ -303,7 +271,6 @@ impl Default for GameState {
                 "window".to_string(),
             ],
             negative_card_count: 0,
-            llm_generated_cards: Vec::new(),
         }
     }
 }
@@ -317,7 +284,6 @@ pub struct GamePhaseState {
     pub selected_card_id: Option<u32>,
     pub pending_cutscene: Option<String>,
     pub cutscene_active: bool,
-    pub drawn_cards: Vec<ActivityCard>,
 }
 
 impl Default for GamePhaseState {
@@ -330,7 +296,6 @@ impl Default for GamePhaseState {
             selected_card_id: None,
             pending_cutscene: None,
             cutscene_active: false,
-            drawn_cards: Vec::new(),
         }
     }
 }
@@ -551,13 +516,9 @@ impl GameState {
                     self.negative_card_count += 1;
                 }
                 s if s.starts_with("LockResource") => {
-                    // Parse resource type and duration from string
-                    // This would need proper parsing in real implementation
-                    // For now, just lock mental for 2 turns as example
                     self.locked_resources.insert(ResourceType::Mental, 2);
                 }
                 s if s.starts_with("ConsumeAllOfResource") => {
-                    // This would consume all of a specific resource
                     if s.contains("Mental") {
                         self.mental_health = 0.0;
                     } else if s.contains("Sleep") {
@@ -589,7 +550,6 @@ impl GameState {
         let resources_after = (self.sleep, self.health, self.mental_health, self.food);
         self.action_history.push(PlayerAction {
             turn: self.turn_number(),
-            card_played: card.id,
             resources_before,
             resources_after,
             timestamp: self.current_hour,
@@ -626,7 +586,6 @@ impl GameState {
     pub fn tick_status_effects(&mut self) -> Vec<StatusEffectExpiredEvent> {
         let mut expired_events = Vec::new();
 
-        // Decrease duration and collect expired effects
         let mut i = 0;
         while i < self.status_effects.len() {
             self.status_effects[i].remaining_duration -= 1;
@@ -640,7 +599,6 @@ impl GameState {
             }
         }
 
-        // Decrease resource locks
         for duration in self.locked_resources.values_mut() {
             *duration = duration.saturating_sub(1);
         }
@@ -718,7 +676,6 @@ impl GameState {
         self.action_history.len() as u32 + 1
     }
 
-    // Existing helper methods from original GameState
     fn calculate_time_of_day(hour: f32) -> TimeOfDay {
         match hour {
             h if (5.0..9.0).contains(&h) => TimeOfDay::EarlyMorning,
@@ -739,7 +696,6 @@ impl GameState {
     fn calculate_mood(&self) -> Mood {
         let avg_resources = (self.sleep + self.health + self.mental_health + self.food) / 4.0;
 
-        // Factor in specific resource states
         match () {
             _ if self.mental_health < 20.0 => Mood::Depressed,
             _ if self.sleep < 20.0 => Mood::Tired,
@@ -797,8 +753,7 @@ fn handle_card_draw(
             continue;
         }
 
-        phase_state.drawn_cards = event.cards.clone();
-        phase_state.cards_drawn_count = event.cards.len();
+        phase_state.cards_drawn_count = event.card_count;
 
         let old_phase = phase_state.current_phase;
         phase_state.current_phase = GamePhase::CardSelection;
@@ -848,6 +803,7 @@ fn handle_card_selection(
                 trigger_reason: CutsceneTrigger::CardEffect,
             });
         } else {
+            // Go to CharacterAction phase
             let old_phase = phase_state.current_phase;
             phase_state.current_phase = GamePhase::CharacterAction;
 
@@ -923,49 +879,6 @@ fn handle_end_game_check(
     for _event in resource_changed_events.read() {
         if let Some(result) = game_state.check_end_game_conditions() {
             end_game_events.write(EndGameEvent { result });
-        }
-    }
-}
-
-fn handle_llm_character_action(
-    mut phase_changed_events: EventReader<PhaseChangedEvent>,
-    mut llm_action_events: EventWriter<LLMActionEvent>,
-    mut action_completed_events: EventWriter<ActionCompletedEvent>,
-    game_state: Res<GameState>,
-    phase_state: Res<GamePhaseState>,
-) {
-    for event in phase_changed_events.read() {
-        if event.new_phase == GamePhase::CharacterAction {
-            info!("Entered Character Action phase");
-
-            // Create LLM request
-            let request = LLMActionRequest {
-                current_state: game_state.clone(),
-                recent_actions: game_state
-                    .action_history
-                    .iter()
-                    .rev()
-                    .take(5)
-                    .cloned()
-                    .collect(),
-                available_cards: phase_state.drawn_cards.clone(),
-                context: format!(
-                    "Turn {}, Day {}, Time: {}, Mood: {:?}, Crisis: {:?}",
-                    phase_state.turn_number,
-                    game_state.current_day,
-                    game_state.get_time_string(),
-                    game_state.current_mood,
-                    game_state.crisis_level
-                ),
-            };
-
-            llm_action_events.write(LLMActionEvent { request });
-
-            // For now, immediately complete the action
-            // In a real implementation, this would wait for LLM response
-            action_completed_events.write(ActionCompletedEvent {
-                card_played: phase_state.drawn_cards.first().cloned().unwrap_or_default(),
-            });
         }
     }
 }
@@ -1048,9 +961,11 @@ fn handle_cutscene_end(
         phase_state.cutscene_active = false;
         phase_state.pending_cutscene = None;
 
-        match phase_state.current_phase {
-            GamePhase::CardSelection => {
-                if phase_state.selected_card_id.is_some() {
+        // Resume from the phase where cutscene was triggered
+        if let Some(previous_phase) = phase_state.previous_phase {
+            match previous_phase {
+                GamePhase::CardSelection => {
+                    // Card was selected, go to CharacterAction
                     let old_phase = phase_state.current_phase;
                     phase_state.current_phase = GamePhase::CharacterAction;
 
@@ -1059,18 +974,40 @@ fn handle_cutscene_end(
                         new_phase: phase_state.current_phase,
                     });
                 }
-            }
-            GamePhase::CharacterAction => {
-                if let Some(card) = phase_state.drawn_cards.first() {
+                GamePhase::CharacterAction => {
+                    // Character action was in progress, complete it
                     action_completed_events.write(ActionCompletedEvent {
-                        card_played: card.clone(),
+                        card_played: ActivityCard::default(), // You may need to store the card being played
                     });
                 }
+                _ => {}
             }
-            _ => {}
         }
 
         phase_state.previous_phase = None;
+    }
+}
+
+fn handle_character_action_phase(
+    mut phase_changed_events: EventReader<PhaseChangedEvent>,
+    mut action_completed_events: EventWriter<ActionCompletedEvent>,
+    phase_state: Res<GamePhaseState>,
+) {
+    for event in phase_changed_events.read() {
+        if event.new_phase == GamePhase::CharacterAction {
+            info!("Entered Character Action phase");
+
+            // In a simplified version, we can automatically complete the action
+            // In a more complex version, this could wait for player input or AI decisions
+            if let Some(selected_card_id) = phase_state.selected_card_id {
+                // For now, create a default card with the selected ID
+                // In a real implementation, you'd retrieve the actual card
+                let mut card = ActivityCard::default();
+                card.id = selected_card_id;
+
+                action_completed_events.write(ActionCompletedEvent { card_played: card });
+            }
+        }
     }
 }
 
@@ -1206,7 +1143,6 @@ fn handle_turn_over_completion(
         // Clear phase state from previous turn
         phase_state.selected_card_id = None;
         phase_state.cards_drawn_count = 0;
-        phase_state.drawn_cards.clear();
 
         // Increment turn number
         phase_state.turn_number += 1;
@@ -1239,17 +1175,6 @@ fn apply_turn_end_effects(game_step_events: &mut EventWriter<GameStepEvent>) {
         mental_health_change: base_resource_decay * 0.8,
         food_change: base_resource_decay * 1.2,
     });
-}
-
-fn handle_character_action_phase(
-    mut phase_changed_events: EventReader<PhaseChangedEvent>,
-    mut action_completed_events: EventWriter<ActionCompletedEvent>,
-) {
-    for event in phase_changed_events.read() {
-        if event.new_phase == GamePhase::CharacterAction {
-            info!("Entered Character Action phase");
-        }
-    }
 }
 
 fn handle_game_step_events(
