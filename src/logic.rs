@@ -314,7 +314,7 @@ pub struct GamePhaseState {
     pub previous_phase: Option<GamePhase>,
     pub turn_number: u32,
     pub cards_drawn_count: usize,
-    pub selected_card_number: Option<u32>,
+    pub selected_card_id: Option<u32>,
     pub pending_cutscene: Option<String>,
     pub cutscene_active: bool,
     pub drawn_cards: Vec<ActivityCard>,
@@ -327,7 +327,7 @@ impl Default for GamePhaseState {
             previous_phase: None,
             turn_number: 1,
             cards_drawn_count: 0,
-            selected_card_number: None,
+            selected_card_id: None,
             pending_cutscene: None,
             cutscene_active: false,
             drawn_cards: Vec::new(),
@@ -429,7 +429,7 @@ impl GameState {
 
         // Check cooldowns
         if let Some(cooldown) = card.cooldown {
-            if let Some(&last_used_turn) = self.card_cooldowns.get(&card.card_number) {
+            if let Some(&last_used_turn) = self.card_cooldowns.get(&card.id) {
                 let turns_since = self.turn_number() - last_used_turn;
                 if turns_since < cooldown {
                     blocking_conditions.push(format!(
@@ -441,13 +441,13 @@ impl GameState {
         }
 
         // Check one-time use
-        if card.one_time_use && self.used_one_time_cards.contains(&card.card_number) {
+        if card.one_time_use && self.used_one_time_cards.contains(&card.id) {
             blocking_conditions.push("Already used (one-time only)".to_string());
         }
 
         // Check daily use
         if matches!(card.availability, CardAvailability::DailyReset)
-            && self.daily_used_cards.contains(&card.card_number)
+            && self.daily_used_cards.contains(&card.id)
         {
             blocking_conditions.push("Already used today".to_string());
         }
@@ -570,17 +570,16 @@ impl GameState {
 
         // Update cooldown
         if let Some(cooldown) = card.cooldown {
-            self.card_cooldowns
-                .insert(card.card_number, self.turn_number());
+            self.card_cooldowns.insert(card.id, self.turn_number());
         }
 
         // Mark usage
         if card.one_time_use {
-            self.used_one_time_cards.push(card.card_number);
+            self.used_one_time_cards.push(card.id);
         }
 
         if matches!(card.availability, CardAvailability::DailyReset) {
-            self.daily_used_cards.push(card.card_number);
+            self.daily_used_cards.push(card.id);
         }
 
         // Update crisis level
@@ -590,7 +589,7 @@ impl GameState {
         let resources_after = (self.sleep, self.health, self.mental_health, self.food);
         self.action_history.push(PlayerAction {
             turn: self.turn_number(),
-            card_played: card.card_number,
+            card_played: card.id,
             resources_before,
             resources_after,
             timestamp: self.current_hour,
@@ -837,7 +836,7 @@ fn handle_card_selection(
             continue;
         }
 
-        phase_state.selected_card_number = Some(event.0.card_number);
+        phase_state.selected_card_id = Some(event.0.id);
 
         // Check if cutscene should be triggered based on card type
         let should_trigger_cutscene =
@@ -845,7 +844,7 @@ fn handle_card_selection(
 
         if should_trigger_cutscene {
             cutscene_events.write(CutsceneStartEvent {
-                cutscene_id: format!("card_{}", event.0.card_number),
+                cutscene_id: format!("card_{}", event.0.id),
                 trigger_reason: CutsceneTrigger::CardEffect,
             });
         } else {
@@ -1051,7 +1050,7 @@ fn handle_cutscene_end(
 
         match phase_state.current_phase {
             GamePhase::CardSelection => {
-                if phase_state.selected_card_number.is_some() {
+                if phase_state.selected_card_id.is_some() {
                     let old_phase = phase_state.current_phase;
                     phase_state.current_phase = GamePhase::CharacterAction;
 
@@ -1205,7 +1204,7 @@ fn handle_turn_over_completion(
         info!("Processing turn over, starting new turn");
 
         // Clear phase state from previous turn
-        phase_state.selected_card_number = None;
+        phase_state.selected_card_id = None;
         phase_state.cards_drawn_count = 0;
         phase_state.drawn_cards.clear();
 

@@ -248,7 +248,7 @@ fn handle_cutscene_end(
 // Card-related types and definitions
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct ActivityCard {
-    pub card_number: u32,
+    pub id: u32,
     pub name: String,
     pub description: String,
     pub category: String,
@@ -439,7 +439,7 @@ impl CardMetadata for ActivityCard {
     type Output = ActivityCard;
 
     fn front_image_filename(&self) -> String {
-        format!("cards/card-{}.png", self.card_number - 1)
+        format!("cards/card-{}.png", self.id)
     }
 
     fn back_image_filename(&self) -> String {

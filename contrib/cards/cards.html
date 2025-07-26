@@ -16,7 +16,7 @@
 
             .card {
                 width: 280px;
-                height: 392px;
+                height: 450px;
                 border-radius: 12px;
                 box-shadow:
                     0 8px 25px rgba(0, 0, 0, 0.6),
@@ -53,6 +53,7 @@
                 text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
                 margin: 0;
                 text-align: center;
+                padding-right: 50px;
             }
 
             .card-type {
@@ -70,7 +71,7 @@
 
             .card-image-container {
                 width: 100%;
-                height: 160px;
+                height: 120px;
                 position: relative;
                 background: linear-gradient(45deg, #667eea, #764ba2);
                 border-bottom: 2px solid #d4af37;
@@ -88,76 +89,181 @@
                 transform: scale(1.05);
             }
 
-            .resource-effects {
+            .costs-effects-section {
                 background: linear-gradient(135deg, #2c3e50, #34495e);
-                padding: 8px;
+                padding: 4px 6px;
                 border-bottom: 1px solid #d4af37;
+                display: flex;
+                align-items: center;
+                gap: 8px;
             }
 
-            .resource-grid {
+            .costs-column {
+                flex: 1;
                 display: flex;
-                justify-content: space-around;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .effects-column {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .divider {
+                width: 1px;
+                height: 40px;
+                background: linear-gradient(
+                    to bottom,
+                    transparent,
+                    #d4af37,
+                    transparent
+                );
+                opacity: 0.6;
+            }
+
+            .costs-header,
+            .effects-header {
+                color: #fff;
+                font-size: 9px;
+                font-weight: bold;
+                margin-bottom: 2px;
+                text-align: center;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .costs-header {
+                color: #ff9999;
+            }
+
+            .effects-header {
+                color: #99ccff;
+            }
+
+            .costs-grid,
+            .effects-grid {
+                display: flex;
+                justify-content: center;
                 align-items: center;
                 flex-wrap: wrap;
-                gap: 4px;
+                gap: 2px;
             }
 
-            .resource-item {
-                background: rgba(255, 255, 255, 0.1);
-                border: 1px solid #d4af37;
-                border-radius: 6px;
-                padding: 3px 6px;
+            .cost-item {
+                background: rgba(255, 153, 153, 0.2);
+                border: 1px solid #ff9999;
+                border-radius: 3px;
+                padding: 1px 3px;
                 color: #fff;
-                font-size: 11px;
+                font-size: 8px;
                 font-weight: bold;
                 text-align: center;
-                min-width: 45px;
-                backdrop-filter: blur(5px);
+                min-width: 28px;
+                backdrop-filter: blur(3px);
             }
 
-            .resource-food {
-                background: rgba(255, 165, 0, 0.2);
-                border-color: #ffa500;
+            .effect-item {
+                background: rgba(153, 204, 255, 0.2);
+                border: 1px solid #99ccff;
+                border-radius: 3px;
+                padding: 1px 3px;
+                color: #fff;
+                font-size: 8px;
+                font-weight: bold;
+                text-align: center;
+                min-width: 28px;
+                backdrop-filter: blur(3px);
             }
 
+            .resource-sleep {
+                background: rgba(75, 0, 130, 0.3);
+                border-color: #4b0082;
+            }
             .resource-health {
-                background: rgba(255, 99, 132, 0.2);
+                background: rgba(255, 99, 132, 0.3);
                 border-color: #ff6384;
             }
-
             .resource-mental {
-                background: rgba(54, 162, 235, 0.2);
+                background: rgba(54, 162, 235, 0.3);
                 border-color: #36a2eb;
+            }
+            .resource-food {
+                background: rgba(255, 165, 0, 0.3);
+                border-color: #ffa500;
+            }
+            .resource-time {
+                background: rgba(128, 128, 128, 0.3);
+                border-color: #808080;
             }
 
             .resource-icon {
-                font-size: 12px;
-                margin-right: 2px;
+                font-size: 8px;
+                margin-right: 1px;
             }
 
             .card-effect {
-                padding: 10px;
-                font-size: 12px;
-                line-height: 1.4;
+                padding: 8px;
+                font-size: 11px;
+                line-height: 1.3;
                 text-align: justify;
                 color: #2c3e50;
                 background: rgba(255, 255, 255, 0.8);
-                min-height: 60px;
+                min-height: 45px;
                 border-bottom: 1px solid #d4af37;
             }
 
-            .card-flavor {
-                padding: 8px 10px;
+            .status-effects {
+                padding: 6px 8px;
                 font-size: 10px;
+                color: #2c3e50;
+                background: rgba(255, 235, 59, 0.2);
+                border-bottom: 1px solid #d4af37;
+                min-height: 25px;
+            }
+
+            .status-effects-header {
+                font-weight: bold;
+                margin-bottom: 3px;
+                text-transform: uppercase;
+                font-size: 9px;
+            }
+
+            .status-effect {
+                display: inline-block;
+                background: rgba(255, 193, 7, 0.3);
+                border: 1px solid #ffc107;
+                border-radius: 3px;
+                padding: 1px 4px;
+                margin: 1px;
+                font-size: 9px;
+            }
+
+            .additional-costs {
+                padding: 3px 6px;
+                font-size: 8px;
+                color: #8b0000;
+                background: rgba(255, 0, 0, 0.1);
+                border-bottom: 1px solid #d4af37;
+                font-style: italic;
+                text-align: center;
+            }
+
+            .card-flavor {
+                padding: 6px 8px;
+                font-size: 9px;
                 font-style: italic;
                 color: #6c757d;
                 text-align: center;
                 background: rgba(248, 249, 250, 0.9);
                 border-radius: 0 0 12px 12px;
-                min-height: 40px;
+                min-height: 30px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                flex-grow: 1;
             }
 
             .card-border-glow {
@@ -241,13 +347,44 @@
                 <img class="card-image" alt="Card artwork" />
             </div>
 
-            <div class="resource-effects">
-                <div class="resource-grid" id="resourceGrid">
-                    <!-- Resource effects will be populated here -->
+            <div class="costs-effects-section">
+                <div class="costs-column">
+                    <div class="costs-header">Costs</div>
+                    <div class="costs-grid" id="costsGrid">
+                        <!-- Costs will be populated here -->
+                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="effects-column">
+                    <div class="effects-header">Effects</div>
+                    <div class="effects-grid" id="effectsGrid">
+                        <!-- Effects will be populated here -->
+                    </div>
                 </div>
             </div>
 
-            <div class="card-effect"><strong>Effect:</strong>{{effect}</div>
+            <div
+                class="additional-costs"
+                id="additionalCosts"
+                style="display: none"
+            >
+                <!-- Additional costs will be populated here -->
+            </div>
+
+            <div
+                class="status-effects"
+                id="statusEffects"
+                style="display: none"
+            >
+                <div class="status-effects-header">Status Effects</div>
+                <div id="statusEffectsList">
+                    <!-- Status effects will be populated here -->
+                </div>
+            </div>
+
+            <div class="card-effect">
+                <strong>Description:</strong> {{effect}}
+            </div>
 
             <div class="card-flavor">"{{flavorText}}"</div>
         </div>
@@ -255,39 +392,195 @@
         <script>
             let cards = [];
 
-            // Sample card data for demonstration
+            // Enhanced sample card data with new structure
             const sampleCards = [
                 {
-                    name: "Mystic Forest Guardian",
-                    card_type: "Creature",
+                    name: "Mystic Forest Feast",
+                    card_type: "Action",
                     flavor_text:
-                        "In the depths of the ancient woods, guardians watch over nature's secrets.",
-                    resource_effects: {
-                        food: 50.0,
-                        health: 15.0,
-                        mental: 10.0,
+                        "The forest provides for those who know where to look.",
+                    effect: "Gather mystical berries from the enchanted forest. Risk getting sick from unknown fruits.",
+                    costs: {
+                        sleep_cost: 0,
+                        health_cost: 15,
+                        mental_cost: 10,
+                        food_cost: 0,
+                        time_cost: 1.0,
+                        additional_costs: ["LockResource(Food, 3)"],
                     },
+                    effects: {
+                        sleep: 0,
+                        health: -15,
+                        mental: -10,
+                        food: 60,
+                    },
+                    status_effects: [
+                        {
+                            effect: "Sick",
+                            duration: 2,
+                            intensity: 1.0,
+                        },
+                    ],
+                    prompt: "A mystical forest with glowing berries",
                 },
                 {
-                    name: "Lightning Bolt",
+                    name: "Lightning Strike",
                     card_type: "Spell",
                     flavor_text:
-                        "A flash of pure energy that can change the course of battle.",
-                    resource_effects: {
-                        mental: 25.0,
-                        health: -10.0,
+                        "Pure energy courses through your mind, devastating but draining.",
+                    effect: "Channel raw lightning energy to devastate enemies, but at great personal cost.",
+                    costs: {
+                        sleep_cost: 20,
+                        health_cost: 30,
+                        mental_cost: 0,
+                        food_cost: 10,
+                        time_cost: 0.5,
                     },
+                    effects: {
+                        sleep: -20,
+                        health: -30,
+                        mental: 50,
+                        food: -10,
+                    },
+                    status_effects: [
+                        {
+                            effect: "Energized",
+                            duration: 3,
+                            intensity: 2.0,
+                        },
+                        {
+                            effect: "Exhausted",
+                            duration: 1,
+                            intensity: 1.5,
+                        },
+                    ],
+                    prompt: "A brilliant lightning bolt crackling with electric energy",
                 },
                 {
-                    name: "Healing Potion",
-                    card_type: "Artifact",
-                    flavor_text:
-                        "The warm glow of restoration flows through your veins.",
-                    resource_effects: {
-                        health: 40.0,
+                    name: "Healing Meditation",
+                    card_type: "Ritual",
+                    flavor_text: "Inner peace brings physical restoration.",
+                    effect: "Deep meditation restores both body and mind through focused breathing.",
+                    costs: {
+                        sleep_cost: 0,
+                        health_cost: 0,
+                        mental_cost: 25,
+                        food_cost: 5,
+                        time_cost: 2.0,
+                        additional_costs: ["RequireLocation(Quiet Place)"],
                     },
+                    effects: {
+                        sleep: 10,
+                        health: 40,
+                        mental: -25,
+                        food: -5,
+                    },
+                    status_effects: [
+                        {
+                            effect: "Peaceful",
+                            duration: 4,
+                            intensity: 1.0,
+                        },
+                    ],
+                    prompt: "A serene meditation scene with glowing aura",
                 },
             ];
+
+            // Function to normalize card data and fill missing fields
+            function normalizeCardData(card, index) {
+                return {
+                    name:
+                        card.name || card.title || `Unknown Card ${index + 1}`,
+                    card_type: card.card_type || card.type || "Unknown",
+                    flavor_text:
+                        card.flavor_text ||
+                        card.flavorText ||
+                        card.description ||
+                        "A mysterious card with unknown origins.",
+                    effect:
+                        card.effect ||
+                        card.ability ||
+                        card.power ||
+                        generateDefaultEffect(card),
+                    costs:
+                        card.costs ||
+                        generateDefaultCosts(card.card_type || card.type),
+                    effects:
+                        card.effects ||
+                        card.resource_effects ||
+                        generateDefaultEffects(card.card_type || card.type),
+                    status_effects: card.status_effects || [],
+                    prompt:
+                        card.prompt ||
+                        card.description ||
+                        `A ${card.card_type || "mysterious"} card`,
+                    // Additional fields
+                    cost: card.cost || card.mana_cost || 0,
+                    rarity: card.rarity || "Common",
+                    artist: card.artist || "Unknown Artist",
+                };
+            }
+
+            // Generate default effect based on card type
+            function generateDefaultEffect(card) {
+                const cardType = (
+                    card.card_type ||
+                    card.type ||
+                    ""
+                ).toLowerCase();
+                switch (cardType) {
+                    case "creature":
+                        return "A creature that can attack and defend.";
+                    case "spell":
+                        return "Cast this spell for an immediate effect.";
+                    case "artifact":
+                        return "An artifact with ongoing benefits.";
+                    case "action":
+                        return "Perform this action to gain resources or effects.";
+                    case "ritual":
+                        return "A powerful ritual with lasting effects.";
+                    default:
+                        return "This card has a mysterious power waiting to be discovered.";
+                }
+            }
+
+            // Generate default costs
+            function generateDefaultCosts(cardType) {
+                const type = (cardType || "").toLowerCase();
+                switch (type) {
+                    case "creature":
+                        return {
+                            health_cost: 10,
+                            mental_cost: 5,
+                            time_cost: 1.0,
+                        };
+                    case "spell":
+                        return { mental_cost: 15, time_cost: 0.5 };
+                    case "action":
+                        return { time_cost: 1.0, mental_cost: 10 };
+                    case "ritual":
+                        return { mental_cost: 20, time_cost: 2.0 };
+                    default:
+                        return { mental_cost: 5, time_cost: 0.5 };
+                }
+            }
+
+            // Generate default effects
+            function generateDefaultEffects(cardType) {
+                const type = (cardType || "").toLowerCase();
+                switch (type) {
+                    case "creature":
+                        return { health: 10, mental: 5 };
+                    case "spell":
+                        return { mental: 15 };
+                    case "action":
+                        return { food: 20 };
+                    case "ritual":
+                        return { health: 25, mental: 10 };
+                    default:
+                        return { mental: 5 };
+                }
+            }
 
             // Function to load cards from JSON file or use sample data
             async function loadCards() {
@@ -295,10 +588,11 @@
                     const response = await fetch("./cards.json");
                     if (!response.ok) {
                         console.log("No cards.json found, using sample data");
-                        cards = sampleCards;
+                        cards = sampleCards.map(normalizeCardData);
                     } else {
                         const data = await response.json();
-                        cards = data;
+                        cards = data.map(normalizeCardData);
+                        console.log("Loaded cards:", cards);
                     }
                     document.getElementById("loading").style.display = "none";
                     initializeCards();
@@ -307,39 +601,153 @@
                         "Error loading cards, using sample data:",
                         error,
                     );
-                    cards = sampleCards;
+                    cards = sampleCards.map(normalizeCardData);
                     document.getElementById("loading").style.display = "none";
                     initializeCards();
                 }
             }
 
-            // Function to create resource effect elements
-            function createResourceEffects(resourceEffects) {
-                const resourceGrid = document.createElement("div");
-                resourceGrid.className = "resource-grid";
+            // Function to create cost elements
+            function createCostElements(costs) {
+                const costsGrid = document.createElement("div");
+                costsGrid.className = "costs-grid";
 
-                if (!resourceEffects) return resourceGrid;
+                if (!costs || typeof costs !== "object") {
+                    const noCost = document.createElement("div");
+                    noCost.className = "cost-item";
+                    noCost.innerHTML =
+                        '<span class="resource-icon">⚡</span>Free';
+                    costsGrid.appendChild(noCost);
+                    return costsGrid;
+                }
 
-                const resourceTypes = {
-                    food: { icon: "🍎", class: "resource-food" },
-                    health: { icon: "❤️", class: "resource-health" },
-                    mental: { icon: "🧠", class: "resource-mental" },
+                const costTypes = {
+                    sleep_cost: { icon: "😴", class: "resource-sleep" },
+                    health_cost: { icon: "❤️", class: "resource-health" },
+                    mental_cost: { icon: "🧠", class: "resource-mental" },
+                    food_cost: { icon: "🍎", class: "resource-food" },
+                    time_cost: { icon: "⏰", class: "resource-time" },
                 };
 
-                for (const [type, value] of Object.entries(resourceEffects)) {
-                    if (value !== 0) {
-                        const resourceItem = document.createElement("div");
-                        resourceItem.className = `resource-item ${resourceTypes[type]?.class || ""}`;
+                let hasCosts = false;
+                for (const [type, value] of Object.entries(costs)) {
+                    if (
+                        type !== "additional_costs" &&
+                        value !== 0 &&
+                        value !== null &&
+                        value !== undefined
+                    ) {
+                        hasCosts = true;
+                        const costItem = document.createElement("div");
+                        costItem.className = `cost-item ${costTypes[type]?.class || ""}`;
 
-                        const icon = resourceTypes[type]?.icon || "⚡";
-                        const sign = value > 0 ? "+" : "";
-                        resourceItem.innerHTML = `<span class="resource-icon">${icon}</span>${sign}${value}`;
+                        const icon = costTypes[type]?.icon || "⚡";
+                        costItem.innerHTML = `<span class="resource-icon">${icon}</span>${value}`;
 
-                        resourceGrid.appendChild(resourceItem);
+                        costsGrid.appendChild(costItem);
                     }
                 }
 
-                return resourceGrid;
+                if (!hasCosts) {
+                    const noCost = document.createElement("div");
+                    noCost.className = "cost-item";
+                    noCost.innerHTML =
+                        '<span class="resource-icon">⚡</span>Free';
+                    costsGrid.appendChild(noCost);
+                }
+
+                return costsGrid;
+            }
+
+            // Function to create effect elements
+            function createEffectElements(effects) {
+                const effectsGrid = document.createElement("div");
+                effectsGrid.className = "effects-grid";
+
+                if (!effects || typeof effects !== "object") {
+                    const noEffect = document.createElement("div");
+                    noEffect.className = "effect-item";
+                    noEffect.innerHTML =
+                        '<span class="resource-icon">⚡</span>None';
+                    effectsGrid.appendChild(noEffect);
+                    return effectsGrid;
+                }
+
+                const effectTypes = {
+                    sleep: { icon: "😴", class: "resource-sleep" },
+                    health: { icon: "❤️", class: "resource-health" },
+                    mental: { icon: "🧠", class: "resource-mental" },
+                    food: { icon: "🍎", class: "resource-food" },
+                };
+
+                let hasEffects = false;
+                for (const [type, value] of Object.entries(effects)) {
+                    if (value !== 0 && value !== null && value !== undefined) {
+                        hasEffects = true;
+                        const effectItem = document.createElement("div");
+                        effectItem.className = `effect-item ${effectTypes[type]?.class || ""}`;
+
+                        const icon = effectTypes[type]?.icon || "⚡";
+                        const sign = value > 0 ? "+" : "";
+                        effectItem.innerHTML = `<span class="resource-icon">${icon}</span>${sign}${value}`;
+
+                        effectsGrid.appendChild(effectItem);
+                    }
+                }
+
+                if (!hasEffects) {
+                    const noEffect = document.createElement("div");
+                    noEffect.className = "effect-item";
+                    noEffect.innerHTML =
+                        '<span class="resource-icon">⚡</span>None';
+                    effectsGrid.appendChild(noEffect);
+                }
+
+                return effectsGrid;
+            }
+
+            // Function to create status effects
+            function createStatusEffects(statusEffects) {
+                if (
+                    !statusEffects ||
+                    !Array.isArray(statusEffects) ||
+                    statusEffects.length === 0
+                ) {
+                    return null;
+                }
+
+                const statusContainer = document.createElement("div");
+                statusEffects.forEach((status) => {
+                    const statusDiv = document.createElement("div");
+                    statusDiv.className = "status-effect";
+                    const durationText = status.duration
+                        ? ` (${status.duration}t)`
+                        : "";
+                    const intensityText =
+                        status.intensity && status.intensity !== 1.0
+                            ? ` x${status.intensity}`
+                            : "";
+                    statusDiv.textContent = `${status.effect}${durationText}${intensityText}`;
+                    statusContainer.appendChild(statusDiv);
+                });
+
+                return statusContainer;
+            }
+
+            // Function to create additional costs display
+            function createAdditionalCosts(costs) {
+                if (
+                    !costs ||
+                    !costs.additional_costs ||
+                    !Array.isArray(costs.additional_costs) ||
+                    costs.additional_costs.length === 0
+                ) {
+                    return null;
+                }
+
+                const additionalDiv = document.createElement("div");
+                additionalDiv.textContent = `Special: ${costs.additional_costs.join(", ")}`;
+                return additionalDiv;
             }
 
             // Function to create a card element
@@ -351,81 +759,177 @@
                 clone.id = `card-${index}`;
 
                 // Set card content
-                clone.querySelector(".card-title").textContent =
-                    card.name || "Unknown Card";
-                clone.querySelector(".card-type").textContent =
-                    card.card_type || "Unknown";
+                clone.querySelector(".card-title").textContent = card.name;
+                clone.querySelector(".card-type").textContent = card.card_type;
                 clone.querySelector(".card-flavor").textContent =
-                    `"${card.flavor_text || "No flavor text available."}"`;
-                clone.querySelector(".card-effect").textContent =
-                    `"${card.effect || "No effect text available."}"`;
+                    `"${card.flavor_text}"`;
+
+                // Update effect text
+                const effectElement = clone.querySelector(".card-effect");
+                effectElement.innerHTML = `<strong>Description:</strong> ${card.effect}`;
 
                 // Set card image
                 const imageElement = clone.querySelector(".card-image");
                 let imageFile = `processed_images/card-picture-${index}.png`;
                 imageElement.src = imageFile;
+                imageElement.alt = `Artwork for ${card.name}`;
+
                 imageElement.onerror = function () {
-                    // Fallback to a placeholder if image doesn't exist
-                    this.src =
-                        "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjgwIiBoZWlnaHQ9IjE2MCIgdmlld0JveD0iMCAwIDI4MCAxNjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyODAiIGhlaWdodD0iMTYwIiBmaWxsPSJ1cmwoI2dyYWRpZW50KSIvPgo8dGV4dCB4PSIxNDAiIHk9IjgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSIgZm9udC1zaXplPSIyMCIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiPkNhcmQgQXJ0d29yazwvdGV4dD4KPGR1ZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZGllbnQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgo8c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNjY3ZWVhIi8+CjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iIzc2NGJhMiIvPgo8L2xpbmVhckdyYWRpZW50Pgo8L2RlZnM+Cjwvc3ZnPgo=";
+                    const cardType = card.card_type.toLowerCase();
+                    let bgColor = "#667eea";
+                    let icon = "🎴";
+
+                    switch (cardType) {
+                        case "creature":
+                            bgColor = "#28a745";
+                            icon = "🐉";
+                            break;
+                        case "spell":
+                            bgColor = "#dc3545";
+                            icon = "✨";
+                            break;
+                        case "artifact":
+                            bgColor = "#ffc107";
+                            icon = "⚡";
+                            break;
+                        case "action":
+                            bgColor = "#17a2b8";
+                            icon = "🎯";
+                            break;
+                        case "ritual":
+                            bgColor = "#6f42c1";
+                            icon = "🔮";
+                            break;
+                    }
+
+                    this.src = `data:image/svg+xml;base64,${btoa(`
+                        <svg width="280" height="120" viewBox="0 0 280 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="280" height="120" fill="${bgColor}"/>
+                            <text x="140" y="50" text-anchor="middle" fill="white" font-size="30" font-family="sans-serif">${icon}</text>
+                            <text x="140" y="75" text-anchor="middle" fill="white" font-size="12" font-family="sans-serif">${card.name}</text>
+                            <text x="140" y="95" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10" font-family="sans-serif">${card.card_type}</text>
+                        </svg>
+                    `)}`;
                 };
 
-                // Create and replace resource effects
-                const resourceContainer = clone.querySelector(
-                    ".resource-effects .resource-grid",
+                // Create and replace costs
+                const costsContainer = clone.querySelector(
+                    ".costs-column .costs-grid",
                 );
-                const newResourceGrid = createResourceEffects(
-                    card.resource_effects,
+                const newCostsGrid = createCostElements(card.costs);
+                costsContainer.parentNode.replaceChild(
+                    newCostsGrid,
+                    costsContainer,
                 );
-                resourceContainer.parentNode.replaceChild(
-                    newResourceGrid,
-                    resourceContainer,
+
+                // Handle additional costs
+                const additionalCostsElement =
+                    clone.querySelector("#additionalCosts");
+                const additionalCosts = createAdditionalCosts(card.costs);
+                if (additionalCosts) {
+                    additionalCostsElement.appendChild(additionalCosts);
+                    additionalCostsElement.style.display = "block";
+                }
+
+                // Create and replace effects
+                const effectsContainer = clone.querySelector(
+                    ".effects-column .effects-grid",
                 );
+                const newEffectsGrid = createEffectElements(card.effects);
+                effectsContainer.parentNode.replaceChild(
+                    newEffectsGrid,
+                    effectsContainer,
+                );
+
+                // Handle status effects
+                const statusEffectsElement =
+                    clone.querySelector("#statusEffects");
+                const statusEffects = createStatusEffects(card.status_effects);
+                if (statusEffects) {
+                    const statusList =
+                        statusEffectsElement.querySelector(
+                            "#statusEffectsList",
+                        );
+                    statusList.appendChild(statusEffects);
+                    statusEffectsElement.style.display = "block";
+                }
 
                 return clone;
             }
 
             function renderCards() {
-                console.log("rendering cards");
+                console.log("Rendering cards to images...");
                 document
                     .querySelectorAll(".card")
                     .forEach((cardElement, index) => {
-                        if (index == 0) {
-                            return;
-                        }
-                        html2canvas(cardElement).then((canvas) => {
-                            const imgData = canvas
-                                .toDataURL("image/png")
-                                .replace("image/png", "image/octet-stream");
+                        if (cardElement.id === "cardTemplate") return;
 
-                            // Optionally download the image (if you want it saved locally)
-                            const link = document.createElement("a");
-                            link.href = imgData;
-                            link.download = `card-${index}.png`;
-                            link.click();
-                        });
+                        html2canvas(cardElement, {
+                            width: 280,
+                            height: 450,
+                            scale: 2,
+                            useCORS: true,
+                            allowTaint: true,
+                        })
+                            .then((canvas) => {
+                                const imgData = canvas.toDataURL("image/png");
+                                const link = document.createElement("a");
+                                link.href = imgData;
+                                link.download = `card-${index}.png`;
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                                console.log(`Rendered card ${index}`);
+                            })
+                            .catch((error) => {
+                                console.error(
+                                    `Error rendering card ${index}:`,
+                                    error,
+                                );
+                            });
                     });
             }
 
             // Initialize cards after loading from JSON
             function initializeCards() {
                 const container = document.getElementById("cardsContainer");
+                const existingCards = container.querySelectorAll(".card");
+                existingCards.forEach((card) => card.remove());
 
-                // Use first 5 cards or all available cards
-                const cardsToShow = cards.slice(0, Math.max(5, cards.length));
-
-                cardsToShow.forEach((cardData, index) => {
+                cards.forEach((cardData, index) => {
                     const cardElement = createCard(cardData, index);
                     cardElement.style.animationDelay = `${index * 0.1}s`;
                     container.appendChild(cardElement);
                 });
 
-                console.log(`Loaded ${cardsToShow.length} cards`);
+                console.log(`Loaded ${cards.length} cards`);
+
+                if (!document.getElementById("renderButton")) {
+                    const renderButton = document.createElement("button");
+                    renderButton.id = "renderButton";
+                    renderButton.textContent = "Download All Cards as Images";
+                    renderButton.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        padding: 10px 20px;
+                        background: #d4af37;
+                        color: #2c3e50;
+                        border: none;
+                        border-radius: 5px;
+                        cursor: pointer;
+                        font-weight: bold;
+                        z-index: 1000;
+                    `;
+                    renderButton.onclick = renderCards;
+                    document.body.appendChild(renderButton);
+                }
             }
 
             // Load cards when page loads
             window.addEventListener("DOMContentLoaded", loadCards);
 
+            // Auto-render after 5 seconds (optional)
             setTimeout(renderCards, 5000);
         </script>
     </body>
