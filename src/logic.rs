@@ -6,6 +6,7 @@ use std::collections::HashMap;
 
 use crate::cards::*;
 use crate::cutscene::ScenarioHandle;
+use crate::navigation::GoToRandomTile;
 
 pub struct GameLogicPlugin;
 
@@ -1002,13 +1003,10 @@ fn handle_character_action_phase(
 ) {
     for event in phase_changed_events.read() {
         if event.new_phase == GamePhase::CharacterAction {
-            if let Some(selected_card_id) = phase_state.selected_card_id {
-                let mut card = ActivityCard::default();
-                card.id = selected_card_id;
-
+            if let Some(_) = phase_state.selected_card_id {
                 commands.spawn_task(move || async move {
-                    AsyncWorld.sleep(10.0).await;
-                    AsyncWorld.send_event(ActionCompletedEvent { card_played: card })?;
+                    AsyncWorld.sleep(3.0).await;
+                    AsyncWorld.send_event(GoToRandomTile {})?;
 
                     Ok(())
                 });
@@ -1132,6 +1130,8 @@ fn handle_turn_over_completion(
                 ew_discard_card_to_deck.write(DiscardCardToDeck {
                     card_entity: entity,
                     deck_entity: main_deck_entity,
+                    flip_card: false,
+                    turn_card: false,
                 });
             }
 
@@ -1140,6 +1140,8 @@ fn handle_turn_over_completion(
                 ew_discard_card_to_deck.write(DiscardCardToDeck {
                     card_entity: entity,
                     deck_entity: main_deck_entity,
+                    flip_card: true,
+                    turn_card: true,
                 });
             }
         }

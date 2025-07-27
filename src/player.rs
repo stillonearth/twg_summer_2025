@@ -1,4 +1,7 @@
-use crate::logic::{CutsceneEndEvent, CutsceneStartEvent};
+use crate::cards::ActivityCard;
+use crate::logic::{
+    ActionCompletedEvent, CutsceneEndEvent, CutsceneStartEvent, GamePhaseState, GameState,
+};
 use crate::navigation::{GridPos, MovePlayerCommand, TileSize};
 use crate::sprites::{
     get_animation_indices, AnimatedCharacterSprite, AnimatedCharacterType, AnimationDirection,
@@ -7,6 +10,7 @@ use crate::sprites::{
 };
 use avian2d::prelude::*;
 use bevy::prelude::*;
+use bevy_la_mesa::Card;
 
 const MOVE_SPEED: f32 = 200.;
 
@@ -26,6 +30,7 @@ impl Plugin for PlayerPlugin {
                     move_player_along_path,
                     handle_cutscene_start,
                     handle_cutscene_end,
+                    handle_player_destination_reached,
                 ),
             );
     }
@@ -83,7 +88,7 @@ pub fn move_player_along_path(
     mut destination_events: EventWriter<PlayerDestinationReachedEvent>,
     tile_size: Res<TileSize>,
 ) {
-    for (entity, transform, mut rb_vel, mut player_movement) in player_query.iter_mut() {
+    for (_, transform, mut rb_vel, mut player_movement) in player_query.iter_mut() {
         if !player_movement.is_moving || player_movement.path.is_empty() {
             rb_vel.0 = Vec2::ZERO;
             // Set animation to stand when not moving
@@ -222,18 +227,20 @@ fn handle_cutscene_end(
 // Example system to handle the destination reached event
 pub fn handle_player_destination_reached(
     mut destination_events: EventReader<PlayerDestinationReachedEvent>,
+    mut ew_action_completed: EventWriter<ActionCompletedEvent>,
+    phase_state: Res<GamePhaseState>,
+    q_cards: Query<(Entity, &Card<ActivityCard>)>,
 ) {
-    for event in destination_events.read() {
-        println!(
-            "Player (Entity {:?}) has reached destination at grid position ({}, {})",
-            event.player_entity, event.final_position.x, event.final_position.y
-        );
-
-        // Add your custom logic here:
-        // - Trigger dialogue
-        // - Start cutscene
-        // - Update quest progress
-        // - Play sound effects
-        // - etc.
+    for _ in destination_events.read() {
+        if let Some(selected_card_id) = phase_state.selected_card_id {
+            if let Some(card) = q_cards
+                .iter()
+                .find(|(_, card)| card.data.id == selected_card_id)
+            {
+                ew_action_completed.write(ActionCompletedEvent {
+                    card_played: card.1.data.clone(),
+                });
+            }
+        }
     }
 }

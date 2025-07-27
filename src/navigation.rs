@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use rand::Rng;
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap, HashSet};
 
@@ -7,6 +8,9 @@ use crate::{game_objects::WalkableTile, player::PlayerMarker};
 const TILE_SIZE: f32 = 32.0;
 
 pub struct NavigationGridPlugin;
+
+#[derive(Event, Debug)]
+pub struct GoToRandomTile;
 
 impl Plugin for NavigationGridPlugin {
     fn build(&self, app: &mut App) {
@@ -17,10 +21,12 @@ impl Plugin for NavigationGridPlugin {
                 (
                     (setup_navigation_grid, setup_walkable_tile_handlers).chain(),
                     handle_navigation_event,
+                    handle_go_to_random_tile,
                 ),
             )
             .add_event::<NavigateToTile>()
-            .add_event::<MovePlayerCommand>();
+            .add_event::<MovePlayerCommand>()
+            .add_event::<GoToRandomTile>();
     }
 }
 
@@ -74,6 +80,48 @@ impl NavigationGrid {
     pub fn new() -> Self {
         Self {
             walkable: HashSet::new(),
+        }
+    }
+
+    pub fn get_random_walkable_tile(&self) -> Option<GridPos> {
+        if self.walkable.is_empty() {
+            return None;
+        }
+
+        let tiles: Vec<&(i32, i32)> = self.walkable.iter().collect();
+        let mut rng = rand::thread_rng();
+        let random_index = rng.gen_range(0..tiles.len());
+
+        if let Some(&(x, y)) = tiles.get(random_index) {
+            Some(GridPos { x: *x, y: *y })
+        } else {
+            None
+        }
+    }
+
+    /// Get a random walkable tile that's different from the current position
+    pub fn get_random_walkable_tile_excluding(&self, exclude: GridPos) -> Option<GridPos> {
+        if self.walkable.len() <= 1 {
+            return None;
+        }
+
+        let tiles: Vec<&(i32, i32)> = self
+            .walkable
+            .iter()
+            .filter(|&&(x, y)| GridPos { x, y } != exclude)
+            .collect();
+
+        if tiles.is_empty() {
+            return None;
+        }
+
+        let mut rng = rand::thread_rng();
+        let random_index = rng.gen_range(0..tiles.len());
+
+        if let Some(&(x, y)) = tiles.get(random_index) {
+            Some(GridPos { x: *x, y: *y })
+        } else {
+            None
         }
     }
 
@@ -183,6 +231,38 @@ impl NavigationGrid {
 
         path.reverse();
         path
+    }
+}
+
+fn handle_go_to_random_tile(
+    mut random_events: EventReader<GoToRandomTile>,
+    mut nav_events: EventWriter<NavigateToTile>,
+    player_query: Query<&Transform, With<PlayerMarker>>,
+    navigation_grid: Res<NavigationGrid>,
+    tile_size: Res<TileSize>,
+) {
+    for _event in random_events.read() {
+        let Ok(player_transform) = player_query.single() else {
+            println!("No player found for random navigation");
+            continue;
+        };
+
+        let player_grid_pos =
+            navigation_grid.world_to_grid(player_transform.translation, tile_size.0);
+
+        // Get a random walkable tile that's different from current position
+        if let Some(random_tile) =
+            navigation_grid.get_random_walkable_tile_excluding(player_grid_pos)
+        {
+            println!("Moving player to random tile: {:?}", random_tile);
+
+            nav_events.write(NavigateToTile {
+                from: player_grid_pos,
+                to: random_tile,
+            });
+        } else {
+            println!("No valid random tiles available for navigation");
+        }
     }
 }
 
