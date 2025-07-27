@@ -1,6 +1,9 @@
 use crate::{
     cards::{Mood, ResourceType},
-    logic::{CutsceneEndEvent, CutsceneStartEvent, GamePhase, GamePhaseState, GameState},
+    logic::{
+        CardSelectionError, CutsceneEndEvent, CutsceneStartEvent, GamePhase, GamePhaseState,
+        GameState,
+    },
     thoughts::ThoughtGeneratedEvent,
 };
 use bevy::prelude::*;
@@ -10,6 +13,8 @@ pub struct GameUIPlugin;
 impl Plugin for GameUIPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<UpdateThoughtsEvent>()
+            .add_event::<ShowCardErrorEvent>()
+            .init_resource::<ErrorDisplayState>()
             .add_systems(Startup, setup_ui)
             .add_systems(
                 Update,
@@ -22,9 +27,17 @@ impl Plugin for GameUIPlugin {
                     handle_new_thought_generated,
                     handle_cutscene_start,
                     handle_cutscene_end,
+                    handle_card_selection_error,
+                    update_error_display,
                 ),
             );
     }
+}
+
+#[derive(Resource, Default)]
+struct ErrorDisplayState {
+    clear_timer: Option<Timer>,
+    is_visible: bool,
 }
 
 // Event for updating character thoughts
@@ -39,6 +52,13 @@ impl UpdateThoughtsEvent {
     }
 }
 
+// Event for showing card selection errors
+#[derive(Event)]
+pub struct ShowCardErrorEvent {
+    pub card_name: String,
+    pub errors: Vec<String>,
+}
+
 // UI Color scheme
 pub struct UIColors;
 
@@ -49,6 +69,8 @@ impl UIColors {
     pub const TEXT_DIM: Color = Color::srgb(0.6, 0.6, 0.6);
     pub const THOUGHTS_TEXT: Color = Color::srgb(0.95, 0.9, 1.0);
     pub const ACCENT: Color = Color::srgb(0.4, 0.7, 1.0);
+    pub const ERROR: Color = Color::srgb(0.9, 0.3, 0.3);
+    pub const ERROR_BACKGROUND: Color = Color::srgba(0.8, 0.2, 0.2, 0.9);
 
     // Resource colors
     pub const SLEEP_GOOD: Color = Color::srgb(0.3, 0.6, 0.9);
@@ -138,6 +160,12 @@ pub struct ResourceBar {
 
 #[derive(Component)]
 pub struct ResourceBarFill;
+
+#[derive(Component)]
+pub struct ErrorDisplay;
+
+#[derive(Component)]
+pub struct ErrorPanel;
 
 pub const LAYER_UI: usize = 0;
 
@@ -360,6 +388,73 @@ fn setup_ui(mut commands: Commands) {
                     ));
                 });
         });
+
+    // Card Error Display Panel - Center screen overlay
+    commands
+        .spawn((
+            UIRoot,
+            ErrorPanel,
+            Node {
+                width: Val::Auto,
+                height: Val::Auto,
+                position_type: PositionType::Absolute,
+                left: Val::Px(300.0), // Start after left panel
+                top: Val::Px(200.0),  // Below thoughts panel
+                justify_content: JustifyContent::Center,
+                align_items: AlignItems::FlexStart,
+                ..default()
+            },
+            Visibility::Hidden, // Initially hidden
+            Name::new("Card Error Panel Container"),
+        ))
+        .with_children(|error_container| {
+            // Card error panel
+            error_container
+                .spawn((
+                    Node {
+                        width: Val::Px(600.0),
+                        min_height: Val::Px(100.0),
+                        max_height: Val::Px(300.0),
+                        padding: UiRect::all(Val::Px(20.0)),
+                        flex_direction: FlexDirection::Column,
+                        border: UiRect::all(Val::Px(2.0)),
+                        ..default()
+                    },
+                    BackgroundColor::from(UIColors::ERROR_BACKGROUND),
+                    BorderColor(UIColors::ERROR),
+                    Name::new("Card Error Panel"),
+                ))
+                .with_children(|error_panel| {
+                    // Error title
+                    error_panel.spawn((
+                        Text::new("Cannot Play Card"),
+                        TextFont {
+                            font_size: 18.0,
+                            ..default()
+                        },
+                        TextColor(UIColors::ERROR),
+                        Node {
+                            margin: UiRect::bottom(Val::Px(12.0)),
+                            ..default()
+                        },
+                    ));
+
+                    // Error details
+                    error_panel.spawn((
+                        Text::new(""),
+                        TextFont {
+                            font_size: 14.0,
+                            ..default()
+                        },
+                        TextColor(UIColors::TEXT),
+                        Node {
+                            flex_wrap: FlexWrap::Wrap,
+                            ..default()
+                        },
+                        ErrorDisplay,
+                    ));
+                });
+        });
 }
 
 // Update character thoughts based on events
@@ -505,6 +600,72 @@ fn handle_cutscene_end(
     for _ in er_cutscene_start.read() {
         for (entity, _) in q_ui_roots.iter() {
             commands.entity(entity).insert(Visibility::Inherited);
+        }
+    }
+}
+
+// Handle card selection errors
+fn handle_card_selection_error(
+    mut er_card_error: EventReader<CardSelectionError>,
+    mut ew_show_error: EventWriter<ShowCardErrorEvent>,
+) {
+    for error in er_card_error.read() {
+        ew_show_error.write(ShowCardErrorEvent {
+            card_name: error.card.name.clone(),
+            errors: error.blocking_conditions.clone(),
+        });
+    }
+}
+
+fn update_error_display(
+    mut commands: Commands,
+    mut error_events: EventReader<ShowCardErrorEvent>,
+    mut error_state: ResMut<ErrorDisplayState>,
+    mut error_text_query: Query<&mut Text, With<ErrorDisplay>>,
+    error_panel_query: Query<Entity, With<ErrorPanel>>,
+    time: Res<Time>,
+) {
+    // Handle new error events
+    for event in error_events.read() {
+        // Show the error panel
+        for entity in error_panel_query.iter() {
+            commands.entity(entity).insert(Visibility::Inherited);
+        }
+
+        // Update error text
+        for mut text in &mut error_text_query {
+            let error_text = format!(
+                "Card: {}\n\nReasons:\n• {}",
+                event.card_name,
+                event.errors.join("\n• ")
+            );
+            *text = Text::new(error_text);
+        }
+
+        // Reset timer and show the error
+        error_state.clear_timer = Some(Timer::from_seconds(5.0, TimerMode::Once));
+        error_state.is_visible = true;
+    }
+
+    // Handle auto-hide timer
+    if error_state.is_visible {
+        if let Some(ref mut timer) = error_state.clear_timer {
+            timer.tick(time.delta());
+
+            if timer.finished() {
+                // Hide the error panel
+                for entity in error_panel_query.iter() {
+                    commands.entity(entity).insert(Visibility::Hidden);
+                }
+
+                // Clear the text and mark as hidden
+                for mut text in &mut error_text_query {
+                    *text = Text::new("");
+                }
+
+                error_state.is_visible = false;
+                error_state.clear_timer = None;
+            }
         }
     }
 }
