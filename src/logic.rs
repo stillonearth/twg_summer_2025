@@ -924,10 +924,11 @@ fn handle_daily_reset(
 
 fn handle_phase_transitions(
     mut phase_state: ResMut<GamePhaseState>,
-    mut phase_changed_events: EventWriter<PhaseChangedEvent>,
+    mut phase_changed_events: EventReader<PhaseChangedEvent>,
 ) {
-    // This system would be triggered by UI interactions or automatic progression
-    // For now, it's a placeholder for the phase transition logic
+    for event in phase_changed_events.read() {
+        phase_state.current_phase = event.new_phase.clone();
+    }
 }
 
 fn handle_cutscene_trigger(
@@ -1108,9 +1109,10 @@ fn check_turn_end_cutscene_triggers(
 }
 
 fn handle_turn_over_completion(
+    mut commands: Commands,
     mut turn_over_events: EventReader<TurnOverEvent>,
     mut phase_state: ResMut<GamePhaseState>,
-    mut phase_changed_events: EventWriter<PhaseChangedEvent>,
+    mut ew_go_to_random_tile: EventWriter<GoToRandomTile>,
     mut game_step_events: EventWriter<GameStepEvent>,
     q_decks: Query<(Entity, &DeckArea)>,
     mut q_cards: ParamSet<(
@@ -1130,8 +1132,7 @@ fn handle_turn_over_completion(
                 ew_discard_card_to_deck.write(DiscardCardToDeck {
                     card_entity: entity,
                     deck_entity: main_deck_entity,
-                    flip_card: false,
-                    turn_card: false,
+                    flip_card: true,
                 });
             }
 
@@ -1141,7 +1142,6 @@ fn handle_turn_over_completion(
                     card_entity: entity,
                     deck_entity: main_deck_entity,
                     flip_card: true,
-                    turn_card: true,
                 });
             }
         }
@@ -1158,13 +1158,20 @@ fn handle_turn_over_completion(
         // Apply passive effects (time passage, resource decay, etc.)
         apply_turn_end_effects(&mut game_step_events);
 
-        // Transition to card draw for new turn
         let old_phase = phase_state.current_phase;
-        phase_state.current_phase = GamePhase::CardDraw;
 
-        phase_changed_events.write(PhaseChangedEvent {
-            old_phase,
-            new_phase: phase_state.current_phase,
+        ew_go_to_random_tile.write(GoToRandomTile {});
+
+        commands.spawn_task(move || async move {
+            AsyncWorld.sleep(2.5).await;
+
+            // Transition to card draw for new turn
+            AsyncWorld.send_event(PhaseChangedEvent {
+                old_phase,
+                new_phase: GamePhase::CardDraw,
+            })?;
+
+            Ok(())
         });
 
         info!("Started turn {}", phase_state.turn_number);
