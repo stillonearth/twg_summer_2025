@@ -38,7 +38,7 @@ bevy_common_assets = { version = "0.13", features = ["json"] }
 bevy_ecs_tiled = { version = "0.7", features = ["avian", "user_properties"] }
 bevy_ecs_tilemap = "0.16"
 # bevy_la_mesa = { version = "0.16" }
-bevy_la_mesa = { path = "../bevy_la_mesa" }
+bevy_la_mesa = { path = "crates/bevy_la_mesa" }
 paste = "1.0"
 anyhow = "1.0"
 serde = "1.0"
@@ -49,3 +49,4 @@ bevy_llm = { path = "crates/bevy_llm" }
 bevy_kira_audio = { version = "0.23", features = ["ogg", "mp3", "wav"] }
 bevy_novel = "0.16.1"
 bevy_hui = { version = "0.4" }
+bevy_tweening = "0.13"

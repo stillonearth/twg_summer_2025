@@ -60,7 +60,7 @@ impl UIColors {
     pub const TEXT_DIM: Color = Color::srgb(0.6, 0.6, 0.6);
     pub const THOUGHTS_TEXT: Color = Color::srgb(0.95, 0.9, 1.0);
     pub const ACCENT: Color = Color::srgb(0.4, 0.7, 1.0);
-    pub const ERROR: Color = Color::srgb(0.9, 0.3, 0.3);
+    pub const ERROR: Color = Color::WHITE;
     pub const ERROR_BACKGROUND: Color = Color::srgba(0.8, 0.2, 0.2, 0.9);
 
     const RESOURCE_COLORS: [(Color, Color); 4] = [
@@ -150,6 +150,11 @@ pub struct ResourceBar {
 pub struct ResourceBarFill;
 
 #[derive(Component)]
+pub struct ResourceValueText {
+    pub resource_type: ResourceType,
+}
+
+#[derive(Component)]
 pub struct ErrorDisplay;
 
 #[derive(Component)]
@@ -185,6 +190,7 @@ fn spawn_left_panel(commands: &mut Commands) {
                         border: UiRect::all(Val::Px(1.0)),
                         ..default()
                     },
+                    BorderRadius::new(Val::Px(5.), Val::Px(5.), Val::Px(5.), Val::Px(5.)),
                     BackgroundColor::from(UIColors::BACKGROUND),
                     BorderColor(UIColors::ACCENT.with_alpha(0.2)),
                 ))
@@ -284,7 +290,7 @@ fn spawn_error_panel(commands: &mut Commands) {
                 height: Val::Auto,
                 position_type: PositionType::Absolute,
                 left: Val::Px(300.0),
-                top: Val::Px(200.0),
+                top: Val::Px(100.0),
                 justify_content: JustifyContent::Center,
                 ..default()
             },
@@ -305,6 +311,16 @@ fn spawn_error_panel(commands: &mut Commands) {
                     },
                     BackgroundColor::from(UIColors::ERROR_BACKGROUND),
                     BorderColor(UIColors::ERROR),
+                    BorderRadius::new(
+                        // top left
+                        Val::Px(30.),
+                        // top right
+                        Val::Px(30.),
+                        // bottom right
+                        Val::Px(30.),
+                        // bottom left
+                        Val::Px(30.),
+                    ),
                 ))
                 .with_children(|panel| {
                     panel.spawn((
@@ -362,24 +378,47 @@ fn spawn_resource_bar(parent: &mut ChildSpawnerCommands, label: &str, resource_t
     parent
         .spawn(Node {
             margin: UiRect::bottom(Val::Px(8.0)),
+            flex_direction: FlexDirection::Column,
             ..default()
         })
         .with_children(|container| {
-            container.spawn((
-                Text::new(label),
-                TextFont {
-                    font_size: 14.0,
+            // Header row with label and value
+            container
+                .spawn(Node {
+                    flex_direction: FlexDirection::Row,
+                    justify_content: JustifyContent::SpaceBetween,
+                    align_items: AlignItems::Center,
+                    width: Val::Percent(100.0),
+                    margin: UiRect::bottom(Val::Px(4.0)),
                     ..default()
-                },
-                TextColor(UIColors::TEXT_DIM),
-            ));
+                })
+                .with_children(|header| {
+                    header.spawn((
+                        Text::new(label),
+                        TextFont {
+                            font_size: 14.0,
+                            ..default()
+                        },
+                        TextColor(UIColors::TEXT_DIM),
+                    ));
 
+                    header.spawn((
+                        Text::new("70/100"),
+                        TextFont {
+                            font_size: 12.0,
+                            ..default()
+                        },
+                        TextColor(UIColors::TEXT),
+                        ResourceValueText { resource_type },
+                    ));
+                });
+
+            // Progress bar
             container
                 .spawn((
                     Node {
                         width: Val::Px(240.0),
                         height: Val::Px(16.0),
-                        margin: UiRect::top(Val::Px(4.0)),
                         ..default()
                     },
                     BackgroundColor(Color::srgb(0.2, 0.2, 0.2)),
@@ -407,6 +446,7 @@ fn update_displays(
         Query<&mut Text, (With<TimeDisplay>, Without<DayDisplay>)>,
         Query<&mut Text, (With<DayDisplay>, Without<TimeDisplay>)>,
         Query<(&mut Text, &mut TextColor), With<MoodDisplay>>,
+        Query<(&mut Text, &ResourceValueText)>,
     )>,
     mut fill_query: Query<
         (&mut Node, &mut BackgroundColor),
@@ -450,6 +490,12 @@ fn update_displays(
             ][game_state.current_mood as usize];
             *text = Text::new(format!("Mood: {mood_name}"));
             *color = TextColor(UIColors::mood_color(&game_state.current_mood));
+        }
+
+        // Resource value text
+        for (mut text, resource_value) in text_queries.p5().iter_mut() {
+            let value = game_state.get_resource_value(resource_value.resource_type);
+            *text = Text::new(format!("{:.0}/100", value));
         }
 
         // Resource bars

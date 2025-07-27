@@ -19,7 +19,7 @@ impl Plugin for NavigationGridPlugin {
             .add_systems(
                 Update,
                 (
-                    (setup_navigation_grid, setup_walkable_tile_handlers).chain(),
+                    (setup_walkable_tile_handlers, setup_navigation_grid).chain(),
                     handle_navigation_event,
                     handle_go_to_random_tile,
                 ),
@@ -293,31 +293,6 @@ fn setup_navigation_grid(
     *initialized = true;
 }
 
-pub fn setup_walkable_tile_handlers(
-    mut commands: Commands,
-    query: Query<Entity, With<WalkableTile>>,
-    mut sprite_query: Query<&mut Sprite>,
-    mut has_run: Local<bool>,
-) {
-    if *has_run {
-        return;
-    }
-    for entity in query.iter() {
-        commands
-            .entity(entity)
-            .insert(Pickable::default())
-            .observe(handle_tile_click);
-
-        // Make sprite transparent
-        if let Ok(mut sprite) = sprite_query.get_mut(entity) {
-            sprite.color = Color::NONE; // or Color::rgba(0.0, 0.0, 0.0, 0.0)
-        }
-    }
-    if !query.is_empty() {
-        *has_run = true;
-    }
-}
-
 fn handle_tile_click(
     trigger: Trigger<Pointer<Click>>,
     mut nav_events: EventWriter<NavigateToTile>,
@@ -359,5 +334,30 @@ fn handle_navigation_event(
         } else {
             println!("No path found!");
         }
+    }
+}
+
+pub fn setup_walkable_tile_handlers(
+    mut commands: Commands,
+    query: Query<Entity, With<WalkableTile>>,
+    mut sprite_query: Query<&mut Sprite>,
+    mut has_run: Local<bool>,
+) {
+    if *has_run {
+        return;
+    }
+    for entity in query.iter() {
+        // commands
+        // .entity(entity)
+        // .insert(Pickable::default())
+        // .observe(handle_tile_click);
+
+        // Make sprite transparent
+        if let Ok(mut sprite) = sprite_query.get_mut(entity) {
+            sprite.color = Color::NONE; // or Color::rgba(0.0, 0.0, 0.0, 0.0)
+        }
+    }
+    if !query.is_empty() {
+        *has_run = true;
     }
 }

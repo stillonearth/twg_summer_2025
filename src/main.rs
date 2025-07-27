@@ -25,9 +25,7 @@ use crate::{
 };
 
 mod cards;
-mod collisions;
 mod cutscene;
-mod debug;
 mod game_objects;
 mod logic;
 mod menu;
@@ -40,9 +38,13 @@ mod ui;
 fn main() {
     App::new()
         .insert_resource(LaMesaPluginSettings { num_players: 1 })
+        .insert_resource(MeshPickingSettings {
+            require_markers: true,
+            ray_cast_visibility: RayCastVisibility::Visible,
+        })
         .add_plugins((
             DefaultPlugins
-                .set(ImagePlugin::default_nearest())
+                // .set(ImagePlugin::default_nearest())
                 .set(WindowPlugin {
                     primary_window: Some(Window {
                         resizable: false,
@@ -81,7 +83,6 @@ fn main() {
         .add_systems(
             Update,
             (
-                // collisions::check_nearest_object,
                 sprites::animate_sprite,
                 sprites::update_animation_indices,
                 handle_cutscene_start,
@@ -105,6 +106,7 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
             .looking_at(Vec3::ZERO, Vec3::Y)
             .with_rotation(Quat::from_rotation_z(0.0))
             .with_rotation(Quat::from_rotation_x(-FRAC_PI_2)),
+        MeshPickingCamera,
     ));
 
     let map_handle: Handle<TiledMap> = asset_server.load("my_room.tmx");

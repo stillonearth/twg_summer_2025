@@ -23,7 +23,6 @@ impl Plugin for CharacterThoughtsPlugin {
                     process_thought_generation,
                     handle_llm_responses,
                     handle_async_llm_responses,
-                    // Event listeners that trigger thoughts automatically
                     listen_for_mood_changes,
                     listen_for_resource_crises,
                     listen_for_time_changes,

@@ -1,15 +1,20 @@
+use std::time::Duration;
+
 use bevy::color::palettes::css::*;
 use bevy::prelude::*;
 use bevy_defer::AsyncCommandsExtension;
 use bevy_defer::AsyncWorld;
+use bevy_la_mesa::events::CardHoverable;
 use bevy_la_mesa::events::{
-    AlignCardsInHand, CardPress, DeckShuffle, DiscardCardToDeck, DrawToHand, PlaceCardOnTable,
-    RenderDeck,
+    AlignCardsInHand, CardPress, DeckShuffle, DrawToHand, PlaceCardOnTable, RenderDeck,
 };
 use bevy_la_mesa::CardMetadata;
 use bevy_la_mesa::{Card, CardOnTable, Hand, PlayArea};
 use bevy_la_mesa::{DeckArea, HandArea};
-use serde::{de::Error, Deserialize, Deserializer, Serialize};
+use bevy_tweening::lens::TransformPositionLens;
+use bevy_tweening::Animator;
+use bevy_tweening::Tween;
+use serde::{Deserialize, Deserializer, Serialize};
 
 use crate::logic::CardSelectionSuccess;
 use crate::logic::CutsceneEndEvent;
@@ -19,19 +24,53 @@ use crate::logic::{CardDrawnEvent, CardSelectedEvent, GamePhase, GamePhaseState}
 /// Plugin that handles all card-related functionality
 pub struct CardSystemPlugin;
 
+#[derive(Event)]
+pub struct DragCardsInHandDown {
+    pub player: usize,
+}
+
 impl Plugin for CardSystemPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, setup).add_systems(
-            Update,
-            (
-                init_cards,
-                handle_card_draw_phase,
-                handle_card_selection_attempt,
-                handle_card_selection_success,
-                handle_cutscene_start,
-                handle_cutscene_end,
-            ),
-        );
+        app.add_systems(Startup, setup)
+            .add_event::<DragCardsInHandDown>()
+            .add_systems(
+                Update,
+                (
+                    init_cards,
+                    handle_card_draw_phase,
+                    handle_card_selection_attempt,
+                    handle_card_selection_success,
+                    handle_cutscene_start,
+                    handle_cutscene_end,
+                    handle_drag_cards_in_hand_down,
+                ),
+            );
+    }
+}
+
+pub fn handle_drag_cards_in_hand_down(
+    mut commands: Commands,
+    mut er_drag_cards: EventReader<DragCardsInHandDown>,
+    mut q_hand_cards: Query<(Entity, &mut Transform, &Card<ActivityCard>, &Hand)>,
+) {
+    for event in er_drag_cards.read() {
+        // Find all cards in the specified player's hand
+        for (entity, mut transform, _card, hand) in q_hand_cards.iter_mut() {
+            if hand.player == event.player {
+                let tween = Tween::new(
+                    EaseFunction::CubicIn,
+                    Duration::from_millis(300),
+                    TransformPositionLens {
+                        start: transform.translation.clone(),
+                        end: transform.translation.clone() - Vec3::new(0.0, 0.0, -5.0),
+                    },
+                );
+
+                commands
+                    .entity(entity)
+                    .insert((Animator::new(tween), CardHoverable(false)));
+            }
+        }
     }
 }
 
@@ -51,7 +90,7 @@ fn setup(
     // Deck area
     commands.spawn((
         Name::new("Deck 1 -- Play Cards"),
-        Transform::from_translation(Vec3::new(14.0, 0.0, 7.5))
+        Transform::from_translation(Vec3::new(14.0, 0.0, -20.0))
             .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
         DeckArea { marker: 1 },
         Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
@@ -62,7 +101,7 @@ fn setup(
     // Hand Area
     commands.spawn((
         Name::new("HandArea - Player 1"),
-        Transform::from_translation(Vec3::new(-5.0, 8.5, 5.0)),
+        Transform::from_translation(Vec3::new(-5.3, 15.7, 3.4)),
         HandArea { player: 1 },
         Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
         MeshMaterial3d(materials.add(Color::srgb_u8(124, 144, 255))),
@@ -200,8 +239,6 @@ pub fn handle_card_selection_attempt(
         let p1 = q_cards.p1();
         if let Ok((_, card, _)) = p1.get(event.entity) {
             if n_cards_on_table < 1 {
-                println!("card id: {}", card.data.id);
-
                 ew_card_selected.write(CardSelectedEvent(card.data.clone()));
             }
         }
@@ -212,6 +249,7 @@ pub fn handle_card_selection_success(
     mut commands: Commands,
     mut ew_place_card_on_table: EventWriter<PlaceCardOnTable>,
     mut er_card_selction_success: EventReader<CardSelectionSuccess>,
+    mut ew_drag_cards: EventWriter<DragCardsInHandDown>,
     mut q_cards: ParamSet<(
         Query<(Entity, &Card<ActivityCard>, &CardOnTable)>,
         Query<(Entity, &Card<ActivityCard>, &Hand)>,
@@ -236,12 +274,7 @@ pub fn handle_card_selection_success(
             marker: n_cards_on_table + 1,
         });
 
-        // Align remaining cards in hand
-        commands.spawn_task(move || async move {
-            AsyncWorld.sleep(0.5).await;
-            AsyncWorld.send_event(AlignCardsInHand { player: 1 })?;
-            Ok(())
-        });
+        ew_drag_cards.write(DragCardsInHandDown { player: 1 });
     }
 }
 
