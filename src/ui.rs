@@ -19,15 +19,9 @@ impl Plugin for GameUIPlugin {
             .add_systems(
                 Update,
                 (
-                    update_phase_display,
-                    update_time_display,
-                    update_mood_display,
-                    update_resource_bars,
+                    update_displays,
                     update_character_thoughts,
-                    handle_new_thought_generated,
-                    handle_cutscene_start,
-                    handle_cutscene_end,
-                    handle_card_selection_error,
+                    handle_events,
                     update_error_display,
                 ),
             );
@@ -40,7 +34,6 @@ struct ErrorDisplayState {
     is_visible: bool,
 }
 
-// Event for updating character thoughts
 #[derive(Event)]
 pub struct UpdateThoughtsEvent {
     pub text: String,
@@ -52,19 +45,17 @@ impl UpdateThoughtsEvent {
     }
 }
 
-// Event for showing card selection errors
 #[derive(Event)]
 pub struct ShowCardErrorEvent {
     pub card_name: String,
     pub errors: Vec<String>,
 }
 
-// UI Color scheme
+// Consolidated UI colors
 pub struct UIColors;
 
 impl UIColors {
     pub const BACKGROUND: Color = Color::srgba(0.1, 0.1, 0.15, 0.9);
-    pub const THOUGHTS_BACKGROUND: Color = Color::srgba(0.15, 0.1, 0.2, 0.95);
     pub const TEXT: Color = Color::srgb(0.9, 0.9, 0.9);
     pub const TEXT_DIM: Color = Color::srgb(0.6, 0.6, 0.6);
     pub const THOUGHTS_TEXT: Color = Color::srgb(0.95, 0.9, 1.0);
@@ -72,58 +63,55 @@ impl UIColors {
     pub const ERROR: Color = Color::srgb(0.9, 0.3, 0.3);
     pub const ERROR_BACKGROUND: Color = Color::srgba(0.8, 0.2, 0.2, 0.9);
 
-    // Resource colors
-    pub const SLEEP_GOOD: Color = Color::srgb(0.3, 0.6, 0.9);
-    pub const SLEEP_BAD: Color = Color::srgb(0.6, 0.3, 0.9);
-    pub const HEALTH_GOOD: Color = Color::srgb(0.4, 0.8, 0.4);
-    pub const HEALTH_BAD: Color = Color::srgb(0.8, 0.3, 0.3);
-    pub const MENTAL_GOOD: Color = Color::srgb(0.9, 0.8, 0.3);
-    pub const MENTAL_BAD: Color = Color::srgb(0.5, 0.2, 0.5);
-    pub const FOOD_GOOD: Color = Color::srgb(0.9, 0.6, 0.2);
-    pub const FOOD_BAD: Color = Color::srgb(0.6, 0.4, 0.2);
+    const RESOURCE_COLORS: [(Color, Color); 4] = [
+        (Color::srgb(0.3, 0.6, 0.9), Color::srgb(0.6, 0.3, 0.9)), // Sleep
+        (Color::srgb(0.4, 0.8, 0.4), Color::srgb(0.8, 0.3, 0.3)), // Health
+        (Color::srgb(0.9, 0.8, 0.3), Color::srgb(0.5, 0.2, 0.5)), // Mental
+        (Color::srgb(0.9, 0.6, 0.2), Color::srgb(0.6, 0.4, 0.2)), // Food
+    ];
 
-    // Phase colors
-    pub const PHASE_DRAW: Color = Color::srgb(0.3, 0.8, 0.9);
-    pub const PHASE_SELECT: Color = Color::srgb(0.9, 0.7, 0.3);
-    pub const PHASE_ACTION: Color = Color::srgb(0.7, 0.9, 0.4);
-    pub const PHASE_TURN_OVER: Color = Color::srgb(0.9, 0.4, 0.8);
+    const PHASE_COLORS: [Color; 4] = [
+        Color::srgb(0.3, 0.8, 0.9), // Draw
+        Color::srgb(0.9, 0.7, 0.3), // Select
+        Color::srgb(0.7, 0.9, 0.4), // Action
+        Color::srgb(0.9, 0.4, 0.8), // TurnOver
+    ];
+
+    const MOOD_COLORS: [Color; 6] = [
+        Color::srgb(0.3, 0.3, 0.4), // Depressed
+        Color::srgb(0.8, 0.6, 0.2), // Anxious
+        Color::srgb(0.5, 0.4, 0.6), // Tired
+        Color::srgb(0.6, 0.6, 0.6), // Neutral
+        Color::srgb(0.4, 0.7, 0.5), // Content
+        Color::srgb(0.9, 0.3, 0.6), // Manic
+    ];
 
     pub fn mood_color(mood: &Mood) -> Color {
-        match mood {
-            Mood::Depressed => Color::srgb(0.3, 0.3, 0.4),
-            Mood::Anxious => Color::srgb(0.8, 0.6, 0.2),
-            Mood::Tired => Color::srgb(0.5, 0.4, 0.6),
-            Mood::Neutral => Color::srgb(0.6, 0.6, 0.6),
-            Mood::Content => Color::srgb(0.4, 0.7, 0.5),
-            Mood::Manic => Color::srgb(0.9, 0.3, 0.6),
-        }
+        Self::MOOD_COLORS[*mood as usize]
     }
 
     pub fn phase_color(phase: &GamePhase) -> Color {
-        match phase {
-            GamePhase::CardDraw => Self::PHASE_DRAW,
-            GamePhase::CardSelection => Self::PHASE_SELECT,
-            GamePhase::CharacterAction => Self::PHASE_ACTION,
-            GamePhase::TurnOver => Self::PHASE_TURN_OVER,
-        }
+        Self::PHASE_COLORS[*phase as usize]
     }
 
-    pub fn resource_color(value: f32, good_color: Color, bad_color: Color) -> Color {
-        let ratio = (value / 100.0).clamp(0.0, 1.0);
+    pub fn resource_colors(resource_type: ResourceType) -> (Color, Color) {
+        Self::RESOURCE_COLORS[resource_type as usize]
+    }
 
-        let bad = bad_color.to_srgba();
-        let good = good_color.to_srgba();
+    pub fn lerp_color(value: f32, good: Color, bad: Color) -> Color {
+        let t = (value / 100.0).clamp(0.0, 1.0);
+        let bad_srgb = bad.to_srgba();
+        let good_srgb = good.to_srgba();
 
         Color::srgb(
-            bad.red + (good.red - bad.red) * ratio,
-            bad.green + (good.green - bad.green) * ratio,
-            bad.blue + (good.blue - bad.blue) * ratio,
+            bad_srgb.red + (good_srgb.red - bad_srgb.red) * t,
+            bad_srgb.green + (good_srgb.green - bad_srgb.green) * t,
+            bad_srgb.blue + (good_srgb.blue - bad_srgb.blue) * t,
         )
     }
 }
 
-// UI component markers
-
+// Component markers
 #[derive(Component)]
 pub struct UIRoot;
 
@@ -167,11 +155,13 @@ pub struct ErrorDisplay;
 #[derive(Component)]
 pub struct ErrorPanel;
 
-pub const LAYER_UI: usize = 0;
-
-// Setup the UI layout
 fn setup_ui(mut commands: Commands) {
-    // Left Side Panel - Game state panel (fixed width, non-blocking)
+    spawn_left_panel(&mut commands);
+    spawn_thoughts_panel(&mut commands);
+    spawn_error_panel(&mut commands);
+}
+
+fn spawn_left_panel(commands: &mut Commands) {
     commands
         .spawn((
             UIRoot,
@@ -180,19 +170,15 @@ fn setup_ui(mut commands: Commands) {
                 height: Val::Percent(100.0),
                 flex_direction: FlexDirection::Column,
                 position_type: PositionType::Absolute,
-                left: Val::Px(0.0),
-                top: Val::Px(0.0),
                 ..default()
             },
-            Name::new("Left Panel Container"),
+            Name::new("Left Panel"),
         ))
-        .with_children(|left_container| {
-            // Game state panel
-            left_container
+        .with_children(|parent| {
+            parent
                 .spawn((
                     Node {
                         width: Val::Percent(100.0),
-                        height: Val::Auto,
                         flex_direction: FlexDirection::Column,
                         padding: UiRect::all(Val::Px(16.0)),
                         margin: UiRect::all(Val::Px(8.0)),
@@ -201,195 +187,94 @@ fn setup_ui(mut commands: Commands) {
                     },
                     BackgroundColor::from(UIColors::BACKGROUND),
                     BorderColor(UIColors::ACCENT.with_alpha(0.2)),
-                    Name::new("Game State Panel"),
                 ))
                 .with_children(|panel| {
-                    // Game phase and turn display
-                    panel
-                        .spawn(Node {
-                            margin: UiRect::bottom(Val::Px(16.0)),
-                            flex_direction: FlexDirection::Column,
-                            ..default()
-                        })
-                        .with_children(|phase_container| {
-                            phase_container.spawn((
-                                Text::new("Phase: Card Draw"),
-                                TextFont {
-                                    font_size: 16.0,
-                                    ..default()
-                                },
-                                TextColor(UIColors::PHASE_DRAW),
-                                PhaseDisplay,
-                            ));
+                    // Phase and turn
+                    spawn_text_section(
+                        panel,
+                        "Phase: Card Draw",
+                        16.0,
+                        UIColors::PHASE_COLORS[0],
+                        Some(PhaseDisplay),
+                    );
+                    spawn_text_section(
+                        panel,
+                        "Turn 1",
+                        12.0,
+                        UIColors::TEXT_DIM,
+                        Some(TurnDisplay),
+                    );
 
-                            phase_container.spawn((
-                                Text::new("Turn 1"),
-                                TextFont {
-                                    font_size: 12.0,
-                                    ..default()
-                                },
-                                TextColor(UIColors::TEXT_DIM),
-                                Node {
-                                    margin: UiRect::top(Val::Px(2.0)),
-                                    ..default()
-                                },
-                                TurnDisplay,
-                            ));
-                        });
-
-                    // Mood display
-                    panel
-                        .spawn(Node {
-                            margin: UiRect::bottom(Val::Px(16.0)),
-                            ..default()
-                        })
-                        .with_children(|mood_container| {
-                            mood_container.spawn((
-                                Text::new("Mood: Neutral"),
-                                TextFont {
-                                    font_size: 18.0,
-                                    ..default()
-                                },
-                                TextColor(UIColors::TEXT),
-                                MoodDisplay,
-                            ));
-                        });
+                    // Mood
+                    spawn_text_section(
+                        panel,
+                        "Mood: Neutral",
+                        18.0,
+                        UIColors::TEXT,
+                        Some(MoodDisplay),
+                    );
 
                     // Resource bars
-                    let resources = [
+                    for (i, &(label, resource_type)) in [
                         ("Sleep", ResourceType::Sleep),
                         ("Health", ResourceType::Health),
                         ("Mental", ResourceType::Mental),
                         ("Food", ResourceType::Food),
-                    ];
-
-                    for (label, resource_type) in resources {
-                        panel
-                            .spawn(Node {
-                                margin: UiRect::bottom(Val::Px(8.0)),
-                                display: Display::Block,
-                                ..default()
-                            })
-                            .with_children(|resource_container| {
-                                // Label
-                                resource_container.spawn((
-                                    Text::new(label),
-                                    TextFont {
-                                        font_size: 14.0,
-                                        ..default()
-                                    },
-                                    TextColor(UIColors::TEXT_DIM),
-                                ));
-
-                                // Bar background
-                                resource_container
-                                    .spawn((
-                                        Node {
-                                            width: Val::Px(240.0), // Reduced width for 200px container
-                                            height: Val::Px(16.0),
-                                            margin: UiRect::top(Val::Px(4.0)),
-                                            ..default()
-                                        },
-                                        BackgroundColor(Color::srgb(0.2, 0.2, 0.2)),
-                                        ResourceBar { resource_type },
-                                    ))
-                                    .with_children(|bar| {
-                                        // Bar fill
-                                        bar.spawn((
-                                            Node {
-                                                width: Val::Percent(70.0), // Will be updated
-                                                height: Val::Percent(100.0),
-                                                ..default()
-                                            },
-                                            BackgroundColor(UIColors::ACCENT),
-                                            ResourceBarFill,
-                                        ));
-                                    });
-                            });
+                    ]
+                    .iter()
+                    .enumerate()
+                    {
+                        spawn_resource_bar(panel, label, resource_type);
                     }
 
-                    // Time and day display at bottom
-                    panel
-                        .spawn(Node {
-                            margin: UiRect::top(Val::Px(24.0)),
-                            flex_direction: FlexDirection::Column,
-                            ..default()
-                        })
-                        .with_children(|time_container| {
-                            time_container.spawn((
-                                Text::new("10:00"),
-                                TextFont {
-                                    font_size: 20.0,
-                                    ..default()
-                                },
-                                TextColor(UIColors::TEXT),
-                                TimeDisplay,
-                            ));
-
-                            time_container.spawn((
-                                Text::new("Day 1"),
-                                TextFont {
-                                    font_size: 14.0,
-                                    ..default()
-                                },
-                                TextColor(UIColors::TEXT_DIM),
-                                DayDisplay,
-                            ));
-                        });
+                    // Time displays
+                    spawn_text_section(panel, "10:00", 20.0, UIColors::TEXT, Some(TimeDisplay));
+                    spawn_text_section(panel, "Day 1", 14.0, UIColors::TEXT_DIM, Some(DayDisplay));
                 });
         });
+}
 
-    // Top Center Panel - Character thoughts (limited height, non-blocking)
+fn spawn_thoughts_panel(commands: &mut Commands) {
     commands
         .spawn((
             UIRoot,
             Node {
                 width: Val::Auto,
-                height: Val::Px(150.0), // Limited height
+                height: Val::Px(150.0),
                 position_type: PositionType::Absolute,
-                left: Val::Px(300.0), // Start after left panel
+                left: Val::Px(300.0),
                 top: Val::Px(20.0),
                 justify_content: JustifyContent::Center,
-                align_items: AlignItems::FlexStart,
                 ..default()
             },
-            Name::new("Top Panel Container"),
+            Name::new("Thoughts Panel"),
         ))
-        .with_children(|top_container| {
-            // Character thoughts panel
-            top_container
-                .spawn((
-                    Node {
-                        width: Val::Px(900.0), // Reduced width since left panel is smaller
-                        min_height: Val::Px(80.0),
-                        max_height: Val::Px(130.0),
-                        padding: UiRect::all(Val::Px(16.0)),
-                        justify_content: JustifyContent::Center,
-                        align_items: AlignItems::Center,
-                        ..default()
-                    },
-                    Name::new("Character Thoughts Panel"),
-                ))
-                .with_children(|thoughts_panel| {
-                    thoughts_panel.spawn((
+        .with_children(|parent| {
+            parent
+                .spawn((Node {
+                    width: Val::Px(900.0),
+                    min_height: Val::Px(80.0),
+                    max_height: Val::Px(130.0),
+                    padding: UiRect::all(Val::Px(16.0)),
+                    justify_content: JustifyContent::Center,
+                    align_items: AlignItems::Center,
+                    ..default()
+                },))
+                .with_children(|panel| {
+                    panel.spawn((
                         Text::new("What am I thinking about..."),
                         TextFont {
                             font_size: 16.0,
                             ..default()
                         },
                         TextColor(UIColors::THOUGHTS_TEXT),
-                        Node {
-                            flex_wrap: FlexWrap::Wrap,
-                            justify_content: JustifyContent::Center,
-                            align_items: AlignItems::Center,
-                            ..default()
-                        },
                         CharacterThoughts::default(),
                     ));
                 });
         });
+}
 
-    // Card Error Display Panel - Center screen overlay
+fn spawn_error_panel(commands: &mut Commands) {
     commands
         .spawn((
             UIRoot,
@@ -398,18 +283,16 @@ fn setup_ui(mut commands: Commands) {
                 width: Val::Auto,
                 height: Val::Auto,
                 position_type: PositionType::Absolute,
-                left: Val::Px(300.0), // Start after left panel
-                top: Val::Px(200.0),  // Below thoughts panel
+                left: Val::Px(300.0),
+                top: Val::Px(200.0),
                 justify_content: JustifyContent::Center,
-                align_items: AlignItems::FlexStart,
                 ..default()
             },
-            Visibility::Hidden, // Initially hidden
-            Name::new("Card Error Panel Container"),
+            Visibility::Hidden,
+            Name::new("Error Panel"),
         ))
-        .with_children(|error_container| {
-            // Card error panel
-            error_container
+        .with_children(|parent| {
+            parent
                 .spawn((
                     Node {
                         width: Val::Px(600.0),
@@ -422,11 +305,9 @@ fn setup_ui(mut commands: Commands) {
                     },
                     BackgroundColor::from(UIColors::ERROR_BACKGROUND),
                     BorderColor(UIColors::ERROR),
-                    Name::new("Card Error Panel"),
                 ))
-                .with_children(|error_panel| {
-                    // Error title
-                    error_panel.spawn((
+                .with_children(|panel| {
+                    panel.spawn((
                         Text::new("Cannot Play Card"),
                         TextFont {
                             font_size: 18.0,
@@ -439,38 +320,164 @@ fn setup_ui(mut commands: Commands) {
                         },
                     ));
 
-                    // Error details
-                    error_panel.spawn((
+                    panel.spawn((
                         Text::new(""),
                         TextFont {
                             font_size: 14.0,
                             ..default()
                         },
                         TextColor(UIColors::TEXT),
-                        Node {
-                            flex_wrap: FlexWrap::Wrap,
-                            ..default()
-                        },
                         ErrorDisplay,
                     ));
                 });
         });
 }
 
-// Update character thoughts based on events
+fn spawn_text_section<T: Component>(
+    parent: &mut ChildSpawnerCommands,
+    text: &str,
+    font_size: f32,
+    color: Color,
+    marker: Option<T>,
+) {
+    let mut entity = parent.spawn((
+        Text::new(text),
+        TextFont {
+            font_size,
+            ..default()
+        },
+        TextColor(color),
+        Node {
+            margin: UiRect::bottom(Val::Px(8.0)),
+            ..default()
+        },
+    ));
+
+    if let Some(component) = marker {
+        entity.insert(component);
+    }
+}
+
+fn spawn_resource_bar(parent: &mut ChildSpawnerCommands, label: &str, resource_type: ResourceType) {
+    parent
+        .spawn(Node {
+            margin: UiRect::bottom(Val::Px(8.0)),
+            ..default()
+        })
+        .with_children(|container| {
+            container.spawn((
+                Text::new(label),
+                TextFont {
+                    font_size: 14.0,
+                    ..default()
+                },
+                TextColor(UIColors::TEXT_DIM),
+            ));
+
+            container
+                .spawn((
+                    Node {
+                        width: Val::Px(240.0),
+                        height: Val::Px(16.0),
+                        margin: UiRect::top(Val::Px(4.0)),
+                        ..default()
+                    },
+                    BackgroundColor(Color::srgb(0.2, 0.2, 0.2)),
+                    ResourceBar { resource_type },
+                ))
+                .with_children(|bar| {
+                    bar.spawn((
+                        Node {
+                            width: Val::Percent(70.0),
+                            height: Val::Percent(100.0),
+                            ..default()
+                        },
+                        BackgroundColor(UIColors::ACCENT),
+                        ResourceBarFill,
+                    ));
+                });
+        });
+}
+
+// Consolidated update systems
+fn update_displays(
+    mut text_queries: ParamSet<(
+        Query<(&mut Text, &mut TextColor), (With<PhaseDisplay>, Without<TurnDisplay>)>,
+        Query<&mut Text, (With<TurnDisplay>, Without<PhaseDisplay>)>,
+        Query<&mut Text, (With<TimeDisplay>, Without<DayDisplay>)>,
+        Query<&mut Text, (With<DayDisplay>, Without<TimeDisplay>)>,
+        Query<(&mut Text, &mut TextColor), With<MoodDisplay>>,
+    )>,
+    mut fill_query: Query<
+        (&mut Node, &mut BackgroundColor),
+        (With<ResourceBarFill>, Without<ResourceBar>),
+    >,
+    bar_query: Query<(&ResourceBar, &Children)>,
+    phase_state: Res<GamePhaseState>,
+    game_state: Res<GameState>,
+) {
+    // Update phase display
+    if phase_state.is_changed() {
+        for (mut text, mut color) in text_queries.p0().iter_mut() {
+            *text = Text::new(format!("Phase: {}", phase_state.get_phase_name()));
+            *color = TextColor(UIColors::phase_color(&phase_state.current_phase));
+        }
+
+        for mut text in text_queries.p1().iter_mut() {
+            *text = Text::new(format!("Turn {}", phase_state.turn_number));
+        }
+    }
+
+    // Update game state displays
+    if game_state.is_changed() {
+        // Time displays
+        for mut text in text_queries.p2().iter_mut() {
+            *text = Text::new(game_state.get_time_string());
+        }
+        for mut text in text_queries.p3().iter_mut() {
+            *text = Text::new(game_state.get_day_string());
+        }
+
+        // Mood display
+        for (mut text, mut color) in text_queries.p4().iter_mut() {
+            let mood_name = [
+                "Depressed",
+                "Anxious",
+                "Tired",
+                "Neutral",
+                "Content",
+                "Manic",
+            ][game_state.current_mood as usize];
+            *text = Text::new(format!("Mood: {mood_name}"));
+            *color = TextColor(UIColors::mood_color(&game_state.current_mood));
+        }
+
+        // Resource bars
+        for (resource_bar, children) in &bar_query {
+            let value = game_state.get_resource_value(resource_bar.resource_type);
+            let (good_color, bad_color) = UIColors::resource_colors(resource_bar.resource_type);
+
+            for child in children.iter() {
+                if let Ok((mut style, mut bg_color)) = fill_query.get_mut(child) {
+                    style.width = Val::Percent(value);
+                    bg_color.0 = UIColors::lerp_color(value, good_color, bad_color);
+                }
+            }
+        }
+    }
+}
+
 fn update_character_thoughts(
     mut thoughts_query: Query<(&mut Text, &mut CharacterThoughts)>,
     mut thoughts_events: EventReader<UpdateThoughtsEvent>,
     time: Res<Time>,
 ) {
-    // Handle new thought events
     for event in thoughts_events.read() {
-        for (mut text, mut thoughts) in &mut thoughts_query {
+        for (mut text, _) in &mut thoughts_query {
             *text = Text::new(&event.text);
         }
     }
 
-    // Handle auto-clear timers
     for (mut text, mut thoughts) in &mut thoughts_query {
         if let Some(ref mut timer) = thoughts.clear_timer {
             timer.tick(time.delta());
@@ -482,133 +489,35 @@ fn update_character_thoughts(
     }
 }
 
-// Update phase and turn display
-fn update_phase_display(
-    mut phase_query: Query<(&mut Text, &mut TextColor), (With<PhaseDisplay>, Without<TurnDisplay>)>,
-    mut turn_query: Query<&mut Text, (With<TurnDisplay>, Without<PhaseDisplay>)>,
-    phase_state: Res<GamePhaseState>,
-) {
-    if phase_state.is_changed() {
-        // Update phase display
-        for (mut text, mut text_color) in &mut phase_query {
-            let phase_str = phase_state.get_phase_name();
-            *text = Text::new(format!("Phase: {phase_str}"));
-            *text_color = TextColor(UIColors::phase_color(&phase_state.current_phase));
-        }
-
-        // Update turn display
-        for mut text in &mut turn_query {
-            *text = Text::new(format!("Turn {}", phase_state.turn_number));
-        }
-    }
-}
-
-// Update time and day display
-fn update_time_display(
-    mut time_query: Query<&mut Text, (With<TimeDisplay>, Without<DayDisplay>)>,
-    mut day_query: Query<&mut Text, (With<DayDisplay>, Without<TimeDisplay>)>,
-    game_state: Res<GameState>,
-) {
-    if game_state.is_changed() {
-        for mut text in &mut time_query {
-            *text = Text::new(game_state.get_time_string());
-        }
-        for mut text in &mut day_query {
-            *text = Text::new(game_state.get_day_string());
-        }
-    }
-}
-
-// Update mood display
-fn update_mood_display(
-    mut query: Query<(&mut Text, &mut TextColor), With<MoodDisplay>>,
-    game_state: Res<GameState>,
-) {
-    if game_state.is_changed() {
-        for (mut text, mut text_color) in &mut query {
-            let mood_str = match game_state.current_mood {
-                Mood::Depressed => "Depressed",
-                Mood::Anxious => "Anxious",
-                Mood::Tired => "Tired",
-                Mood::Neutral => "Neutral",
-                Mood::Content => "Content",
-                Mood::Manic => "Manic",
-            };
-            *text = Text::new(format!("Mood: {mood_str}"));
-            *text_color = TextColor(UIColors::mood_color(&game_state.current_mood));
-        }
-    }
-}
-
-// Update resource bars
-fn update_resource_bars(
-    mut fill_query: Query<
-        (&mut Node, &mut BackgroundColor),
-        (With<ResourceBarFill>, Without<ResourceBar>),
-    >,
-    bar_query: Query<(&ResourceBar, &Children)>,
-    game_state: Res<GameState>,
-) {
-    if game_state.is_changed() {
-        for (resource_bar, children) in &bar_query {
-            let resource_value = game_state.get_resource_value(resource_bar.resource_type);
-
-            let (good_color, bad_color) = match resource_bar.resource_type {
-                ResourceType::Sleep => (UIColors::SLEEP_GOOD, UIColors::SLEEP_BAD),
-                ResourceType::Health => (UIColors::HEALTH_GOOD, UIColors::HEALTH_BAD),
-                ResourceType::Mental => (UIColors::MENTAL_GOOD, UIColors::MENTAL_BAD),
-                ResourceType::Food => (UIColors::FOOD_GOOD, UIColors::FOOD_BAD),
-            };
-
-            // Update fill bar for this resource
-            for child in children.iter() {
-                if let Ok((mut style, mut bg_color)) = fill_query.get_mut(child) {
-                    style.width = Val::Percent(resource_value);
-                    bg_color.0 = UIColors::resource_color(resource_value, good_color, bad_color);
-                }
-            }
-        }
-    }
-}
-
-fn handle_new_thought_generated(
-    mut er_though_generated: EventReader<ThoughtGeneratedEvent>,
-    mut ew_update_thoughts_ui: EventWriter<UpdateThoughtsEvent>,
-) {
-    for response in er_though_generated.read() {
-        ew_update_thoughts_ui.write(UpdateThoughtsEvent::new(response.text.clone()));
-    }
-}
-
-fn handle_cutscene_start(
+fn handle_events(
     mut commands: Commands,
+    mut er_thought: EventReader<ThoughtGeneratedEvent>,
     mut er_cutscene_start: EventReader<CutsceneStartEvent>,
+    mut er_cutscene_end: EventReader<CutsceneEndEvent>,
+    mut er_card_error: EventReader<CardSelectionError>,
+    mut ew_update_thoughts: EventWriter<UpdateThoughtsEvent>,
+    mut ew_show_error: EventWriter<ShowCardErrorEvent>,
     q_ui_roots: Query<(Entity, &UIRoot)>,
 ) {
+    // Handle thought events
+    for event in er_thought.read() {
+        ew_update_thoughts.write(UpdateThoughtsEvent::new(event.text.clone()));
+    }
+
+    // Handle cutscene events
     for _ in er_cutscene_start.read() {
-        for (entity, _) in q_ui_roots.iter() {
+        for (entity, _) in &q_ui_roots {
             commands.entity(entity).insert(Visibility::Hidden);
         }
     }
-}
 
-fn handle_cutscene_end(
-    mut commands: Commands,
-    mut er_cutscene_start: EventReader<CutsceneEndEvent>,
-    q_ui_roots: Query<(Entity, &UIRoot)>,
-) {
-    for _ in er_cutscene_start.read() {
-        for (entity, _) in q_ui_roots.iter() {
+    for _ in er_cutscene_end.read() {
+        for (entity, _) in &q_ui_roots {
             commands.entity(entity).insert(Visibility::Inherited);
         }
     }
-}
 
-// Handle card selection errors
-fn handle_card_selection_error(
-    mut er_card_error: EventReader<CardSelectionError>,
-    mut ew_show_error: EventWriter<ShowCardErrorEvent>,
-) {
+    // Handle card error events
     for error in er_card_error.read() {
         ew_show_error.write(ShowCardErrorEvent {
             card_name: error.card.name.clone(),
@@ -625,40 +534,32 @@ fn update_error_display(
     error_panel_query: Query<Entity, With<ErrorPanel>>,
     time: Res<Time>,
 ) {
-    // Handle new error events
     for event in error_events.read() {
-        // Show the error panel
-        for entity in error_panel_query.iter() {
+        for entity in &error_panel_query {
             commands.entity(entity).insert(Visibility::Inherited);
         }
 
-        // Update error text
         for mut text in &mut error_text_query {
-            let error_text = format!(
+            *text = Text::new(format!(
                 "Card: {}\n\nReasons:\n• {}",
                 event.card_name,
                 event.errors.join("\n• ")
-            );
-            *text = Text::new(error_text);
+            ));
         }
 
-        // Reset timer and show the error
         error_state.clear_timer = Some(Timer::from_seconds(5.0, TimerMode::Once));
         error_state.is_visible = true;
     }
 
-    // Handle auto-hide timer
     if error_state.is_visible {
         if let Some(ref mut timer) = error_state.clear_timer {
             timer.tick(time.delta());
 
             if timer.finished() {
-                // Hide the error panel
-                for entity in error_panel_query.iter() {
+                for entity in &error_panel_query {
                     commands.entity(entity).insert(Visibility::Hidden);
                 }
 
-                // Clear the text and mark as hidden
                 for mut text in &mut error_text_query {
                     *text = Text::new("");
                 }
