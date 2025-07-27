@@ -10,19 +10,24 @@ use bevy::prelude::*;
 
 const MOVE_SPEED: f32 = 200.;
 
+// Add the new event
+#[derive(Event)]
+pub struct PlayerDestinationReachedEvent {}
+
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(
-            Update,
-            (
-                move_player_from_command,
-                move_player_along_path,
-                handle_cutscene_start,
-                handle_cutscene_end,
-            ),
-        );
+        app.add_event::<PlayerDestinationReachedEvent>()
+            .add_systems(
+                Update,
+                (
+                    move_player_from_command,
+                    move_player_along_path,
+                    handle_cutscene_start,
+                    handle_cutscene_end,
+                ),
+            );
     }
 }
 
@@ -66,13 +71,19 @@ pub fn move_player_from_command(
 
 pub fn move_player_along_path(
     mut player_query: Query<
-        (&mut Transform, &mut LinearVelocity, &mut PlayerMovement),
+        (
+            Entity,
+            &mut Transform,
+            &mut LinearVelocity,
+            &mut PlayerMovement,
+        ),
         With<PlayerMarker>,
     >,
     mut animation_query: Query<&mut CharacterAnimation, With<AnimatedCharacterSprite>>,
+    mut destination_events: EventWriter<PlayerDestinationReachedEvent>,
     tile_size: Res<TileSize>,
 ) {
-    for (transform, mut rb_vel, mut player_movement) in player_query.iter_mut() {
+    for (entity, transform, mut rb_vel, mut player_movement) in player_query.iter_mut() {
         if !player_movement.is_moving || player_movement.path.is_empty() {
             rb_vel.0 = Vec2::ZERO;
             // Set animation to stand when not moving
@@ -107,7 +118,11 @@ pub fn move_player_along_path(
                     character_animation.animation_type = AnimationType::Stand;
                 }
 
-                println!("Player reached destination!");
+                // Send the destination reached event
+                destination_events.write(PlayerDestinationReachedEvent {});
+
+                println!("Player reached destination at {:?}", current_target);
+
                 continue;
             }
         }
@@ -201,5 +216,24 @@ fn handle_cutscene_end(
         for (entity, _) in q_players.iter() {
             commands.entity(entity).insert(Visibility::Inherited);
         }
+    }
+}
+
+// Example system to handle the destination reached event
+pub fn handle_player_destination_reached(
+    mut destination_events: EventReader<PlayerDestinationReachedEvent>,
+) {
+    for event in destination_events.read() {
+        println!(
+            "Player (Entity {:?}) has reached destination at grid position ({}, {})",
+            event.player_entity, event.final_position.x, event.final_position.y
+        );
+
+        // Add your custom logic here:
+        // - Trigger dialogue
+        // - Start cutscene
+        // - Update quest progress
+        // - Play sound effects
+        // - etc.
     }
 }
