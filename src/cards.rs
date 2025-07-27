@@ -11,6 +11,7 @@ use bevy_la_mesa::{Card, CardOnTable, Hand, PlayArea};
 use bevy_la_mesa::{DeckArea, HandArea};
 use serde::{de::Error, Deserialize, Deserializer, Serialize};
 
+use crate::logic::CardSelectionSuccess;
 use crate::logic::CutsceneEndEvent;
 use crate::logic::CutsceneStartEvent;
 use crate::logic::{CardDrawnEvent, CardSelectedEvent, GamePhase, GamePhaseState};
@@ -25,7 +26,8 @@ impl Plugin for CardSystemPlugin {
             (
                 init_cards,
                 handle_card_draw_phase,
-                handle_place_card_on_table,
+                handle_card_selection_attempt,
+                handle_card_selection_success,
                 handle_cutscene_start,
                 handle_cutscene_end,
             ),
@@ -172,10 +174,8 @@ fn handle_card_draw_phase(
 }
 
 /// Handle placing card on table after selection
-pub fn handle_place_card_on_table(
-    mut commands: Commands,
+pub fn handle_card_selection_attempt(
     mut card_press: EventReader<CardPress>,
-    mut ew_place_card_on_table: EventWriter<PlaceCardOnTable>,
     mut ew_card_selected: EventWriter<CardSelectedEvent>,
     phase_state: Res<GamePhaseState>,
     mut q_cards: ParamSet<(
@@ -199,25 +199,49 @@ pub fn handle_place_card_on_table(
 
         let p1 = q_cards.p1();
         if let Ok((_, card, _)) = p1.get(event.entity) {
-            // Send card selection event with card number as ID
-            ew_card_selected.write(CardSelectedEvent(card.data.clone()));
-        }
+            if n_cards_on_table < 1 {
+                println!("card id: {}", card.data.id);
 
-        // Only allow one card on table at a time for now
-        if n_cards_on_table < 1 {
-            ew_place_card_on_table.write(PlaceCardOnTable {
-                card_entity: event.entity,
-                player: 1,
-                marker: n_cards_on_table + 1,
-            });
-
-            // Align remaining cards in hand
-            commands.spawn_task(move || async move {
-                AsyncWorld.sleep(0.5).await;
-                AsyncWorld.send_event(AlignCardsInHand { player: 1 })?;
-                Ok(())
-            });
+                ew_card_selected.write(CardSelectedEvent(card.data.clone()));
+            }
         }
+    }
+}
+
+pub fn handle_card_selection_success(
+    mut commands: Commands,
+    mut ew_place_card_on_table: EventWriter<PlaceCardOnTable>,
+    mut er_card_selction_success: EventReader<CardSelectionSuccess>,
+    mut q_cards: ParamSet<(
+        Query<(Entity, &Card<ActivityCard>, &CardOnTable)>,
+        Query<(Entity, &Card<ActivityCard>, &Hand)>,
+    )>,
+) {
+    for event in er_card_selction_success.read() {
+        let selected_card_entity = q_cards
+            .p1()
+            .iter()
+            .find(|(_, card, _)| {
+                println!("card id: {} | {}", card.data.id, event.0.id);
+                return card.data.id == event.0.id;
+            })
+            .unwrap()
+            .0;
+
+        let n_cards_on_table = q_cards.p0().iter().len();
+
+        ew_place_card_on_table.write(PlaceCardOnTable {
+            card_entity: selected_card_entity,
+            player: 1,
+            marker: n_cards_on_table + 1,
+        });
+
+        // Align remaining cards in hand
+        commands.spawn_task(move || async move {
+            AsyncWorld.sleep(0.5).await;
+            AsyncWorld.send_event(AlignCardsInHand { player: 1 })?;
+            Ok(())
+        });
     }
 }
 

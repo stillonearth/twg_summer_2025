@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_defer::{AsyncCommandsExtension, AsyncWorld};
 use bevy_la_mesa::{events::DiscardCardToDeck, Card, CardOnTable, DeckArea, Hand};
 use bevy_novel::{events::EventStartScenario, rpy_asset_loader::Rpy};
 use std::collections::HashMap;
@@ -20,11 +21,12 @@ impl Plugin for GameLogicPlugin {
             .add_event::<PhaseChangedEvent>()
             .add_event::<CardDrawnEvent>()
             .add_event::<CardSelectedEvent>()
+            .add_event::<CardSelectionSuccess>()
+            .add_event::<CardSelectionError>()
             .add_event::<ActionCompletedEvent>()
             .add_event::<TurnOverEvent>()
             .add_event::<CutsceneStartEvent>()
             .add_event::<CutsceneEndEvent>()
-            .add_event::<CardPlayAttemptEvent>()
             .add_event::<StatusEffectAppliedEvent>()
             .add_event::<StatusEffectExpiredEvent>()
             .add_event::<CrisisLevelChangedEvent>()
@@ -36,13 +38,13 @@ impl Plugin for GameLogicPlugin {
                     handle_phase_transitions,
                     handle_card_draw,
                     handle_card_selection,
+                    handle_card_selection_success,
                     handle_character_action_phase,
                     handle_action_completion,
                     handle_turn_over,
                     handle_cutscene_trigger,
                     handle_cutscene_end,
                     handle_turn_over_completion,
-                    handle_card_play_attempt,
                     handle_status_effect_tick,
                     handle_crisis_level_changes,
                     handle_end_game_check,
@@ -51,14 +53,6 @@ impl Plugin for GameLogicPlugin {
                     .chain(),
             );
     }
-}
-
-// Game Events
-#[derive(Event)]
-pub struct CardPlayAttemptEvent {
-    pub card: ActivityCard,
-    pub can_play: bool,
-    pub blocking_conditions: Vec<String>,
 }
 
 #[derive(Event)]
@@ -84,8 +78,17 @@ pub struct EndGameEvent {
     pub result: EndGameResult,
 }
 
-#[derive(Event, Deref)]
+#[derive(Event)]
 pub struct CardSelectedEvent(pub ActivityCard);
+
+#[derive(Event)]
+pub struct CardSelectionSuccess(pub ActivityCard);
+
+#[derive(Event)]
+pub struct CardSelectionError {
+    pub card: ActivityCard,
+    pub blocking_conditions: Vec<String>,
+}
 
 #[derive(Event)]
 pub struct CutsceneEndEvent;
@@ -767,10 +770,9 @@ fn handle_card_draw(
 
 fn handle_card_selection(
     mut card_selected_events: EventReader<CardSelectedEvent>,
-    mut phase_state: ResMut<GamePhaseState>,
-    mut phase_changed_events: EventWriter<PhaseChangedEvent>,
-    mut cutscene_events: EventWriter<CutsceneStartEvent>,
-    mut card_play_attempt_events: EventWriter<CardPlayAttemptEvent>,
+    mut card_selection_success_events: EventWriter<CardSelectionSuccess>,
+    mut card_selection_error_events: EventWriter<CardSelectionError>,
+    phase_state: Res<GamePhaseState>,
     game_state: Res<GameState>,
 ) {
     for event in card_selected_events.read() {
@@ -780,14 +782,35 @@ fn handle_card_selection(
 
         let (can_play, blocking_conditions) = game_state.can_play_card(&event.0);
 
-        card_play_attempt_events.write(CardPlayAttemptEvent {
-            card: event.0.clone(),
-            can_play,
-            blocking_conditions: blocking_conditions.clone(),
-        });
+        println!(
+            "can play: {}, condition: {:?}",
+            can_play, blocking_conditions
+        );
 
         if !can_play {
             info!("Cannot play card: {:?}", blocking_conditions);
+            card_selection_error_events.write(CardSelectionError {
+                card: event.0.clone(),
+                blocking_conditions,
+            });
+            continue;
+        }
+
+        // Emit success event when card can be played
+        card_selection_success_events.write(CardSelectionSuccess(event.0.clone()));
+    }
+}
+
+fn handle_card_selection_success(
+    mut card_selection_success_events: EventReader<CardSelectionSuccess>,
+    mut phase_state: ResMut<GamePhaseState>,
+    mut phase_changed_events: EventWriter<PhaseChangedEvent>,
+    mut cutscene_events: EventWriter<CutsceneStartEvent>,
+    mut status_effect_events: EventWriter<StatusEffectAppliedEvent>,
+    mut game_state: ResMut<GameState>,
+) {
+    for event in card_selection_success_events.read() {
+        if phase_state.cutscene_active {
             continue;
         }
 
@@ -796,6 +819,11 @@ fn handle_card_selection(
         // Check if cutscene should be triggered based on card type
         let should_trigger_cutscene =
             matches!(event.0.card_type, CardType::Crisis | CardType::ComboCard);
+
+        let status_events = game_state.apply_card_effects(&event.0);
+        for status_event in status_events {
+            status_effect_events.write(status_event);
+        }
 
         if should_trigger_cutscene {
             cutscene_events.write(CutsceneStartEvent {
@@ -810,27 +838,6 @@ fn handle_card_selection(
             phase_changed_events.write(PhaseChangedEvent {
                 old_phase,
                 new_phase: phase_state.current_phase,
-            });
-        }
-    }
-}
-
-fn handle_card_play_attempt(
-    mut card_play_events: EventReader<CardPlayAttemptEvent>,
-    mut game_state: ResMut<GameState>,
-    mut status_effect_events: EventWriter<StatusEffectAppliedEvent>,
-    mut action_completed_events: EventWriter<ActionCompletedEvent>,
-) {
-    for event in card_play_events.read() {
-        if event.can_play {
-            let status_events = game_state.apply_card_effects(&event.card);
-
-            for status_event in status_events {
-                status_effect_events.write(status_event);
-            }
-
-            action_completed_events.write(ActionCompletedEvent {
-                card_played: event.card.clone(),
             });
         }
     }
@@ -989,23 +996,22 @@ fn handle_cutscene_end(
 }
 
 fn handle_character_action_phase(
+    mut commands: Commands,
     mut phase_changed_events: EventReader<PhaseChangedEvent>,
-    mut action_completed_events: EventWriter<ActionCompletedEvent>,
     phase_state: Res<GamePhaseState>,
 ) {
     for event in phase_changed_events.read() {
         if event.new_phase == GamePhase::CharacterAction {
-            info!("Entered Character Action phase");
-
-            // In a simplified version, we can automatically complete the action
-            // In a more complex version, this could wait for player input or AI decisions
             if let Some(selected_card_id) = phase_state.selected_card_id {
-                // For now, create a default card with the selected ID
-                // In a real implementation, you'd retrieve the actual card
                 let mut card = ActivityCard::default();
                 card.id = selected_card_id;
 
-                action_completed_events.write(ActionCompletedEvent { card_played: card });
+                commands.spawn_task(move || async move {
+                    AsyncWorld.sleep(10.0).await;
+                    AsyncWorld.send_event(ActionCompletedEvent { card_played: card })?;
+
+                    Ok(())
+                });
             }
         }
     }
