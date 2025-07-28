@@ -42,10 +42,10 @@ impl Plugin for GameLogicPlugin {
                     handle_card_selection_success,
                     handle_character_action_phase,
                     handle_action_completion,
+                    handle_phase_changed_turn_over,
                     handle_turn_over,
                     handle_cutscene_trigger,
                     handle_cutscene_end,
-                    handle_turn_over_completion,
                     handle_status_effect_tick,
                     handle_crisis_level_changes,
                     handle_end_game_check,
@@ -99,7 +99,6 @@ pub struct TurnOverEvent;
 
 #[derive(Event)]
 pub struct PhaseChangedEvent {
-    pub old_phase: GamePhase,
     pub new_phase: GamePhase,
 }
 
@@ -450,6 +449,17 @@ impl GameState {
         (blocking_conditions.is_empty(), blocking_conditions)
     }
 
+    pub fn filter_cards(&self, cards: &[ActivityCard]) -> Vec<ActivityCard> {
+        cards
+            .iter()
+            .filter(|card| {
+                let (can_play, _) = self.can_play_card(card);
+                can_play
+            })
+            .cloned()
+            .collect()
+    }
+
     pub fn can_afford_costs(&self, costs: &CardCosts) -> bool {
         self.sleep >= costs.sleep_cost
             && self.health >= costs.health_cost
@@ -750,7 +760,6 @@ impl GamePhaseState {
 fn handle_card_draw(
     mut card_drawn_events: EventReader<CardDrawnEvent>,
     mut phase_state: ResMut<GamePhaseState>,
-    mut phase_changed_events: EventWriter<PhaseChangedEvent>,
 ) {
     for event in card_drawn_events.read() {
         if phase_state.cutscene_active {
@@ -758,14 +767,6 @@ fn handle_card_draw(
         }
 
         phase_state.cards_drawn_count = event.card_count;
-
-        let old_phase = phase_state.current_phase;
-        phase_state.current_phase = GamePhase::CardSelection;
-
-        phase_changed_events.write(PhaseChangedEvent {
-            old_phase,
-            new_phase: phase_state.current_phase,
-        });
     }
 }
 
@@ -832,13 +833,8 @@ fn handle_card_selection_success(
                 trigger_reason: CutsceneTrigger::CardEffect,
             });
         } else {
-            // Go to CharacterAction phase
-            let old_phase = phase_state.current_phase;
-            phase_state.current_phase = GamePhase::CharacterAction;
-
             phase_changed_events.write(PhaseChangedEvent {
-                old_phase,
-                new_phase: phase_state.current_phase,
+                new_phase: GamePhase::CharacterAction,
             });
         }
     }
@@ -974,13 +970,8 @@ fn handle_cutscene_end(
         if let Some(previous_phase) = phase_state.previous_phase {
             match previous_phase {
                 GamePhase::CardSelection => {
-                    // Card was selected, go to CharacterAction
-                    let old_phase = phase_state.current_phase;
-                    phase_state.current_phase = GamePhase::CharacterAction;
-
                     phase_changed_events.write(PhaseChangedEvent {
-                        old_phase,
-                        new_phase: phase_state.current_phase,
+                        new_phase: GamePhase::CharacterAction,
                     });
                 }
                 GamePhase::CharacterAction => {
@@ -1038,42 +1029,9 @@ fn handle_action_completion(
             food_change: 0.0,
         });
 
-        let old_phase = phase_state.current_phase;
-        phase_state.current_phase = GamePhase::TurnOver;
-
         phase_changed_events.write(PhaseChangedEvent {
-            old_phase,
-            new_phase: phase_state.current_phase,
+            new_phase: GamePhase::TurnOver,
         });
-    }
-}
-
-fn handle_turn_over(
-    mut phase_changed_events: EventReader<PhaseChangedEvent>,
-    mut turn_over_events: EventWriter<TurnOverEvent>,
-    mut cutscene_events: EventWriter<CutsceneStartEvent>,
-    phase_state: Res<GamePhaseState>,
-    game_state: Res<GameState>,
-) {
-    for event in phase_changed_events.read() {
-        if event.new_phase == GamePhase::TurnOver {
-            info!(
-                "Entered TurnOver phase for turn {}",
-                phase_state.turn_number
-            );
-
-            let should_trigger_cutscene =
-                check_turn_end_cutscene_triggers(&game_state, &phase_state);
-
-            if let Some(cutscene_id) = should_trigger_cutscene {
-                cutscene_events.write(CutsceneStartEvent {
-                    cutscene_id,
-                    trigger_reason: CutsceneTrigger::TurnEnd,
-                });
-            } else {
-                turn_over_events.write(TurnOverEvent);
-            }
-        }
     }
 }
 
@@ -1108,20 +1066,48 @@ fn check_turn_end_cutscene_triggers(
     }
 }
 
-fn handle_turn_over_completion(
+fn handle_phase_changed_turn_over(
+    mut phase_changed_events: EventReader<PhaseChangedEvent>,
+    mut turn_over_events: EventWriter<TurnOverEvent>,
+    mut cutscene_events: EventWriter<CutsceneStartEvent>,
+    phase_state: Res<GamePhaseState>,
+    game_state: Res<GameState>,
+) {
+    for event in phase_changed_events.read() {
+        if event.new_phase == GamePhase::TurnOver {
+            info!(
+                "Entered TurnOver phase for turn {}",
+                phase_state.turn_number
+            );
+            let should_trigger_cutscene =
+                check_turn_end_cutscene_triggers(&game_state, &phase_state);
+            if let Some(cutscene_id) = should_trigger_cutscene {
+                cutscene_events.write(CutsceneStartEvent {
+                    cutscene_id,
+                    trigger_reason: CutsceneTrigger::TurnEnd,
+                });
+            } else {
+                turn_over_events.write(TurnOverEvent);
+            }
+        }
+    }
+}
+
+fn handle_turn_over(
     mut commands: Commands,
     mut turn_over_events: EventReader<TurnOverEvent>,
     mut phase_state: ResMut<GamePhaseState>,
-    mut ew_go_to_random_tile: EventWriter<GoToRandomTile>,
     mut game_step_events: EventWriter<GameStepEvent>,
     q_decks: Query<(Entity, &DeckArea)>,
     mut q_cards: ParamSet<(
         Query<(Entity, &Card<ActivityCard>, &CardOnTable)>,
         Query<(Entity, &Card<ActivityCard>, &Hand)>,
     )>,
-    mut ew_discard_card_to_deck: EventWriter<DiscardCardToDeck>,
+    // mut ew_discard_card_to_deck: EventWriter<DiscardCardToDeck>,
 ) {
-    for _event in turn_over_events.read() {
+    for event in turn_over_events.read() {
+        println!("Processing turn over, starting new turn");
+
         if phase_state.cutscene_active {
             continue;
         }
@@ -1129,24 +1115,16 @@ fn handle_turn_over_completion(
         if let Some((main_deck_entity, _)) = q_decks.iter().find(|(_, deck)| deck.marker == 1) {
             // Discard cards from table
             for (entity, _, _) in q_cards.p0().iter() {
-                ew_discard_card_to_deck.write(DiscardCardToDeck {
-                    card_entity: entity,
-                    deck_entity: main_deck_entity,
-                    flip_card: true,
-                });
+                commands.entity(entity).despawn();
             }
 
             // Discard cards from hand
             for (entity, _, _) in q_cards.p1().iter() {
-                ew_discard_card_to_deck.write(DiscardCardToDeck {
-                    card_entity: entity,
-                    deck_entity: main_deck_entity,
-                    flip_card: true,
-                });
+                commands.entity(entity).despawn();
             }
         }
 
-        info!("Processing turn over, starting new turn");
+        println!("Processing turn over, starting new turn");
 
         // Clear phase state from previous turn
         phase_state.selected_card_id = None;
@@ -1158,16 +1136,11 @@ fn handle_turn_over_completion(
         // Apply passive effects (time passage, resource decay, etc.)
         apply_turn_end_effects(&mut game_step_events);
 
-        let old_phase = phase_state.current_phase;
-
-        ew_go_to_random_tile.write(GoToRandomTile {});
-
         commands.spawn_task(move || async move {
             AsyncWorld.sleep(2.5).await;
 
             // Transition to card draw for new turn
             AsyncWorld.send_event(PhaseChangedEvent {
-                old_phase,
                 new_phase: GamePhase::CardDraw,
             })?;
 

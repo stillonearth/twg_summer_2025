@@ -19,6 +19,8 @@ use serde::{Deserialize, Deserializer, Serialize};
 use crate::logic::CardSelectionSuccess;
 use crate::logic::CutsceneEndEvent;
 use crate::logic::CutsceneStartEvent;
+use crate::logic::GameState;
+use crate::logic::PhaseChangedEvent;
 use crate::logic::{CardDrawnEvent, CardSelectedEvent, GamePhase, GamePhaseState};
 
 /// Plugin that handles all card-related functionality
@@ -36,8 +38,7 @@ impl Plugin for CardSystemPlugin {
             .add_systems(
                 Update,
                 (
-                    init_cards,
-                    handle_card_draw_phase,
+                    (init_deck, handle_card_draw_phase).chain(),
                     handle_card_selection_attempt,
                     handle_card_selection_success,
                     handle_cutscene_start,
@@ -55,7 +56,7 @@ pub fn handle_drag_cards_in_hand_down(
 ) {
     for event in er_drag_cards.read() {
         // Find all cards in the specified player's hand
-        for (entity, mut transform, _card, hand) in q_hand_cards.iter_mut() {
+        for (entity, transform, _card, hand) in q_hand_cards.iter_mut() {
             if hand.player == event.player {
                 let tween = Tween::new(
                     EaseFunction::CubicIn,
@@ -90,7 +91,7 @@ fn setup(
     // Deck area
     commands.spawn((
         Name::new("Deck 1 -- Play Cards"),
-        Transform::from_translation(Vec3::new(14.0, 0.0, -20.0))
+        Transform::from_translation(Vec3::new(14.0, 0.0, 8.0))
             .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
         DeckArea { marker: 1 },
         Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
@@ -123,14 +124,15 @@ fn setup(
 }
 
 /// Initialize the game by loading and rendering the activity cards deck
-fn init_cards(
+fn init_deck(
     mut ew_render_deck: EventWriter<RenderDeck<ActivityCard>>,
     q_decks: Query<(Entity, &DeckArea)>,
     activity_cards_handle: Option<Res<ActivityCardsHandle>>,
     activity_cards_assets: Res<Assets<ActivityCards>>,
-    mut has_run: Local<bool>,
+    phase_state: Res<GamePhaseState>,
+    game_state: Res<GameState>,
 ) {
-    if *has_run {
+    if phase_state.current_phase != GamePhase::CardDraw {
         return;
     }
 
@@ -140,13 +142,13 @@ fn init_cards(
     };
 
     if let Some(activity_cards) = activity_cards_assets.get(activity_cards_handle.id()) {
+        let available_cards = game_state.filter_cards(activity_cards);
+
         if let Some((deck_entity, _)) = q_decks.iter().next() {
             ew_render_deck.write(RenderDeck::<ActivityCard> {
                 deck_entity,
-                deck: activity_cards.to_vec(),
+                deck: available_cards,
             });
-
-            *has_run = true;
         }
     }
 }
@@ -158,8 +160,8 @@ fn handle_card_draw_phase(
     q_decks: Query<(Entity, &DeckArea)>,
     q_cards_on_table: Query<(Entity, &Card<ActivityCard>, &CardOnTable)>,
     mut ew_shuffle: EventWriter<DeckShuffle>,
-    mut ew_card_drawn: EventWriter<CardDrawnEvent>,
     mut last_turn: Local<u32>,
+    mut phase_changed_events: EventWriter<PhaseChangedEvent>,
 ) {
     // Only trigger when we enter the CardDraw phase
     if phase_state.current_phase != GamePhase::CardDraw {
@@ -209,6 +211,10 @@ fn handle_card_draw_phase(
         })?;
 
         Ok(())
+    });
+
+    phase_changed_events.write(PhaseChangedEvent {
+        new_phase: GamePhase::CardSelection,
     });
 }
 
