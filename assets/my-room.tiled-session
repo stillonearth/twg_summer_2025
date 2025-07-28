@@ -110,7 +110,7 @@
         "Room_Builder_Office_32x32.tsx"
     ],
     "project": "my-room.tiled-project",
-    "property.type": "llm_game::game_objects::WalkableTile",
+    "property.type": "llm_game::game_objects::Phone",
     "recentFiles": [
         "my_room.tmx",
         "/home/cwiz/code/gamedev/bevy_ecs_tiled/assets/maps/demo.tmx",

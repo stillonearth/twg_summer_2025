@@ -143,7 +143,7 @@
     "conditions": {
       "min_food": 0,
       "max_food": 80,
-      "required_objects": ["fridge"]
+      "required_objects": ["kitchen"]
     },
     "costs": {
       "sleep_cost": 0,
@@ -240,7 +240,7 @@
     "conditions": {
       "min_mental": 15,
       "min_health": 10,
-      "required_objects": ["bathroom"]
+      "required_objects": ["bath"]
     },
     "costs": {
       "sleep_cost": 0,
@@ -277,7 +277,7 @@
     "category": "hygiene",
     "conditions": {
       "min_mental": 5,
-      "required_objects": ["bathroom"]
+      "required_objects": ["bath"]
     },
     "costs": {
       "sleep_cost": 0,
@@ -344,7 +344,7 @@
     "category": "tv",
     "conditions": {
       "min_mental": 10,
-      "required_objects": ["tv"]
+      "required_objects": ["gameconsole"]
     },
     "costs": {
       "sleep_cost": 5,

@@ -6,6 +6,7 @@ use std::collections::HashMap;
 
 use crate::cards::*;
 use crate::cutscene::ScenarioHandle;
+use crate::game_objects::NavigateToObjectEvent;
 use crate::navigation::GoToRandomTile;
 
 pub struct GameLogicPlugin;
@@ -310,62 +311,74 @@ impl GameState {
 
         // Check resource requirements
         if let Some(min_sleep) = card.conditions.min_sleep
-            && self.sleep < min_sleep {
-                blocking_conditions.push(format!(
-                    "Need at least {} Sleep (have {})",
-                    min_sleep, self.sleep
-                ));
-            }
+            && self.sleep < min_sleep
+        {
+            blocking_conditions.push(format!(
+                "Need at least {} Sleep (have {})",
+                min_sleep, self.sleep
+            ));
+        }
         if let Some(max_sleep) = card.conditions.max_sleep
-            && self.sleep > max_sleep {
-                blocking_conditions.push(format!("Sleep too high (max {max_sleep})"));
-            }
+            && self.sleep > max_sleep
+        {
+            blocking_conditions.push(format!("Sleep too high (max {max_sleep})"));
+        }
         if let Some(min_health) = card.conditions.min_health
-            && self.health < min_health {
-                blocking_conditions.push(format!("Need at least {min_health} Health"));
-            }
+            && self.health < min_health
+        {
+            blocking_conditions.push(format!("Need at least {min_health} Health"));
+        }
         if let Some(max_health) = card.conditions.max_health
-            && self.health > max_health {
-                blocking_conditions.push(format!("Health too high (max {max_health})"));
-            }
+            && self.health > max_health
+        {
+            blocking_conditions.push(format!("Health too high (max {max_health})"));
+        }
         if let Some(min_mental) = card.conditions.min_mental
-            && self.mental_health < min_mental {
-                blocking_conditions.push(format!("Need at least {min_mental} Mental Health"));
-            }
+            && self.mental_health < min_mental
+        {
+            blocking_conditions.push(format!("Need at least {min_mental} Mental Health"));
+        }
         if let Some(max_mental) = card.conditions.max_mental
-            && self.mental_health > max_mental {
-                blocking_conditions.push(format!("Mental Health too high (max {max_mental})"));
-            }
+            && self.mental_health > max_mental
+        {
+            blocking_conditions.push(format!("Mental Health too high (max {max_mental})"));
+        }
         if let Some(min_food) = card.conditions.min_food
-            && self.food < min_food {
-                blocking_conditions.push(format!("Need at least {min_food} Food"));
-            }
+            && self.food < min_food
+        {
+            blocking_conditions.push(format!("Need at least {min_food} Food"));
+        }
         if let Some(max_food) = card.conditions.max_food
-            && self.food > max_food {
-                blocking_conditions.push(format!("Food too high (max {max_food})"));
-            }
+            && self.food > max_food
+        {
+            blocking_conditions.push(format!("Food too high (max {max_food})"));
+        }
 
         // Check mood requirements
         if let Some(required_mood) = &card.conditions.required_mood
-            && self.current_mood != *required_mood {
-                blocking_conditions.push(format!("Must be {required_mood:?} mood"));
-            }
+            && self.current_mood != *required_mood
+        {
+            blocking_conditions.push(format!("Must be {required_mood:?} mood"));
+        }
         if let Some(forbidden_mood) = &card.conditions.forbidden_mood
-            && self.current_mood == *forbidden_mood {
-                blocking_conditions.push(format!("Cannot be {forbidden_mood:?} mood"));
-            }
+            && self.current_mood == *forbidden_mood
+        {
+            blocking_conditions.push(format!("Cannot be {forbidden_mood:?} mood"));
+        }
 
         // Check time requirements
         if let Some(allowed_times) = &card.conditions.time_of_day
-            && !allowed_times.contains(&self.time_of_day) {
-                blocking_conditions.push(format!("Wrong time of day (need {allowed_times:?})"));
-            }
+            && !allowed_times.contains(&self.time_of_day)
+        {
+            blocking_conditions.push(format!("Wrong time of day (need {allowed_times:?})"));
+        }
 
         // Check day range
         if let Some((min_day, max_day)) = card.conditions.day_range
-            && (self.current_day < min_day || self.current_day > max_day) {
-                blocking_conditions.push(format!("Wrong day (need days {min_day}-{max_day})"));
-            }
+            && (self.current_day < min_day || self.current_day > max_day)
+        {
+            blocking_conditions.push(format!("Wrong day (need days {min_day}-{max_day})"));
+        }
 
         // Check required objects
         if let Some(required_objects) = card.conditions.required_objects.clone() {
@@ -378,21 +391,23 @@ impl GameState {
 
         // Check crisis level
         if let Some(required_crisis) = &card.conditions.crisis_level
-            && self.crisis_level != *required_crisis {
-                blocking_conditions.push(format!("Need {required_crisis:?} crisis level"));
-            }
+            && self.crisis_level != *required_crisis
+        {
+            blocking_conditions.push(format!("Need {required_crisis:?} crisis level"));
+        }
 
         // Check cooldowns
         if let Some(cooldown) = card.cooldown
-            && let Some(&last_used_turn) = self.card_cooldowns.get(&card.id) {
-                let turns_since = self.turn_number() - last_used_turn;
-                if turns_since < cooldown {
-                    blocking_conditions.push(format!(
-                        "On cooldown for {} more turns",
-                        cooldown - turns_since
-                    ));
-                }
+            && let Some(&last_used_turn) = self.card_cooldowns.get(&card.id)
+        {
+            let turns_since = self.turn_number() - last_used_turn;
+            if turns_since < cooldown {
+                blocking_conditions.push(format!(
+                    "On cooldown for {} more turns",
+                    cooldown - turns_since
+                ));
             }
+        }
 
         // Check one-time use
         if card.one_time_use && self.used_one_time_cards.contains(&card.id) {
@@ -770,10 +785,6 @@ fn handle_card_selection(
 
         let (can_play, blocking_conditions) = game_state.can_play_card(&event.0);
 
-        println!(
-            "can play: {can_play}, condition: {blocking_conditions:?}"
-        );
-
         if !can_play {
             info!("Cannot play card: {:?}", blocking_conditions);
             card_selection_error_events.write(CardSelectionError {
@@ -976,18 +987,46 @@ fn handle_cutscene_end(
 fn handle_character_action_phase(
     mut commands: Commands,
     mut phase_changed_events: EventReader<PhaseChangedEvent>,
+    mut navigation_events: EventWriter<NavigateToObjectEvent>,
     phase_state: Res<GamePhaseState>,
+    activity_cards_handle: Option<Res<ActivityCardsHandle>>,
+    activity_cards_assets: Res<Assets<ActivityCards>>,
 ) {
-    for event in phase_changed_events.read() {
-        if event.new_phase == GamePhase::CharacterAction
-            && phase_state.selected_card_id.is_some() {
-                commands.spawn_task(move || async move {
-                    AsyncWorld.sleep(3.0).await;
-                    AsyncWorld.send_event(GoToRandomTile {})?;
+    let Some(activity_cards_handle) = activity_cards_handle else {
+        warn!("ActivityCardsHandle resource not found");
+        return;
+    };
 
-                    Ok(())
-                });
+    for event in phase_changed_events.read() {
+        if event.new_phase == GamePhase::CharacterAction && phase_state.selected_card_id.is_some() {
+            if let Some(activity_cards) = activity_cards_assets.get(activity_cards_handle.id()) {
+                let selected_card = activity_cards
+                    .iter()
+                    .find(|card| card.id == phase_state.selected_card_id.unwrap())
+                    .unwrap();
+
+                if let Some(required_objects) = selected_card.conditions.required_objects.clone() {
+                    for object in required_objects {
+                        commands.spawn_task(move || async move {
+                            AsyncWorld.sleep(3.0).await;
+                            AsyncWorld.send_event(NavigateToObjectEvent {
+                                object_name: object,
+                            })?;
+
+                            Ok(())
+                        });
+                        break;
+                    }
+                } else {
+                    commands.spawn_task(move || async move {
+                        AsyncWorld.sleep(3.0).await;
+                        AsyncWorld.send_event(GoToRandomTile {})?;
+
+                        Ok(())
+                    });
+                }
             }
+        }
     }
 }
 
@@ -1087,8 +1126,6 @@ fn handle_turn_over(
     // mut ew_discard_card_to_deck: EventWriter<DiscardCardToDeck>,
 ) {
     for _ in turn_over_events.read() {
-        println!("Processing turn over, starting new turn");
-
         if phase_state.cutscene_active {
             continue;
         }
@@ -1097,8 +1134,6 @@ fn handle_turn_over(
         for (entity, _) in q_cards.p0().iter() {
             commands.entity(entity).despawn();
         }
-
-        println!("Processing turn over, starting new turn");
 
         // Clear phase state from previous turn
         phase_state.selected_card_id = None;

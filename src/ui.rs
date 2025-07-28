@@ -186,6 +186,9 @@ pub struct CharacterThoughts {
 }
 
 #[derive(Component)]
+pub struct AvatarImage;
+
+#[derive(Component)]
 pub struct ResourceBar {
     pub resource_type: ResourceType,
 }
@@ -198,9 +201,9 @@ pub struct ResourceValueText {
     pub resource_type: ResourceType,
 }
 
-fn setup_ui(mut commands: Commands) {
+fn setup_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
     spawn_left_panel(&mut commands);
-    spawn_thoughts_panel(&mut commands);
+    spawn_thoughts_panel(&mut commands, &asset_server);
 }
 
 fn spawn_left_panel(commands: &mut Commands) {
@@ -313,7 +316,7 @@ fn spawn_left_panel(commands: &mut Commands) {
         });
 }
 
-fn spawn_thoughts_panel(commands: &mut Commands) {
+fn spawn_thoughts_panel(commands: &mut Commands, asset_server: &Res<AssetServer>) {
     commands
         .spawn((
             UIRoot,
@@ -322,26 +325,58 @@ fn spawn_thoughts_panel(commands: &mut Commands) {
                 height: Val::Px(150.0),
                 position_type: PositionType::Absolute,
                 left: Val::Px(300.0),
-                top: Val::Px(20.0),
+                top: Val::Px(0.0),
                 justify_content: JustifyContent::Center,
+                flex_direction: FlexDirection::Row,
+                align_items: AlignItems::Center,
                 ..default()
             },
             Name::new("Thoughts Panel"),
         ))
         .with_children(|parent| {
+            // Avatar image container
             parent
-                .spawn((Node {
-                    width: Val::Px(900.0),
+                .spawn(Node {
+                    width: Val::Px(120.0),
+                    height: Val::Px(120.0),
+                    margin: UiRect::right(Val::Px(20.0)),
+                    border: UiRect::all(Val::Px(1.0)),
+                    ..default()
+                })
+                .insert(BorderRadius::all(Val::Px(60.0))) // Circular border
+                .insert(BorderColor(UIColors::ACCENT.with_alpha(0.3)))
+                .insert(BackgroundColor(UIColors::BACKGROUND.with_alpha(0.5)))
+                .with_children(|avatar_container| {
+                    avatar_container.spawn((
+                        ImageNode::new(asset_server.load("avatars/avatar_anxious.png")),
+                        Node {
+                            width: Val::Percent(100.0),
+                            height: Val::Percent(100.0),
+                            ..default()
+                        },
+                        BorderRadius::all(Val::Px(58.0)), // Slightly smaller radius for the image
+                        AvatarImage,
+                    ));
+                });
+
+            // Thoughts text container
+            parent
+                .spawn(Node {
+                    width: Val::Px(600.0),
                     min_height: Val::Px(80.0),
                     max_height: Val::Px(130.0),
                     padding: UiRect::all(Val::Px(16.0)),
-                    justify_content: JustifyContent::Center,
-                    align_items: AlignItems::Center,
+                    justify_content: JustifyContent::Default,
+                    align_items: AlignItems::Default,
+                    border: UiRect::all(Val::Px(1.0)),
                     ..default()
-                },))
+                })
+                // .insert(BorderRadius::all(Val::Px(8.0)))
+                // .insert(BackgroundColor(UIColors::BACKGROUND.with_alpha(0.7)))
+                // .insert(BorderColor(UIColors::ACCENT.with_alpha(0.2)))
                 .with_children(|panel| {
                     panel.spawn((
-                        Text::new("What am I thinking about..."),
+                        Text::new("A new day to survive..."),
                         TextFont {
                             font_size: 16.0,
                             ..default()
@@ -463,6 +498,8 @@ fn update_displays(
     status_effect_items_query: Query<Entity, With<StatusEffectItem>>,
     phase_state: Res<GamePhaseState>,
     game_state: Res<GameState>,
+    asset_server: Res<AssetServer>,
+    mut avatar_query: Query<&mut ImageNode, With<AvatarImage>>,
 ) {
     // Update phase display
     if phase_state.is_changed() {
@@ -478,6 +515,19 @@ fn update_displays(
 
     // Update game state displays
     if game_state.is_changed() {
+        // Update avatar based on mood
+        for mut image in avatar_query.iter_mut() {
+            let avatar_path = match game_state.current_mood {
+                Mood::Depressed => "avatars/avatar_depressed.png",
+                Mood::Anxious => "avatars/avatar_depressed.png",
+                Mood::Tired => "avatars/avatar_depressed.png",
+                Mood::Neutral => "avatars/avatar_depressed.png",
+                Mood::Content => "avatars/avatar_depressed.png",
+                Mood::Manic => "avatars/avatar_depressed.png",
+            };
+            *image = ImageNode::new(asset_server.load(avatar_path));
+        }
+
         // Time displays
         for mut text in text_queries.p2().iter_mut() {
             *text = Text::new(game_state.get_time_string());

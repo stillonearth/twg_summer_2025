@@ -29,7 +29,6 @@ pub struct AnimationIndices {
 pub enum AnimationState {
     #[default]
     Idle,
-    // Run,
 }
 
 #[derive(Clone, Default, Copy, PartialEq, Debug, Reflect)]
@@ -66,7 +65,6 @@ pub fn get_animation_indices(
     let mut first = 0;
     let mut last = 0;
 
-    // Walk animations
     if animation_type == AnimationType::Walk && animation_direction == AnimationDirection::Right {
         first = SHEET_1_COLUMNS as usize * 11 + 1;
         last = SHEET_1_COLUMNS as usize * 11 + N_FRAMES_WALK;
@@ -83,8 +81,6 @@ pub fn get_animation_indices(
         first = SHEET_1_COLUMNS as usize * 10 + 1;
         last = SHEET_1_COLUMNS as usize * 10 + N_FRAMES_WALK;
     }
-
-    // Stand animations
     if animation_type == AnimationType::Stand && animation_direction == AnimationDirection::Right {
         first = SHEET_1_COLUMNS as usize * 11;
         last = first;
@@ -112,17 +108,17 @@ pub fn animate_sprite(
     for (indices, mut timer, mut sprite) in &mut query {
         timer.tick(time.delta());
         if timer.just_finished()
-            && let Some(atlas) = &mut sprite.texture_atlas {
-                atlas.index = if (atlas.index >= indices.last) || (atlas.index < indices.first) {
-                    indices.first
-                } else {
-                    atlas.index + 1
-                };
-            }
+            && let Some(atlas) = &mut sprite.texture_atlas
+        {
+            atlas.index = if (atlas.index >= indices.last) || (atlas.index < indices.first) {
+                indices.first
+            } else {
+                atlas.index + 1
+            };
+        }
     }
 }
 
-// System to update animation indices when character animation changes
 pub fn update_animation_indices(
     mut query: Query<(&CharacterAnimation, &mut AnimationIndices), Changed<CharacterAnimation>>,
 ) {

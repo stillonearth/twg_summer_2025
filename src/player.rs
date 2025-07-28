@@ -1,7 +1,5 @@
 use crate::cards::ActivityCard;
-use crate::logic::{
-    ActionCompletedEvent, CutsceneEndEvent, CutsceneStartEvent, GamePhaseState,
-};
+use crate::logic::{ActionCompletedEvent, CutsceneEndEvent, CutsceneStartEvent, GamePhaseState};
 use crate::navigation::{GridPos, MovePlayerCommand, TileSize};
 use crate::sprites::{
     get_animation_indices, AnimatedCharacterSprite, AnimatedCharacterType, AnimationDirection,
@@ -65,11 +63,6 @@ pub fn move_player_from_command(
             player_movement.path = path;
             player_movement.current_target_index = 0;
             player_movement.is_moving = !player_movement.path.is_empty();
-
-            println!(
-                "Player received movement command with {} waypoints",
-                player_movement.path.len()
-            );
         }
     }
 }
@@ -125,9 +118,6 @@ pub fn move_player_along_path(
 
                 // Send the destination reached event
                 destination_events.write(PlayerDestinationReachedEvent {});
-
-                println!("Player reached destination at {current_target:?}");
-
                 continue;
             }
         }
@@ -236,10 +226,10 @@ pub fn handle_player_destination_reached(
             && let Some(card) = q_cards
                 .iter()
                 .find(|(_, card)| card.data.id == selected_card_id)
-            {
-                ew_action_completed.write(ActionCompletedEvent {
-                    card_played: card.1.data.clone(),
-                });
-            }
+        {
+            ew_action_completed.write(ActionCompletedEvent {
+                card_played: card.1.data.clone(),
+            });
+        }
     }
 }

@@ -181,7 +181,6 @@ fn handle_card_draw_phase(
 
     if cards_to_draw <= 0 {
         warn!("No cards to draw, table is full");
-        println!("exit 2");
         return;
     }
 
@@ -266,10 +265,7 @@ pub fn handle_card_selection_success(
         let selected_card_entity = q_cards
             .p1()
             .iter()
-            .find(|(_, card, _)| {
-                println!("card id: {} | {}", card.data.id, event.0.id);
-                card.data.id == event.0.id
-            })
+            .find(|(_, card, _)| card.data.id == event.0.id)
             .unwrap()
             .0;
 

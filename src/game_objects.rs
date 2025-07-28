@@ -9,7 +9,6 @@ pub struct GameObjectsPlugin;
 // Events
 #[derive(Event)]
 pub struct NavigateToObjectEvent {
-    pub object_position: Vec2,
     pub object_name: String,
 }
 
@@ -94,76 +93,13 @@ impl GameObjectRegistry {
     }
 }
 
-// Macro to generate setup systems
-macro_rules! generate_setup_systems {
-    ($($component:ident),+) => {
-        $(
-            paste::paste! {
-                pub fn [<setup_ $component:lower _hoverable>](
-                    commands: Commands,
-                    query: Query<Entity, With<$component>>,
-                    has_run: Local<bool>,
-                ) {
-                    setup_hoverable::<$component>(commands, query, has_run);
-                }
-
-                pub fn [<setup_ $component:lower _clickable>](
-                    commands: Commands,
-                    query: Query<Entity, (With<$component>, Without<ClickNavigable>)>,
-                ) {
-                    setup_object_clickable::<$component>(commands, query);
-                }
-            }
-        )+
-    };
-}
-
-// Generate all setup systems
-generate_setup_systems!(
-    Bed,
-    Bath,
-    Kitchen,
-    Mirror,
-    ComputerDesk,
-    Couch,
-    WaterBottle,
-    Toilet,
-    Sink,
-    Phone,
-    GameConsole
-);
-
 impl Plugin for GameObjectsPlugin {
     fn build(&self, app: &mut App) {
         GameObjectRegistry::register_types(app);
 
         app.add_event::<NavigateToObjectEvent>().add_systems(
             Update,
-            (
-                // Hoverable systems
-                // setup_bed_hoverable,
-                // setup_bath_hoverable,
-                // setup_kitchen_hoverable,
-                // setup_toilet_hoverable,
-                // setup_sink_hoverable,
-                // setup_mirror_hoverable,
-                // setup_computerdesk_hoverable,
-                // setup_couch_hoverable,
-                // setup_waterbottle_hoverable,
-                // // Clickable systems
-                // setup_bed_clickable,
-                // setup_bath_clickable,
-                // setup_kitchen_clickable,
-                // setup_toilet_clickable,
-                // setup_sink_clickable,
-                // setup_mirror_clickable,
-                // setup_computerdesk_clickable,
-                // setup_couch_clickable,
-                // setup_waterbottle_clickable,
-                // Cleanup and navigation
-                cleanup_orphaned_tooltips,
-                handle_object_navigation_events,
-            ),
+            (cleanup_orphaned_tooltips, handle_object_navigation_events),
         );
     }
 }
@@ -198,18 +134,6 @@ pub fn setup_hoverable<T: NamedComponent>(
     }
 }
 
-pub fn setup_object_clickable<T: NamedComponent>(
-    mut commands: Commands,
-    query: Query<Entity, (With<T>, Without<ClickNavigable>)>,
-) {
-    for entity in query.iter() {
-        commands
-            .entity(entity)
-            .insert(ClickNavigable)
-            .observe(navigate_to_object_on_click::<T>);
-    }
-}
-
 // Generic observer functions
 pub fn recolor_same_component_on<T: NamedComponent, E: Debug + Clone + Reflect>(
     color: Color,
@@ -227,23 +151,6 @@ pub fn recolor_same_component_on<T: NamedComponent, E: Debug + Clone + Reflect>(
             }
         }
     }
-}
-
-pub fn navigate_to_object_on_click<T: NamedComponent>(
-    trigger: Trigger<Pointer<Click>>,
-    mut navigation_events: EventWriter<NavigateToObjectEvent>,
-    target_query: Query<(&T, &Transform)>,
-) {
-    let Ok((target_component, target_transform)) = target_query.get(trigger.target()) else {
-        return;
-    };
-
-    navigation_events.write(NavigateToObjectEvent {
-        object_position: target_transform.translation.truncate(),
-        object_name: target_component.name().to_string(),
-    });
-
-    info!("Clicked on {}, navigating player", target_component.name());
 }
 
 pub fn show_tooltip_on_hover<T: NamedComponent>(
@@ -331,6 +238,14 @@ pub fn handle_object_navigation_events(
     walkable_tiles_query: Query<&Transform, (With<WalkableTile>, Without<PlayerMarker>)>,
     navigation_grid: Res<NavigationGrid>,
     tile_size: Res<TileSize>,
+    mut q_objects: ParamSet<(
+        Query<(Entity, &Transform, &Bed)>,
+        Query<(Entity, &Transform, &Kitchen)>,
+        Query<(Entity, &Transform, &ComputerDesk)>,
+        Query<(Entity, &Transform, &Sink)>,
+        Query<(Entity, &Transform, &GameConsole)>,
+        Query<(Entity, &Transform, &Phone)>,
+    )>,
 ) {
     for event in object_nav_events.read() {
         let Ok(player_transform) = player_query.single() else {
@@ -339,25 +254,100 @@ pub fn handle_object_navigation_events(
 
         let player_grid_pos =
             navigation_grid.world_to_grid(player_transform.translation, tile_size.0);
-        let object_position = event.object_position;
 
-        if let Some(target_grid_pos) = find_nearest_walkable_tile(
-            object_position,
-            &walkable_tiles_query,
-            &navigation_grid,
-            &tile_size,
-        ) {
-            tile_nav_events.write(NavigateToTile {
-                from: player_grid_pos,
-                to: target_grid_pos,
-            });
+        if let Some(object_position) = match event.object_name.as_ref() {
+            "bed" => {
+                let beds = q_objects.p0();
+                let transforms: Vec<Vec3> = beds
+                    .iter()
+                    .map(|(_, transform, _)| transform.translation)
+                    .collect();
+                let mean_translation = transforms.iter().sum::<Vec3>() / transforms.len() as f32;
+                Some(mean_translation)
+            }
+            "kitchen" => {
+                let kitchens = q_objects.p1();
+                let transforms: Vec<Vec3> = kitchens
+                    .iter()
+                    .map(|(_, transform, _)| transform.translation)
+                    .collect();
+                let mean_translation = transforms.iter().sum::<Vec3>() / transforms.len() as f32;
+                Some(mean_translation)
+            }
+            "computer" => {
+                let computerdesks = q_objects.p2();
+                let transforms: Vec<Vec3> = computerdesks
+                    .iter()
+                    .map(|(_, transform, _)| transform.translation)
+                    .collect();
+                let mean_translation = transforms.iter().sum::<Vec3>() / transforms.len() as f32;
+                Some(mean_translation)
+            }
+            "fridge" => {
+                let kitchens = q_objects.p1();
+                let transforms: Vec<Vec3> = kitchens
+                    .iter()
+                    .map(|(_, transform, _)| transform.translation)
+                    .collect();
+                let mean_translation = transforms.iter().sum::<Vec3>() / transforms.len() as f32;
+                Some(mean_translation)
+            }
+            "phone" => {
+                let phones = q_objects.p5();
+                let transforms: Vec<Vec3> = phones
+                    .iter()
+                    .map(|(_, transform, _)| transform.translation)
+                    .collect();
+                let mean_translation = transforms.iter().sum::<Vec3>() / transforms.len() as f32;
+                Some(mean_translation)
+            }
+            "bathroom" => {
+                let sinks = q_objects.p3();
+                let transforms: Vec<Vec3> = sinks
+                    .iter()
+                    .map(|(_, transform, _)| transform.translation)
+                    .collect();
+                let mean_translation = transforms.iter().sum::<Vec3>() / transforms.len() as f32;
+                Some(mean_translation)
+            }
+            "tv" => {
+                let gameconsoles = q_objects.p4();
+                let transforms: Vec<Vec3> = gameconsoles
+                    .iter()
+                    .map(|(_, transform, _)| transform.translation)
+                    .collect();
+                let mean_translation = transforms.iter().sum::<Vec3>() / transforms.len() as f32;
+                Some(mean_translation)
+            }
+            "gameconsole" => {
+                let gameconsoles = q_objects.p4();
+                let transforms: Vec<Vec3> = gameconsoles
+                    .iter()
+                    .map(|(_, transform, _)| transform.translation)
+                    .collect();
+                let mean_translation = transforms.iter().sum::<Vec3>() / transforms.len() as f32;
+                Some(mean_translation)
+            }
+            _ => None,
+        } {
+            if let Some(target_grid_pos) = find_nearest_walkable_tile(
+                object_position.truncate(),
+                &walkable_tiles_query,
+                &navigation_grid,
+                &tile_size,
+            ) {
+                tile_nav_events.write(NavigateToTile {
+                    from: player_grid_pos,
+                    to: target_grid_pos,
+                });
 
-            info!(
-                "Moving from {:?} to nearest walkable tile {:?} for object: {}",
-                player_grid_pos, target_grid_pos, event.object_name
-            );
-        } else {
-            warn!("No walkable tiles found near object: {}", event.object_name);
+                info!(
+                    "Moving from {:?} to nearest walkable tile {:?} for object: {}",
+                    player_grid_pos, target_grid_pos, event.object_name
+                );
+            } else {
+                warn!("No walkable tiles found near object: {}", event.object_name);
+            }
         }
     }
 }

@@ -44,7 +44,7 @@ fn main() {
         })
         .add_plugins((
             DefaultPlugins
-                // .set(ImagePlugin::default_nearest())
+                .set(ImagePlugin::default_nearest())
                 .set(WindowPlugin {
                     primary_window: Some(Window {
                         resizable: false,

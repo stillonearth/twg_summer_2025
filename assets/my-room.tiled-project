@@ -7757,9 +7757,21 @@
                     "type": "class",
                     "value": {
                         "matrix3": {
-                            "x_axis": null,
-                            "y_axis": null,
-                            "z_axis": null
+                            "x_axis": {
+                                "x": 1,
+                                "y": 0,
+                                "z": 0
+                            },
+                            "y_axis": {
+                                "x": 0,
+                                "y": 1,
+                                "z": 0
+                            },
+                            "z_axis": {
+                                "x": 0,
+                                "y": 0,
+                                "z": 1
+                            }
                         },
                         "translation": {
                             "x": 0,
@@ -9592,14 +9604,7 @@
                     "name": ":variant",
                     "propertyType": "bevy_winit::cursor::CursorIcon:::Variant",
                     "type": "string",
-                    "value": "Custom"
-                },
-                {
-                    "name": "Custom",
-                    "propertyType": "bevy_winit::cursor::CursorIcon::Custom",
-                    "type": "class",
-                    "value": {
-                    }
+                    "value": "System"
                 },
                 {
                     "name": "System",
@@ -9621,7 +9626,6 @@
             "storageType": "string",
             "type": "enum",
             "values": [
-                "Custom",
                 "System"
             ],
             "valuesAsFlags": false
@@ -11182,58 +11186,6 @@
         {
             "color": "#ff000000",
             "drawFill": true,
-            "id": 531,
-            "members": [
-                {
-                    "name": "name",
-                    "type": "string",
-                    "value": ""
-                },
-                {
-                    "name": "wall_type",
-                    "propertyType": "llm_game::game_objects::WallType",
-                    "type": "class",
-                    "value": {
-                    }
-                }
-            ],
-            "name": "llm_game::game_objects::WallProperties",
-            "type": "class",
-            "useAs": [
-                "property"
-            ]
-        },
-        {
-            "color": "#ff000000",
-            "drawFill": true,
-            "id": 532,
-            "members": [
-                {
-                    "name": ":variant",
-                    "propertyType": "llm_game::game_objects::WallType:::Variant",
-                    "type": "string",
-                    "value": "Stone"
-                }
-            ],
-            "name": "llm_game::game_objects::WallType",
-            "type": "class",
-            "useAs": [
-                "property"
-            ]
-        },
-        {
-            "id": 533,
-            "name": "llm_game::game_objects::WallType:::Variant",
-            "storageType": "string",
-            "type": "enum",
-            "values": [
-                "Stone"
-            ],
-            "valuesAsFlags": false
-        },
-        {
-            "color": "#ff000000",
-            "drawFill": true,
             "id": 536,
             "members": [
                 {
@@ -11336,6 +11288,75 @@
         {
             "color": "#ff000000",
             "drawFill": true,
+            "id": 545,
+            "members": [
+                {
+                    "name": "name",
+                    "type": "string",
+                    "value": ""
+                }
+            ],
+            "name": "llm_game::game_objects::WalkableTile",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 531,
+            "members": [
+                {
+                    "name": "name",
+                    "type": "string",
+                    "value": ""
+                },
+                {
+                    "name": "wall_type",
+                    "propertyType": "llm_game::game_objects::WallType",
+                    "type": "class",
+                    "value": {
+                    }
+                }
+            ],
+            "name": "llm_game::game_objects::WallProperties",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 532,
+            "members": [
+                {
+                    "name": ":variant",
+                    "propertyType": "llm_game::game_objects::WallType:::Variant",
+                    "type": "string",
+                    "value": "Stone"
+                }
+            ],
+            "name": "llm_game::game_objects::WallType",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "id": 533,
+            "name": "llm_game::game_objects::WallType:::Variant",
+            "storageType": "string",
+            "type": "enum",
+            "values": [
+                "Stone"
+            ],
+            "valuesAsFlags": false
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
             "id": 542,
             "members": [
                 {
@@ -11353,7 +11374,95 @@
         {
             "color": "#ff000000",
             "drawFill": true,
-            "id": 545,
+            "id": 546,
+            "members": [
+                {
+                    "name": "ray_cast_visibility",
+                    "propertyType": "bevy_picking::mesh_picking::ray_cast::RayCastVisibility",
+                    "type": "class",
+                    "value": {
+                    }
+                },
+                {
+                    "name": "require_markers",
+                    "type": "bool",
+                    "value": false
+                }
+            ],
+            "name": "bevy_picking::mesh_picking::MeshPickingSettings",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 547,
+            "members": [
+                {
+                    "name": ":variant",
+                    "propertyType": "bevy_picking::mesh_picking::ray_cast::RayCastVisibility:::Variant",
+                    "type": "string",
+                    "value": "Any"
+                }
+            ],
+            "name": "bevy_picking::mesh_picking::ray_cast::RayCastVisibility",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "id": 548,
+            "name": "bevy_picking::mesh_picking::ray_cast::RayCastVisibility:::Variant",
+            "storageType": "string",
+            "type": "enum",
+            "values": [
+                "Any",
+                "Visible",
+                "VisibleInView"
+            ],
+            "valuesAsFlags": false
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 549,
+            "members": [
+                {
+                    "name": "0",
+                    "type": "file",
+                    "value": ""
+                }
+            ],
+            "name": "bevy_picking::mesh_picking::ray_cast::SimplifiedMesh",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 550,
+            "members": [
+                {
+                    "name": "0",
+                    "type": "int",
+                    "value": 0
+                }
+            ],
+            "name": "bevy_ui::ui_node::GlobalZIndex",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 551,
             "members": [
                 {
                     "name": "name",
@@ -11361,7 +11470,24 @@
                     "value": ""
                 }
             ],
-            "name": "llm_game::game_objects::WalkableTile",
+            "name": "llm_game::game_objects::GameConsole",
+            "type": "class",
+            "useAs": [
+                "property"
+            ]
+        },
+        {
+            "color": "#ff000000",
+            "drawFill": true,
+            "id": 552,
+            "members": [
+                {
+                    "name": "name",
+                    "type": "string",
+                    "value": ""
+                }
+            ],
+            "name": "llm_game::game_objects::Phone",
             "type": "class",
             "useAs": [
                 "property"

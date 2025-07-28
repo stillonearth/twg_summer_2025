@@ -990,9 +990,33 @@
   <object id="433" gid="683" x="160" y="320" width="32" height="32"/>
   <object id="434" gid="684" x="192" y="320" width="32" height="32"/>
   <object id="435" gid="685" x="224" y="320" width="32" height="32"/>
-  <object id="436" gid="667" x="160" y="352" width="32" height="32"/>
-  <object id="437" gid="651" x="160" y="320" width="32" height="32"/>
-  <object id="442" gid="825" x="79" y="412" width="32" height="32"/>
+  <object id="436" gid="667" x="160" y="352" width="32" height="32">
+   <properties>
+    <property name="gameconsoile" type="class" propertytype="llm_game::game_objects::GameConsole">
+     <properties>
+      <property name="name" value="gameconsole"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="437" gid="651" x="160" y="320" width="32" height="32">
+   <properties>
+    <property name="gameconsoile" type="class" propertytype="llm_game::game_objects::GameConsole">
+     <properties>
+      <property name="name" value="gameconsole"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="442" gid="825" x="79" y="412" width="32" height="32">
+   <properties>
+    <property name="phone" type="class" propertytype="llm_game::game_objects::Phone">
+     <properties>
+      <property name="name" value="phone"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
   <object id="444" gid="809" x="79" y="380" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="13" name="Navigation">

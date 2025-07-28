@@ -243,7 +243,6 @@ fn handle_go_to_random_tile(
 ) {
     for _event in random_events.read() {
         let Ok(player_transform) = player_query.single() else {
-            println!("No player found for random navigation");
             continue;
         };
 
@@ -254,14 +253,37 @@ fn handle_go_to_random_tile(
         if let Some(random_tile) =
             navigation_grid.get_random_walkable_tile_excluding(player_grid_pos)
         {
-            println!("Moving player to random tile: {random_tile:?}");
-
             nav_events.write(NavigateToTile {
                 from: player_grid_pos,
                 to: random_tile,
             });
-        } else {
-            println!("No valid random tiles available for navigation");
+        }
+    }
+}
+
+fn handle_go_to_tile(
+    mut random_events: EventReader<GoToRandomTile>,
+    mut nav_events: EventWriter<NavigateToTile>,
+    player_query: Query<&Transform, With<PlayerMarker>>,
+    navigation_grid: Res<NavigationGrid>,
+    tile_size: Res<TileSize>,
+) {
+    for _event in random_events.read() {
+        let Ok(player_transform) = player_query.single() else {
+            continue;
+        };
+
+        let player_grid_pos =
+            navigation_grid.world_to_grid(player_transform.translation, tile_size.0);
+
+        // Get a random walkable tile that's different from current position
+        if let Some(random_tile) =
+            navigation_grid.get_random_walkable_tile_excluding(player_grid_pos)
+        {
+            nav_events.write(NavigateToTile {
+                from: player_grid_pos,
+                to: random_tile,
+            });
         }
     }
 }
@@ -286,37 +308,7 @@ fn setup_navigation_grid(
         nav_grid.add_walkable_tile(grid_pos.0, grid_pos.1);
     }
 
-    println!(
-        "Navigation grid initialized with {} walkable tiles",
-        nav_grid.walkable.len()
-    );
     *initialized = true;
-}
-
-fn handle_tile_click(
-    trigger: Trigger<Pointer<Click>>,
-    mut nav_events: EventWriter<NavigateToTile>,
-    player_query: Query<&Transform, (With<PlayerMarker>, Without<WalkableTile>)>,
-    tile_query: Query<&Transform, (With<WalkableTile>, Without<PlayerMarker>)>,
-    navigation_grid: Res<NavigationGrid>,
-    tile_size: Res<TileSize>,
-) {
-    let Ok(player_transform) = player_query.single() else {
-        return;
-    };
-
-    let Ok(tile_transform) = tile_query.get(trigger.target) else {
-        return;
-    };
-
-    let player_grid_pos = navigation_grid.world_to_grid(player_transform.translation, tile_size.0);
-    let target_grid_pos = navigation_grid.world_to_grid(tile_transform.translation, tile_size.0);
-
-    // Use EventWriter instead of commands.trigger
-    nav_events.write(NavigateToTile {
-        from: player_grid_pos,
-        to: target_grid_pos,
-    });
 }
 
 fn handle_navigation_event(
@@ -325,20 +317,13 @@ fn handle_navigation_event(
     navigation_grid: Res<NavigationGrid>,
 ) {
     for event in nav_events.read() {
-        println!("Pathfinding from {:?} to {:?}", event.from, event.to);
-
         if let Some(path) = navigation_grid.find_path(event.from, event.to) {
-            println!("Path found with {} steps: {:?}", path.len(), path);
-
             mov_cmds.write(MovePlayerCommand { path });
-        } else {
-            println!("No path found!");
         }
     }
 }
 
 pub fn setup_walkable_tile_handlers(
-    commands: Commands,
     query: Query<Entity, With<WalkableTile>>,
     mut sprite_query: Query<&mut Sprite>,
     mut has_run: Local<bool>,
@@ -347,11 +332,6 @@ pub fn setup_walkable_tile_handlers(
         return;
     }
     for entity in query.iter() {
-        // commands
-        // .entity(entity)
-        // .insert(Pickable::default())
-        // .observe(handle_tile_click);
-
         // Make sprite transparent
         if let Ok(mut sprite) = sprite_query.get_mut(entity) {
             sprite.color = Color::NONE; // or Color::rgba(0.0, 0.0, 0.0, 0.0)
