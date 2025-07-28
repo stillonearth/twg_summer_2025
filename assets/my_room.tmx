@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="22" height="14" tilewidth="32" tileheight="32" infinite="0" nextlayerid="14" nextobjectid="429">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="22" height="14" tilewidth="32" tileheight="32" infinite="0" nextlayerid="14" nextobjectid="445">
  <tileset firstgid="1" source="Room_Builder_Office_32x32.tsx"/>
  <tileset firstgid="225" source="Modern_Office_Shadowless_32x32.tsx"/>
  <tileset firstgid="1073" source="4x-2x.tsx"/>
@@ -112,11 +112,6 @@
    </properties>
   </object>
   <object id="41" x="32" y="0" width="320"/>
-  <object id="45" x="32" y="416" width="672" height="32">
-   <properties>
-    <property name="bottom wall" type="class" propertytype="llm_game::game_objects::WallProperties"/>
-   </properties>
-  </object>
   <object id="47" x="304" y="160" width="16" height="256">
    <properties>
     <property name="wall" type="class" propertytype="llm_game::game_objects::WallProperties">
@@ -881,7 +876,7 @@
     </property>
    </properties>
   </object>
-  <object id="149" gid="2857" x="112" y="416" width="32" height="32">
+  <object id="149" gid="2857" x="160" y="416" width="32" height="32">
    <properties>
     <property name="couch" type="class" propertytype="llm_game::game_objects::Couch">
      <properties>
@@ -890,16 +885,7 @@
     </property>
    </properties>
   </object>
-  <object id="150" gid="2858" x="144" y="416" width="32" height="32">
-   <properties>
-    <property name="couch" type="class" propertytype="llm_game::game_objects::Couch">
-     <properties>
-      <property name="name" value="couch"/>
-     </properties>
-    </property>
-   </properties>
-  </object>
-  <object id="151" gid="2859" x="176" y="416" width="32" height="32">
+  <object id="150" gid="2858" x="192" y="416" width="32" height="32">
    <properties>
     <property name="couch" type="class" propertytype="llm_game::game_objects::Couch">
      <properties>
@@ -944,7 +930,7 @@
     </property>
    </properties>
   </object>
-  <object id="156" gid="2845" x="176" y="384" width="32" height="32">
+  <object id="157" gid="2845" x="192" y="384" width="32" height="32">
    <properties>
     <property name="couch" type="class" propertytype="llm_game::game_objects::Couch">
      <properties>
@@ -953,16 +939,7 @@
     </property>
    </properties>
   </object>
-  <object id="157" gid="2845" x="144" y="384" width="32" height="32">
-   <properties>
-    <property name="couch" type="class" propertytype="llm_game::game_objects::Couch">
-     <properties>
-      <property name="name" value="couch"/>
-     </properties>
-    </property>
-   </properties>
-  </object>
-  <object id="158" gid="2844" x="112" y="384" width="32" height="32">
+  <object id="158" gid="2844" x="160" y="384" width="32" height="32">
    <properties>
     <property name="couch" type="class" propertytype="llm_game::game_objects::Couch">
      <properties>
@@ -1007,6 +984,16 @@
     </property>
    </properties>
   </object>
+  <object id="430" gid="699" x="160" y="352" width="32" height="32"/>
+  <object id="431" gid="700" x="192" y="352" width="32" height="32"/>
+  <object id="432" gid="701" x="224" y="352" width="32" height="32"/>
+  <object id="433" gid="683" x="160" y="320" width="32" height="32"/>
+  <object id="434" gid="684" x="192" y="320" width="32" height="32"/>
+  <object id="435" gid="685" x="224" y="320" width="32" height="32"/>
+  <object id="436" gid="667" x="160" y="352" width="32" height="32"/>
+  <object id="437" gid="651" x="160" y="320" width="32" height="32"/>
+  <object id="442" gid="825" x="79" y="412" width="32" height="32"/>
+  <object id="444" gid="809" x="79" y="380" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="13" name="Navigation">
   <object id="299" gid="169" x="352" y="32" width="32" height="32">
@@ -1271,60 +1258,6 @@
    </properties>
   </object>
   <object id="334" gid="169" x="128" y="352" width="32" height="32">
-   <properties>
-    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
-     <properties>
-      <property name="name" value="~~"/>
-     </properties>
-    </property>
-   </properties>
-  </object>
-  <object id="335" gid="169" x="160" y="352" width="32" height="32">
-   <properties>
-    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
-     <properties>
-      <property name="name" value="~~"/>
-     </properties>
-    </property>
-   </properties>
-  </object>
-  <object id="336" gid="169" x="192" y="352" width="32" height="32">
-   <properties>
-    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
-     <properties>
-      <property name="name" value="~~"/>
-     </properties>
-    </property>
-   </properties>
-  </object>
-  <object id="337" gid="169" x="224" y="352" width="32" height="32">
-   <properties>
-    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
-     <properties>
-      <property name="name" value="~~"/>
-     </properties>
-    </property>
-   </properties>
-  </object>
-  <object id="338" gid="169" x="224" y="320" width="32" height="32">
-   <properties>
-    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
-     <properties>
-      <property name="name" value="~~"/>
-     </properties>
-    </property>
-   </properties>
-  </object>
-  <object id="339" gid="169" x="192" y="320" width="32" height="32">
-   <properties>
-    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
-     <properties>
-      <property name="name" value="~~"/>
-     </properties>
-    </property>
-   </properties>
-  </object>
-  <object id="340" gid="169" x="160" y="320" width="32" height="32">
    <properties>
     <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
      <properties>
@@ -2063,6 +1996,24 @@
    </properties>
   </object>
   <object id="428" gid="169" x="448" y="160" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="438" gid="169" x="128" y="384" width="32" height="32">
+   <properties>
+    <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
+     <properties>
+      <property name="name" value="~~"/>
+     </properties>
+    </property>
+   </properties>
+  </object>
+  <object id="439" gid="169" x="128" y="416" width="32" height="32">
    <properties>
     <property name="walkable" type="class" propertytype="llm_game::game_objects::WalkableTile">
      <properties>

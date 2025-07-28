@@ -68,6 +68,8 @@ define_game_object!(Couch);
 define_game_object!(WaterBottle);
 define_game_object!(Toilet);
 define_game_object!(Sink);
+define_game_object!(GameConsole);
+define_game_object!(Phone);
 define_game_object!(WalkableTile);
 
 // Registry of all game object types for automation
@@ -86,6 +88,8 @@ impl GameObjectRegistry {
             .register_type::<WaterBottle>()
             .register_type::<Toilet>()
             .register_type::<Sink>()
+            .register_type::<GameConsole>()
+            .register_type::<Phone>()
             .register_type::<WalkableTile>();
     }
 }
@@ -124,7 +128,9 @@ generate_setup_systems!(
     Couch,
     WaterBottle,
     Toilet,
-    Sink
+    Sink,
+    Phone,
+    GameConsole
 );
 
 impl Plugin for GameObjectsPlugin {
@@ -215,9 +221,10 @@ pub fn recolor_same_component_on<T: NamedComponent, E: Debug + Clone + Reflect>(
 
         for (entity, component) in component_query.iter() {
             if component.name() == target_component.name()
-                && let Ok(mut sprite) = sprites.get_mut(entity) {
-                    sprite.color = color;
-                }
+                && let Ok(mut sprite) = sprites.get_mut(entity)
+            {
+                sprite.color = color;
+            }
         }
     }
 }
@@ -415,9 +422,8 @@ pub fn cleanup_orphaned_tooltips(
                 .any(|comp| comp.name() == tooltip.target_name)
             || sinks.iter().any(|comp| comp.name() == tooltip.target_name);
 
-        if !name_exists
-            && let Ok(mut ec) = commands.get_entity(tooltip_entity) {
-                ec.despawn();
-            }
+        if !name_exists && let Ok(mut ec) = commands.get_entity(tooltip_entity) {
+            ec.despawn();
+        }
     }
 }
