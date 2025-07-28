@@ -1,5 +1,5 @@
 use crate::{
-    cards::{Mood, ResourceType},
+    cards::{CrisisLevel, Mood, ResourceType},
     logic::{CutsceneEndEvent, CutsceneStartEvent, GamePhase, GamePhaseState, GameState},
     thoughts::ThoughtGeneratedEvent,
 };
@@ -62,12 +62,24 @@ impl UIColors {
         Color::srgb(0.9, 0.3, 0.6), // Manic
     ];
 
+    const CRISIS_COLORS: [Color; 5] = [
+        Color::srgb(0.4, 0.7, 0.5), // None - Green
+        Color::srgb(0.9, 0.8, 0.3), // Mild - Yellow
+        Color::srgb(0.9, 0.6, 0.2), // Moderate - Orange
+        Color::srgb(0.9, 0.4, 0.2), // Severe - Red-Orange
+        Color::srgb(0.9, 0.2, 0.2), // Critical - Red
+    ];
+
     pub fn mood_color(mood: &Mood) -> Color {
         Self::MOOD_COLORS[*mood as usize]
     }
 
     pub fn phase_color(phase: &GamePhase) -> Color {
         Self::PHASE_COLORS[*phase as usize]
+    }
+
+    pub fn crisis_color(crisis_level: &CrisisLevel) -> Color {
+        Self::CRISIS_COLORS[*crisis_level as usize]
     }
 
     pub fn resource_colors(resource_type: ResourceType) -> (Color, Color) {
@@ -107,11 +119,12 @@ pub struct DayDisplay;
 pub struct MoodDisplay;
 
 #[derive(Component)]
-#[derive(Default)]
+pub struct CrisisDisplay;
+
+#[derive(Component, Default)]
 pub struct CharacterThoughts {
     pub clear_timer: Option<Timer>,
 }
-
 
 #[derive(Component)]
 pub struct ResourceBar {
@@ -183,6 +196,15 @@ fn spawn_left_panel(commands: &mut Commands) {
                         18.0,
                         UIColors::TEXT,
                         Some(MoodDisplay),
+                    );
+
+                    // Crisis Level
+                    spawn_text_section(
+                        panel,
+                        "Crisis: None",
+                        16.0,
+                        UIColors::CRISIS_COLORS[0],
+                        Some(CrisisDisplay),
                     );
 
                     // Resource bars
@@ -342,6 +364,7 @@ fn update_displays(
         Query<&mut Text, (With<TimeDisplay>, Without<DayDisplay>)>,
         Query<&mut Text, (With<DayDisplay>, Without<TimeDisplay>)>,
         Query<(&mut Text, &mut TextColor), With<MoodDisplay>>,
+        Query<(&mut Text, &mut TextColor), With<CrisisDisplay>>,
         Query<(&mut Text, &ResourceValueText)>,
     )>,
     mut fill_query: Query<
@@ -388,8 +411,21 @@ fn update_displays(
             *color = TextColor(UIColors::mood_color(&game_state.current_mood));
         }
 
+        // Crisis display
+        for (mut text, mut color) in text_queries.p5().iter_mut() {
+            let crisis_name = match game_state.crisis_level {
+                CrisisLevel::None => "None",
+                CrisisLevel::Mild => "Mild",
+                CrisisLevel::Moderate => "Moderate",
+                CrisisLevel::Severe => "Severe",
+                CrisisLevel::Critical => "Critical",
+            };
+            *text = Text::new(format!("Crisis: {crisis_name}"));
+            *color = TextColor(UIColors::crisis_color(&game_state.crisis_level));
+        }
+
         // Resource value text
-        for (mut text, resource_value) in text_queries.p5().iter_mut() {
+        for (mut text, resource_value) in text_queries.p6().iter_mut() {
             let value = game_state.get_resource_value(resource_value.resource_type);
             *text = Text::new(format!("{value:.0}/100"));
         }

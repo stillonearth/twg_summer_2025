@@ -5,9 +5,7 @@ use bevy::prelude::*;
 use bevy_defer::AsyncCommandsExtension;
 use bevy_defer::AsyncWorld;
 use bevy_la_mesa::events::CardHoverable;
-use bevy_la_mesa::events::{
-    CardPress, DeckShuffle, DrawToHand, PlaceCardOnTable, RenderDeck,
-};
+use bevy_la_mesa::events::{CardPress, DeckShuffle, DrawToHand, PlaceCardOnTable, RenderDeck};
 use bevy_la_mesa::CardMetadata;
 use bevy_la_mesa::{Card, CardOnTable, Hand, PlayArea};
 use bevy_la_mesa::{DeckArea, HandArea};
@@ -170,7 +168,6 @@ fn handle_card_draw_phase(
 
     // Prevent triggering multiple times for the same turn
     if *last_turn == phase_state.turn_number {
-        println!("exit 1");
         return;
     }
 
@@ -248,9 +245,10 @@ pub fn handle_card_selection_attempt(
 
         let p1 = q_cards.p1();
         if let Ok((_, card, _)) = p1.get(event.entity)
-            && n_cards_on_table < 1 {
-                ew_card_selected.write(CardSelectedEvent(card.data.clone()));
-            }
+            && n_cards_on_table < 1
+        {
+            ew_card_selected.write(CardSelectedEvent(card.data.clone()));
+        }
     }
 }
 
@@ -372,8 +370,7 @@ pub struct StatusEffectApplication {
     pub intensity: f32,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[derive(Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
 pub enum CardType {
     #[default]
     BasicNeed,
@@ -389,9 +386,7 @@ pub enum CardType {
     ComboCard,
 }
 
-
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[derive(Default)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
 pub enum CardAvailability {
     #[default]
     Always,
@@ -401,7 +396,6 @@ pub enum CardAvailability {
     OneTime,
     DailyReset,
 }
-
 
 #[derive(Debug, Clone, Serialize, PartialEq)]
 pub enum StatusEffect {
@@ -470,7 +464,7 @@ pub enum TimeOfDay {
     LateNight,    // 0-5
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
 pub enum CrisisLevel {
     None,
     Mild,
