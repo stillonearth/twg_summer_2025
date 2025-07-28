@@ -1,6 +1,6 @@
 use crate::cards::ActivityCard;
 use crate::logic::{
-    ActionCompletedEvent, CutsceneEndEvent, CutsceneStartEvent, GamePhaseState, GameState,
+    ActionCompletedEvent, CutsceneEndEvent, CutsceneStartEvent, GamePhaseState,
 };
 use crate::navigation::{GridPos, MovePlayerCommand, TileSize};
 use crate::sprites::{
@@ -126,7 +126,7 @@ pub fn move_player_along_path(
                 // Send the destination reached event
                 destination_events.write(PlayerDestinationReachedEvent {});
 
-                println!("Player reached destination at {:?}", current_target);
+                println!("Player reached destination at {current_target:?}");
 
                 continue;
             }
@@ -232,8 +232,8 @@ pub fn handle_player_destination_reached(
     q_cards: Query<(Entity, &Card<ActivityCard>)>,
 ) {
     for _ in destination_events.read() {
-        if let Some(selected_card_id) = phase_state.selected_card_id {
-            if let Some(card) = q_cards
+        if let Some(selected_card_id) = phase_state.selected_card_id
+            && let Some(card) = q_cards
                 .iter()
                 .find(|(_, card)| card.data.id == selected_card_id)
             {
@@ -241,6 +241,5 @@ pub fn handle_player_destination_reached(
                     card_played: card.1.data.clone(),
                 });
             }
-        }
     }
 }

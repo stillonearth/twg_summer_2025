@@ -214,11 +214,10 @@ pub fn recolor_same_component_on<T: NamedComponent, E: Debug + Clone + Reflect>(
         };
 
         for (entity, component) in component_query.iter() {
-            if component.name() == target_component.name() {
-                if let Ok(mut sprite) = sprites.get_mut(entity) {
+            if component.name() == target_component.name()
+                && let Ok(mut sprite) = sprites.get_mut(entity) {
                     sprite.color = color;
                 }
-            }
         }
     }
 }
@@ -416,10 +415,9 @@ pub fn cleanup_orphaned_tooltips(
                 .any(|comp| comp.name() == tooltip.target_name)
             || sinks.iter().any(|comp| comp.name() == tooltip.target_name);
 
-        if !name_exists {
-            if let Ok(mut ec) = commands.get_entity(tooltip_entity) {
+        if !name_exists
+            && let Ok(mut ec) = commands.get_entity(tooltip_entity) {
                 ec.despawn();
             }
-        }
     }
 }

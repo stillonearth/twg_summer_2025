@@ -254,7 +254,7 @@ fn handle_go_to_random_tile(
         if let Some(random_tile) =
             navigation_grid.get_random_walkable_tile_excluding(player_grid_pos)
         {
-            println!("Moving player to random tile: {:?}", random_tile);
+            println!("Moving player to random tile: {random_tile:?}");
 
             nav_events.write(NavigateToTile {
                 from: player_grid_pos,
@@ -338,7 +338,7 @@ fn handle_navigation_event(
 }
 
 pub fn setup_walkable_tile_handlers(
-    mut commands: Commands,
+    commands: Commands,
     query: Query<Entity, With<WalkableTile>>,
     mut sprite_query: Query<&mut Sprite>,
     mut has_run: Local<bool>,

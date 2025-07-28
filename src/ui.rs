@@ -1,9 +1,6 @@
 use crate::{
     cards::{Mood, ResourceType},
-    logic::{
-        CardSelectionError, CutsceneEndEvent, CutsceneStartEvent, GamePhase, GamePhaseState,
-        GameState,
-    },
+    logic::{CutsceneEndEvent, CutsceneStartEvent, GamePhase, GamePhaseState, GameState},
     thoughts::ThoughtGeneratedEvent,
 };
 use bevy::prelude::*;
@@ -13,25 +10,12 @@ pub struct GameUIPlugin;
 impl Plugin for GameUIPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<UpdateThoughtsEvent>()
-            .add_event::<ShowCardErrorEvent>()
-            .init_resource::<ErrorDisplayState>()
             .add_systems(Startup, setup_ui)
             .add_systems(
                 Update,
-                (
-                    update_displays,
-                    update_character_thoughts,
-                    handle_events,
-                    update_error_display,
-                ),
+                (update_displays, update_character_thoughts, handle_events),
             );
     }
-}
-
-#[derive(Resource, Default)]
-struct ErrorDisplayState {
-    clear_timer: Option<Timer>,
-    is_visible: bool,
 }
 
 #[derive(Event)]
@@ -45,12 +29,6 @@ impl UpdateThoughtsEvent {
     }
 }
 
-#[derive(Event)]
-pub struct ShowCardErrorEvent {
-    pub card_name: String,
-    pub errors: Vec<String>,
-}
-
 // Consolidated UI colors
 pub struct UIColors;
 
@@ -60,8 +38,6 @@ impl UIColors {
     pub const TEXT_DIM: Color = Color::srgb(0.6, 0.6, 0.6);
     pub const THOUGHTS_TEXT: Color = Color::srgb(0.95, 0.9, 1.0);
     pub const ACCENT: Color = Color::srgb(0.4, 0.7, 1.0);
-    pub const ERROR: Color = Color::WHITE;
-    pub const ERROR_BACKGROUND: Color = Color::srgba(0.8, 0.2, 0.2, 0.9);
 
     const RESOURCE_COLORS: [(Color, Color); 4] = [
         (Color::srgb(0.3, 0.6, 0.9), Color::srgb(0.6, 0.3, 0.9)), // Sleep
@@ -131,15 +107,11 @@ pub struct DayDisplay;
 pub struct MoodDisplay;
 
 #[derive(Component)]
+#[derive(Default)]
 pub struct CharacterThoughts {
     pub clear_timer: Option<Timer>,
 }
 
-impl Default for CharacterThoughts {
-    fn default() -> Self {
-        Self { clear_timer: None }
-    }
-}
 
 #[derive(Component)]
 pub struct ResourceBar {
@@ -154,16 +126,9 @@ pub struct ResourceValueText {
     pub resource_type: ResourceType,
 }
 
-#[derive(Component)]
-pub struct ErrorDisplay;
-
-#[derive(Component)]
-pub struct ErrorPanel;
-
 fn setup_ui(mut commands: Commands) {
     spawn_left_panel(&mut commands);
     spawn_thoughts_panel(&mut commands);
-    spawn_error_panel(&mut commands);
 }
 
 fn spawn_left_panel(commands: &mut Commands) {
@@ -275,75 +240,6 @@ fn spawn_thoughts_panel(commands: &mut Commands) {
                         },
                         TextColor(UIColors::THOUGHTS_TEXT),
                         CharacterThoughts::default(),
-                    ));
-                });
-        });
-}
-
-fn spawn_error_panel(commands: &mut Commands) {
-    commands
-        .spawn((
-            UIRoot,
-            ErrorPanel,
-            Node {
-                width: Val::Auto,
-                height: Val::Auto,
-                position_type: PositionType::Absolute,
-                left: Val::Px(300.0),
-                top: Val::Px(100.0),
-                justify_content: JustifyContent::Center,
-                ..default()
-            },
-            Visibility::Hidden,
-            Name::new("Error Panel"),
-        ))
-        .with_children(|parent| {
-            parent
-                .spawn((
-                    Node {
-                        width: Val::Px(600.0),
-                        min_height: Val::Px(100.0),
-                        max_height: Val::Px(300.0),
-                        padding: UiRect::all(Val::Px(20.0)),
-                        flex_direction: FlexDirection::Column,
-                        border: UiRect::all(Val::Px(2.0)),
-                        ..default()
-                    },
-                    BackgroundColor::from(UIColors::ERROR_BACKGROUND),
-                    BorderColor(UIColors::ERROR),
-                    BorderRadius::new(
-                        // top left
-                        Val::Px(30.),
-                        // top right
-                        Val::Px(30.),
-                        // bottom right
-                        Val::Px(30.),
-                        // bottom left
-                        Val::Px(30.),
-                    ),
-                ))
-                .with_children(|panel| {
-                    panel.spawn((
-                        Text::new("Cannot Play Card"),
-                        TextFont {
-                            font_size: 18.0,
-                            ..default()
-                        },
-                        TextColor(UIColors::ERROR),
-                        Node {
-                            margin: UiRect::bottom(Val::Px(12.0)),
-                            ..default()
-                        },
-                    ));
-
-                    panel.spawn((
-                        Text::new(""),
-                        TextFont {
-                            font_size: 14.0,
-                            ..default()
-                        },
-                        TextColor(UIColors::TEXT),
-                        ErrorDisplay,
                     ));
                 });
         });
@@ -495,7 +391,7 @@ fn update_displays(
         // Resource value text
         for (mut text, resource_value) in text_queries.p5().iter_mut() {
             let value = game_state.get_resource_value(resource_value.resource_type);
-            *text = Text::new(format!("{:.0}/100", value));
+            *text = Text::new(format!("{value:.0}/100"));
         }
 
         // Resource bars
@@ -540,9 +436,7 @@ fn handle_events(
     mut er_thought: EventReader<ThoughtGeneratedEvent>,
     mut er_cutscene_start: EventReader<CutsceneStartEvent>,
     mut er_cutscene_end: EventReader<CutsceneEndEvent>,
-    mut er_card_error: EventReader<CardSelectionError>,
     mut ew_update_thoughts: EventWriter<UpdateThoughtsEvent>,
-    mut ew_show_error: EventWriter<ShowCardErrorEvent>,
     q_ui_roots: Query<(Entity, &UIRoot)>,
 ) {
     // Handle thought events
@@ -560,59 +454,6 @@ fn handle_events(
     for _ in er_cutscene_end.read() {
         for (entity, _) in &q_ui_roots {
             commands.entity(entity).insert(Visibility::Inherited);
-        }
-    }
-
-    // Handle card error events
-    for error in er_card_error.read() {
-        ew_show_error.write(ShowCardErrorEvent {
-            card_name: error.card.name.clone(),
-            errors: error.blocking_conditions.clone(),
-        });
-    }
-}
-
-fn update_error_display(
-    mut commands: Commands,
-    mut error_events: EventReader<ShowCardErrorEvent>,
-    mut error_state: ResMut<ErrorDisplayState>,
-    mut error_text_query: Query<&mut Text, With<ErrorDisplay>>,
-    error_panel_query: Query<Entity, With<ErrorPanel>>,
-    time: Res<Time>,
-) {
-    for event in error_events.read() {
-        for entity in &error_panel_query {
-            commands.entity(entity).insert(Visibility::Inherited);
-        }
-
-        for mut text in &mut error_text_query {
-            *text = Text::new(format!(
-                "Card: {}\n\nReasons:\n• {}",
-                event.card_name,
-                event.errors.join("\n• ")
-            ));
-        }
-
-        error_state.clear_timer = Some(Timer::from_seconds(5.0, TimerMode::Once));
-        error_state.is_visible = true;
-    }
-
-    if error_state.is_visible {
-        if let Some(ref mut timer) = error_state.clear_timer {
-            timer.tick(time.delta());
-
-            if timer.finished() {
-                for entity in &error_panel_query {
-                    commands.entity(entity).insert(Visibility::Hidden);
-                }
-
-                for mut text in &mut error_text_query {
-                    *text = Text::new("");
-                }
-
-                error_state.is_visible = false;
-                error_state.clear_timer = None;
-            }
         }
     }
 }

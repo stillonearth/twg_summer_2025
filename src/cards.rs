@@ -6,7 +6,7 @@ use bevy_defer::AsyncCommandsExtension;
 use bevy_defer::AsyncWorld;
 use bevy_la_mesa::events::CardHoverable;
 use bevy_la_mesa::events::{
-    AlignCardsInHand, CardPress, DeckShuffle, DrawToHand, PlaceCardOnTable, RenderDeck,
+    CardPress, DeckShuffle, DrawToHand, PlaceCardOnTable, RenderDeck,
 };
 use bevy_la_mesa::CardMetadata;
 use bevy_la_mesa::{Card, CardOnTable, Hand, PlayArea};
@@ -38,7 +38,8 @@ impl Plugin for CardSystemPlugin {
             .add_systems(
                 Update,
                 (
-                    (init_deck, handle_card_draw_phase).chain(),
+                    init_deck,
+                    handle_card_draw_phase.after(init_deck),
                     handle_card_selection_attempt,
                     handle_card_selection_success,
                     handle_cutscene_start,
@@ -62,8 +63,8 @@ pub fn handle_drag_cards_in_hand_down(
                     EaseFunction::CubicIn,
                     Duration::from_millis(300),
                     TransformPositionLens {
-                        start: transform.translation.clone(),
-                        end: transform.translation.clone() - Vec3::new(0.0, 0.0, -5.0),
+                        start: transform.translation,
+                        end: transform.translation - Vec3::new(0.0, 0.0, -5.0),
                     },
                 );
 
@@ -118,7 +119,7 @@ fn setup(
             marker: 1,
             player: 1,
         },
-        Name::new(format!("Play Area 1")),
+        Name::new("Play Area 1".to_string()),
         Visibility::Hidden,
     ));
 }
@@ -136,20 +137,15 @@ fn init_deck(
         return;
     }
 
-    println!("~~render deck~~ -1");
     let Some(activity_cards_handle) = activity_cards_handle else {
         warn!("ActivityCardsHandle resource not found");
         return;
     };
 
-    println!("~~render deck~~ 0");
-
     if let Some(activity_cards) = activity_cards_assets.get(activity_cards_handle.id()) {
         let available_cards = game_state.filter_cards(activity_cards);
 
-        println!("~~render deck~~ 1");
         if let Some((deck_entity, _)) = q_decks.iter().next() {
-            println!("~~render deck~~ 2");
             ew_render_deck.write(RenderDeck::<ActivityCard> {
                 deck_entity,
                 deck: available_cards,
@@ -161,7 +157,7 @@ fn init_deck(
 /// Handle the card draw phase - shuffle deck and draw cards
 fn handle_card_draw_phase(
     mut commands: Commands,
-    mut phase_state: ResMut<GamePhaseState>,
+    phase_state: Res<GamePhaseState>,
     q_decks: Query<(Entity, &DeckArea)>,
     q_cards_on_table: Query<(Entity, &Card<ActivityCard>, &CardOnTable)>,
     mut last_turn: Local<u32>,
@@ -174,6 +170,7 @@ fn handle_card_draw_phase(
 
     // Prevent triggering multiple times for the same turn
     if *last_turn == phase_state.turn_number {
+        println!("exit 1");
         return;
     }
 
@@ -187,6 +184,7 @@ fn handle_card_draw_phase(
 
     if cards_to_draw <= 0 {
         warn!("No cards to draw, table is full");
+        println!("exit 2");
         return;
     }
 
@@ -204,8 +202,6 @@ fn handle_card_draw_phase(
 
         AsyncWorld.sleep(2.0).await;
 
-        println!("draw to hand");
-
         // Send draw event
         AsyncWorld.send_event(DrawToHand {
             deck_entity,
@@ -220,8 +216,6 @@ fn handle_card_draw_phase(
 
         Ok(())
     });
-
-    println!("here");
 
     phase_changed_events.write(PhaseChangedEvent {
         new_phase: GamePhase::CardSelection,
@@ -253,16 +247,15 @@ pub fn handle_card_selection_attempt(
         }
 
         let p1 = q_cards.p1();
-        if let Ok((_, card, _)) = p1.get(event.entity) {
-            if n_cards_on_table < 1 {
+        if let Ok((_, card, _)) = p1.get(event.entity)
+            && n_cards_on_table < 1 {
                 ew_card_selected.write(CardSelectedEvent(card.data.clone()));
             }
-        }
     }
 }
 
 pub fn handle_card_selection_success(
-    mut commands: Commands,
+    commands: Commands,
     mut ew_place_card_on_table: EventWriter<PlaceCardOnTable>,
     mut er_card_selction_success: EventReader<CardSelectionSuccess>,
     mut ew_drag_cards: EventWriter<DragCardsInHandDown>,
@@ -277,7 +270,7 @@ pub fn handle_card_selection_success(
             .iter()
             .find(|(_, card, _)| {
                 println!("card id: {} | {}", card.data.id, event.0.id);
-                return card.data.id == event.0.id;
+                card.data.id == event.0.id
             })
             .unwrap()
             .0;
@@ -380,7 +373,9 @@ pub struct StatusEffectApplication {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Default)]
 pub enum CardType {
+    #[default]
     BasicNeed,
     Entertainment,
     Social,
@@ -394,14 +389,11 @@ pub enum CardType {
     ComboCard,
 }
 
-impl Default for CardType {
-    fn default() -> Self {
-        CardType::BasicNeed
-    }
-}
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Default)]
 pub enum CardAvailability {
+    #[default]
     Always,
     ConditionalOnly,
     CrisisOnly,
@@ -410,11 +402,6 @@ pub enum CardAvailability {
     DailyReset,
 }
 
-impl Default for CardAvailability {
-    fn default() -> Self {
-        CardAvailability::Always
-    }
-}
 
 #[derive(Debug, Clone, Serialize, PartialEq)]
 pub enum StatusEffect {
@@ -457,8 +444,7 @@ impl<'de> Deserialize<'de> for StatusEffect {
                 Ok(StatusEffect::Addicted("generic".to_string(), 0))
             }
             _ => Err(serde::de::Error::custom(format!(
-                "Unknown status effect: {}",
-                s
+                "Unknown status effect: {s}"
             ))),
         }
     }

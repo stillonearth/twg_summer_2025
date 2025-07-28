@@ -1,7 +1,7 @@
 use crate::{
     cards::{ActivityCard, Mood, ResourceType, TimeOfDay},
     logic::{
-        CardSelectedEvent, DayChangedEvent, GamePhase, GamePhaseState, GameState, MoodChangedEvent,
+        CardSelectedEvent, GamePhase, GamePhaseState, GameState, MoodChangedEvent,
         PhaseChangedEvent, ResourceChangedEvent, TimeChangedEvent,
     },
 };
@@ -170,7 +170,7 @@ fn process_thought_generation(
         let prompt = generate_thought_prompt(&context);
 
         let messages = vec![
-            ChatMessage::system(&get_character_system_prompt()),
+            ChatMessage::system(get_character_system_prompt()),
             ChatMessage::user(&prompt),
         ];
 
@@ -213,7 +213,7 @@ fn handle_async_llm_responses(
             let accumulated = thought_system
                 .streaming_thoughts
                 .entry(response.id)
-                .or_insert_with(String::new);
+                .or_default();
 
             accumulated.push_str(&response.result);
 
@@ -309,28 +309,25 @@ fn generate_thought_prompt(context: &ThoughtContext) -> String {
             )
         }
         ThoughtType::ObjectInteraction(object) => {
-            format!("I'm looking at the {}. What crosses my mind?", object)
+            format!("I'm looking at the {object}. What crosses my mind?")
         }
         ThoughtType::ResourceCrisis(resource) => {
             format!(
-                "My {:?} is critically low. What desperate thoughts am I having?",
-                resource
+                "My {resource:?} is critically low. What desperate thoughts am I having?"
             )
         }
         ThoughtType::MoodChange(from, to) => {
             format!(
-                "My mood shifted from {:?} to {:?}. How do I feel?",
-                from, to
+                "My mood shifted from {from:?} to {to:?}. How do I feel?"
             )
         }
         ThoughtType::TimeChange(time_of_day) => {
             format!(
-                "It's {:?} now. What thoughts does this time bring?",
-                time_of_day
+                "It's {time_of_day:?} now. What thoughts does this time bring?"
             )
         }
         ThoughtType::PhaseChange(phase) => {
-            format!("Game phase is {:?}. What am I thinking?", phase)
+            format!("Game phase is {phase:?}. What am I thinking?")
         }
         ThoughtType::General => {
             "I'm sitting here in my apartment. What random thought drifts through my mind?"
@@ -339,18 +336,18 @@ fn generate_thought_prompt(context: &ThoughtContext) -> String {
     };
 
     let additional = if let Some(extra) = &context.additional_context {
-        format!(" Additional context: {}", extra)
+        format!(" Additional context: {extra}")
     } else {
         String::new()
     };
 
-    format!("{} {}{}", base_context, specific_prompt, additional)
+    format!("{base_context} {specific_prompt}{additional}")
 }
 
 // Automatic event listeners that integrate with GameLogicPlugin events
 fn listen_for_mood_changes(
     mut mood_events: EventReader<MoodChangedEvent>,
-    mut thought_events: EventWriter<GenerateThoughtEvent>,
+    thought_events: EventWriter<GenerateThoughtEvent>,
     mut action_log: ResMut<ActionLog>,
     game_state: Res<GameState>,
 ) {
@@ -375,7 +372,7 @@ fn listen_for_mood_changes(
 
 fn listen_for_resource_crises(
     mut resource_events: EventReader<ResourceChangedEvent>,
-    mut thought_events: EventWriter<GenerateThoughtEvent>,
+    thought_events: EventWriter<GenerateThoughtEvent>,
     mut action_log: ResMut<ActionLog>,
     game_state: Res<GameState>,
     mut last_crisis_states: Local<std::collections::HashMap<ResourceType, bool>>,
@@ -412,7 +409,7 @@ fn listen_for_resource_crises(
 
 fn listen_for_time_changes(
     mut time_events: EventReader<TimeChangedEvent>,
-    mut thought_events: EventWriter<GenerateThoughtEvent>,
+    thought_events: EventWriter<GenerateThoughtEvent>,
 ) {
     for event in time_events.read() {
         // Only generate thoughts when time of day changes (not every hour)

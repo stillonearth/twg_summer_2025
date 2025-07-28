@@ -1,4 +1,4 @@
-use bevy::{prelude::*, render::view::RenderLayers};
+use bevy::prelude::*;
 
 pub const SHEET_1_COLUMNS: u32 = 13;
 pub const SHEET_1_ROWS: u32 = 21;
@@ -111,15 +111,14 @@ pub fn animate_sprite(
 ) {
     for (indices, mut timer, mut sprite) in &mut query {
         timer.tick(time.delta());
-        if timer.just_finished() {
-            if let Some(atlas) = &mut sprite.texture_atlas {
+        if timer.just_finished()
+            && let Some(atlas) = &mut sprite.texture_atlas {
                 atlas.index = if (atlas.index >= indices.last) || (atlas.index < indices.first) {
                     indices.first
                 } else {
                     atlas.index + 1
                 };
             }
-        }
     }
 }
 

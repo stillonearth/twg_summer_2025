@@ -3,7 +3,7 @@
 use std::f32::consts::FRAC_PI_2;
 
 use avian2d::prelude::*;
-use bevy::{input::common_conditions::input_toggle_active, prelude::*, render::view::RenderLayers};
+use bevy::{input::common_conditions::input_toggle_active, prelude::*};
 use bevy_common_assets::json::JsonAssetPlugin;
 use bevy_defer::AsyncPlugin;
 use bevy_ecs_tiled::prelude::*;
