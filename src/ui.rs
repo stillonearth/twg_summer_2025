@@ -1,6 +1,9 @@
 use crate::{
-    cards::{CrisisLevel, Mood, ResourceType},
-    logic::{CutsceneEndEvent, CutsceneStartEvent, GamePhase, GamePhaseState, GameState},
+    cards::{CrisisLevel, Mood, ResourceType, StatusEffect},
+    logic::{
+        ActiveStatusEffect, CutsceneEndEvent, CutsceneStartEvent, GamePhase, GamePhaseState,
+        GameState,
+    },
     thoughts::ThoughtGeneratedEvent,
 };
 use bevy::prelude::*;
@@ -70,6 +73,21 @@ impl UIColors {
         Color::srgb(0.9, 0.2, 0.2), // Critical - Red
     ];
 
+    const STATUS_EFFECT_COLORS: [Color; 12] = [
+        Color::srgb(0.3, 0.4, 0.8), // Insomnia - Blue
+        Color::srgb(0.8, 0.3, 0.3), // Sick - Red
+        Color::srgb(0.4, 0.8, 0.4), // Motivated - Green
+        Color::srgb(0.8, 0.6, 0.2), // Overwhelmed - Orange
+        Color::srgb(0.8, 0.2, 0.8), // Addicted - Purple
+        Color::srgb(0.6, 0.6, 0.3), // Exhausted - Brown
+        Color::srgb(0.8, 0.8, 0.2), // Anxious - Yellow
+        Color::srgb(0.4, 0.4, 0.6), // Depressed - Dark Blue
+        Color::srgb(0.9, 0.3, 0.6), // Manic - Pink
+        Color::srgb(0.5, 0.7, 0.5), // Stable - Light Green
+        Color::srgb(0.3, 0.7, 0.9), // Focused - Cyan
+        Color::srgb(0.9, 0.5, 0.2), // Hungry - Orange-Red
+    ];
+
     pub fn mood_color(mood: &Mood) -> Color {
         Self::MOOD_COLORS[*mood as usize]
     }
@@ -80,6 +98,41 @@ impl UIColors {
 
     pub fn crisis_color(crisis_level: &CrisisLevel) -> Color {
         Self::CRISIS_COLORS[*crisis_level as usize]
+    }
+
+    pub fn status_effect_color(effect: &StatusEffect) -> Color {
+        let index = match effect {
+            StatusEffect::Insomnia(_) => 0,
+            StatusEffect::Sick(_) => 1,
+            StatusEffect::Motivated(_) => 2,
+            StatusEffect::Overwhelmed(_) => 3,
+            StatusEffect::Addicted(_, _) => 4,
+            StatusEffect::Exhausted(_) => 5,
+            StatusEffect::Anxious(_) => 6,
+            StatusEffect::Depressed(_) => 7,
+            StatusEffect::Manic(_) => 8,
+            StatusEffect::Stable(_) => 9,
+            StatusEffect::Focused(_) => 10,
+            StatusEffect::Hungry(_) => 11,
+        };
+        Self::STATUS_EFFECT_COLORS[index]
+    }
+
+    pub fn status_effect_name(effect: &StatusEffect) -> String {
+        match effect {
+            StatusEffect::Insomnia(_) => "Insomnia".to_string(),
+            StatusEffect::Sick(_) => "Sick".to_string(),
+            StatusEffect::Motivated(_) => "Motivated".to_string(),
+            StatusEffect::Overwhelmed(_) => "Overwhelmed".to_string(),
+            StatusEffect::Addicted(substance, _) => format!("Addicted ({})", substance),
+            StatusEffect::Exhausted(_) => "Exhausted".to_string(),
+            StatusEffect::Anxious(_) => "Anxious".to_string(),
+            StatusEffect::Depressed(_) => "Depressed".to_string(),
+            StatusEffect::Manic(_) => "Manic".to_string(),
+            StatusEffect::Stable(_) => "Stable".to_string(),
+            StatusEffect::Focused(_) => "Focused".to_string(),
+            StatusEffect::Hungry(_) => "Hungry".to_string(),
+        }
     }
 
     pub fn resource_colors(resource_type: ResourceType) -> (Color, Color) {
@@ -120,6 +173,12 @@ pub struct MoodDisplay;
 
 #[derive(Component)]
 pub struct CrisisDisplay;
+
+#[derive(Component)]
+pub struct StatusEffectsPanel;
+
+#[derive(Component)]
+pub struct StatusEffectItem;
 
 #[derive(Component, Default)]
 pub struct CharacterThoughts {
@@ -173,14 +232,6 @@ fn spawn_left_panel(commands: &mut Commands) {
                     BorderColor(UIColors::ACCENT.with_alpha(0.2)),
                 ))
                 .with_children(|panel| {
-                    // Phase and turn
-                    spawn_text_section(
-                        panel,
-                        "Phase: Card Draw",
-                        16.0,
-                        UIColors::PHASE_COLORS[0],
-                        Some(PhaseDisplay),
-                    );
                     spawn_text_section(
                         panel,
                         "Turn 1",
@@ -189,16 +240,22 @@ fn spawn_left_panel(commands: &mut Commands) {
                         Some(TurnDisplay),
                     );
 
-                    // Mood
+                    spawn_text_section(
+                        panel,
+                        "Phase: Card Draw",
+                        16.0,
+                        UIColors::PHASE_COLORS[0],
+                        Some(PhaseDisplay),
+                    );
+
                     spawn_text_section(
                         panel,
                         "Mood: Neutral",
-                        18.0,
+                        16.0,
                         UIColors::TEXT,
                         Some(MoodDisplay),
                     );
 
-                    // Crisis Level
                     spawn_text_section(
                         panel,
                         "Crisis: None",
@@ -223,6 +280,35 @@ fn spawn_left_panel(commands: &mut Commands) {
                     // Time displays
                     spawn_text_section(panel, "10:00", 20.0, UIColors::TEXT, Some(TimeDisplay));
                     spawn_text_section(panel, "Day 1", 14.0, UIColors::TEXT_DIM, Some(DayDisplay));
+
+                    // Status Effects Section
+                    panel
+                        .spawn((
+                            Node {
+                                flex_direction: FlexDirection::Column,
+                                margin: UiRect::top(Val::Px(16.0)),
+
+                                ..default()
+                            },
+                            StatusEffectsPanel,
+                        ))
+                        .with_children(|status_panel| {
+                            // Status effects header
+                            status_panel.spawn((
+                                Text::new("Active Effects"),
+                                TextFont {
+                                    font_size: 14.0,
+                                    ..default()
+                                },
+                                TextColor(UIColors::TEXT),
+                                Node {
+                                    margin: UiRect::bottom(Val::Px(8.0)),
+                                    padding: UiRect::top(Val::Px(20.0)),
+                                    display: Display::Grid,
+                                    ..default()
+                                },
+                            ));
+                        });
                 });
         });
 }
@@ -358,6 +444,7 @@ fn spawn_resource_bar(parent: &mut ChildSpawnerCommands, label: &str, resource_t
 
 // Consolidated update systems
 fn update_displays(
+    mut commands: Commands,
     mut text_queries: ParamSet<(
         Query<(&mut Text, &mut TextColor), (With<PhaseDisplay>, Without<TurnDisplay>)>,
         Query<&mut Text, (With<TurnDisplay>, Without<PhaseDisplay>)>,
@@ -372,6 +459,8 @@ fn update_displays(
         (With<ResourceBarFill>, Without<ResourceBar>),
     >,
     bar_query: Query<(&ResourceBar, &Children)>,
+    status_effects_panel_query: Query<(Entity, &Children), With<StatusEffectsPanel>>,
+    status_effect_items_query: Query<Entity, With<StatusEffectItem>>,
     phase_state: Res<GamePhaseState>,
     game_state: Res<GameState>,
 ) {
@@ -443,6 +532,122 @@ fn update_displays(
             }
         }
     }
+
+    // Update status effects display
+    if game_state.is_changed() {
+        update_status_effects_display(
+            &mut commands,
+            &status_effects_panel_query,
+            &status_effect_items_query,
+            &game_state,
+        );
+    }
+}
+
+fn update_status_effects_display(
+    commands: &mut Commands,
+    status_effects_panel_query: &Query<(Entity, &Children), With<StatusEffectsPanel>>,
+    status_effect_items_query: &Query<Entity, With<StatusEffectItem>>,
+    game_state: &GameState,
+) {
+    // Clear existing status effect items
+    for entity in status_effect_items_query.iter() {
+        commands.entity(entity).despawn_recursive();
+    }
+
+    // Find the status effects panel
+    if let Ok((panel_entity, children)) = status_effects_panel_query.get_single() {
+        // Find the panel container (skip the header)
+        for child in children.iter() {
+            commands.entity(child).with_children(|panel| {
+                // Skip the header and add status effects
+                if game_state.status_effects.is_empty() {
+                    panel.spawn((
+                        Text::new("No active effects"),
+                        TextFont {
+                            font_size: 12.0,
+                            ..default()
+                        },
+                        TextColor(UIColors::TEXT_DIM),
+                        Node {
+                            margin: UiRect::bottom(Val::Px(4.0)),
+                            ..default()
+                        },
+                        StatusEffectItem,
+                    ));
+                } else {
+                    for status_effect in &game_state.status_effects {
+                        spawn_status_effect_item(panel, status_effect);
+                    }
+                }
+            });
+            break; // Only add to the first child (the panel container)
+        }
+    }
+}
+
+fn spawn_status_effect_item(parent: &mut ChildSpawnerCommands, status_effect: &ActiveStatusEffect) {
+    parent
+        .spawn((
+            Node {
+                flex_direction: FlexDirection::Column,
+                margin: UiRect::bottom(Val::Px(6.0)),
+                padding: UiRect::all(Val::Px(6.0)),
+                border: UiRect::all(Val::Px(1.0)),
+                ..default()
+            },
+            BorderRadius::new(Val::Px(3.), Val::Px(3.), Val::Px(3.), Val::Px(3.)),
+            BackgroundColor(UIColors::BACKGROUND.with_alpha(0.3)),
+            BorderColor(UIColors::status_effect_color(&status_effect.effect).with_alpha(0.5)),
+            StatusEffectItem,
+        ))
+        .with_children(|item| {
+            // Effect name
+            item.spawn((
+                Text::new(UIColors::status_effect_name(&status_effect.effect)),
+                TextFont {
+                    font_size: 12.0,
+                    ..default()
+                },
+                TextColor(UIColors::status_effect_color(&status_effect.effect)),
+                Node {
+                    margin: UiRect::bottom(Val::Px(2.0)),
+                    ..default()
+                },
+            ));
+
+            // Duration and intensity info
+            let info_text = if status_effect.intensity != 1.0 {
+                format!(
+                    "{} turns • {:.0}%",
+                    status_effect.remaining_duration,
+                    status_effect.intensity * 100.0
+                )
+            } else {
+                format!("{} turns", status_effect.remaining_duration)
+            };
+
+            item.spawn((
+                Text::new(info_text),
+                TextFont {
+                    font_size: 9.0,
+                    ..default()
+                },
+                TextColor(UIColors::TEXT_DIM),
+            ));
+
+            // Source info if available (shorter format for left panel)
+            if !status_effect.source.is_empty() {
+                item.spawn((
+                    Text::new(format!("({})", status_effect.source)),
+                    TextFont {
+                        font_size: 8.0,
+                        ..default()
+                    },
+                    TextColor(UIColors::TEXT_DIM.with_alpha(0.7)),
+                ));
+            }
+        });
 }
 
 fn update_character_thoughts(

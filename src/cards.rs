@@ -112,7 +112,7 @@ fn setup(
     commands.spawn((
         Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
         MeshMaterial3d(materials.add(Color::srgb_u8(124, 144, 255))),
-        Transform::from_translation(Vec3::new(-5.6, 15.1, 2.15)),
+        Transform::from_translation(Vec3::new(5.1, 16.0, -0.55)),
         PlayArea {
             marker: 1,
             player: 1,
