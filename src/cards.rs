@@ -136,15 +136,20 @@ fn init_deck(
         return;
     }
 
+    println!("~~render deck~~ -1");
     let Some(activity_cards_handle) = activity_cards_handle else {
         warn!("ActivityCardsHandle resource not found");
         return;
     };
 
+    println!("~~render deck~~ 0");
+
     if let Some(activity_cards) = activity_cards_assets.get(activity_cards_handle.id()) {
         let available_cards = game_state.filter_cards(activity_cards);
 
+        println!("~~render deck~~ 1");
         if let Some((deck_entity, _)) = q_decks.iter().next() {
+            println!("~~render deck~~ 2");
             ew_render_deck.write(RenderDeck::<ActivityCard> {
                 deck_entity,
                 deck: available_cards,
@@ -156,10 +161,9 @@ fn init_deck(
 /// Handle the card draw phase - shuffle deck and draw cards
 fn handle_card_draw_phase(
     mut commands: Commands,
-    phase_state: Res<GamePhaseState>,
+    mut phase_state: ResMut<GamePhaseState>,
     q_decks: Query<(Entity, &DeckArea)>,
     q_cards_on_table: Query<(Entity, &Card<ActivityCard>, &CardOnTable)>,
-    mut ew_shuffle: EventWriter<DeckShuffle>,
     mut last_turn: Local<u32>,
     mut phase_changed_events: EventWriter<PhaseChangedEvent>,
 ) {
@@ -188,15 +192,19 @@ fn handle_card_draw_phase(
 
     *last_turn = phase_state.turn_number;
 
-    // Shuffle the deck first
-    ew_shuffle.write(DeckShuffle {
-        deck_entity,
-        duration: 8,
-    });
-
     // Draw cards after a delay
     commands.spawn_task(move || async move {
-        AsyncWorld.sleep(0.5).await;
+        AsyncWorld.sleep(1.0).await;
+
+        // Shuffle the deck first
+        AsyncWorld.send_event(DeckShuffle {
+            deck_entity,
+            duration: 50,
+        })?;
+
+        AsyncWorld.sleep(2.0).await;
+
+        println!("draw to hand");
 
         // Send draw event
         AsyncWorld.send_event(DrawToHand {
@@ -212,6 +220,8 @@ fn handle_card_draw_phase(
 
         Ok(())
     });
+
+    println!("here");
 
     phase_changed_events.write(PhaseChangedEvent {
         new_phase: GamePhase::CardSelection,

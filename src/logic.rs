@@ -1098,30 +1098,20 @@ fn handle_turn_over(
     mut turn_over_events: EventReader<TurnOverEvent>,
     mut phase_state: ResMut<GamePhaseState>,
     mut game_step_events: EventWriter<GameStepEvent>,
-    q_decks: Query<(Entity, &DeckArea)>,
-    mut q_cards: ParamSet<(
-        Query<(Entity, &Card<ActivityCard>, &CardOnTable)>,
-        Query<(Entity, &Card<ActivityCard>, &Hand)>,
-    )>,
+    mut q_cards: ParamSet<(Query<(Entity, &Card<ActivityCard>)>,)>,
+    mut ew_phase_change: EventWriter<PhaseChangedEvent>,
     // mut ew_discard_card_to_deck: EventWriter<DiscardCardToDeck>,
 ) {
-    for event in turn_over_events.read() {
+    for _ in turn_over_events.read() {
         println!("Processing turn over, starting new turn");
 
         if phase_state.cutscene_active {
             continue;
         }
 
-        if let Some((main_deck_entity, _)) = q_decks.iter().find(|(_, deck)| deck.marker == 1) {
-            // Discard cards from table
-            for (entity, _, _) in q_cards.p0().iter() {
-                commands.entity(entity).despawn();
-            }
-
-            // Discard cards from hand
-            for (entity, _, _) in q_cards.p1().iter() {
-                commands.entity(entity).despawn();
-            }
+        // Discard cards from table
+        for (entity, _) in q_cards.p0().iter() {
+            commands.entity(entity).despawn();
         }
 
         println!("Processing turn over, starting new turn");
@@ -1136,15 +1126,8 @@ fn handle_turn_over(
         // Apply passive effects (time passage, resource decay, etc.)
         apply_turn_end_effects(&mut game_step_events);
 
-        commands.spawn_task(move || async move {
-            AsyncWorld.sleep(2.5).await;
-
-            // Transition to card draw for new turn
-            AsyncWorld.send_event(PhaseChangedEvent {
-                new_phase: GamePhase::CardDraw,
-            })?;
-
-            Ok(())
+        ew_phase_change.write(PhaseChangedEvent {
+            new_phase: GamePhase::CardDraw,
         });
 
         info!("Started turn {}", phase_state.turn_number);
