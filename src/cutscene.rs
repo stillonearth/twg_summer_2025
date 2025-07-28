@@ -14,10 +14,46 @@ impl Plugin for CutscenePlugin {
 }
 
 #[derive(Resource, Deref, DerefMut)]
-pub struct ScenarioHandle(Handle<Rpy>);
+pub struct ScenarioHandle(Vec<Handle<Rpy>>);
 
 fn load_scenario(mut commands: Commands, asset_server: Res<AssetServer>) {
-    let scenario_handle = ScenarioHandle(asset_server.load("script.rpy"));
+    let scenario_handle = ScenarioHandle(vec![
+        asset_server.load("scenarios/0.rpy"),
+        asset_server.load("scenarios/1.rpy"),
+        asset_server.load("scenarios/2.rpy"),
+        asset_server.load("scenarios/3.rpy"),
+        asset_server.load("scenarios/4.rpy"),
+        asset_server.load("scenarios/5.rpy"),
+        asset_server.load("scenarios/6.rpy"),
+        asset_server.load("scenarios/7.rpy"),
+        asset_server.load("scenarios/8.rpy"),
+        asset_server.load("scenarios/9.rpy"),
+        asset_server.load("scenarios/10.rpy"),
+        asset_server.load("scenarios/11.rpy"),
+        asset_server.load("scenarios/12.rpy"),
+        asset_server.load("scenarios/13.rpy"),
+        asset_server.load("scenarios/14.rpy"),
+        asset_server.load("scenarios/15.rpy"),
+        asset_server.load("scenarios/16.rpy"),
+        asset_server.load("scenarios/17.rpy"),
+        asset_server.load("scenarios/18.rpy"),
+        asset_server.load("scenarios/19.rpy"),
+        asset_server.load("scenarios/20.rpy"),
+        asset_server.load("scenarios/21.rpy"),
+        asset_server.load("scenarios/22.rpy"),
+        asset_server.load("scenarios/23.rpy"),
+        asset_server.load("scenarios/24.rpy"),
+        asset_server.load("scenarios/25.rpy"),
+        asset_server.load("scenarios/26.rpy"),
+        asset_server.load("scenarios/27.rpy"),
+        asset_server.load("scenarios/28.rpy"),
+        asset_server.load("scenarios/29.rpy"),
+        asset_server.load("scenarios/30.rpy"),
+        asset_server.load("scenarios/31.rpy"),
+        asset_server.load("scenarios/32.rpy"),
+        asset_server.load("scenarios/33.rpy"),
+        asset_server.load("scenarios/34.rpy"),
+    ]);
     commands.insert_resource(scenario_handle);
 }
 

@@ -3,16 +3,13 @@
 
 define mi = Character("Mi", color="#c8ffc8")
 
-# Character Image
-image mi = "mi.png"
-
 # Main Menu/Card Selection (simplified for this episode)
 label start:
     jump card_cook_meal_scenario
 
 # Cook Meal Card Scenario - "Kitchen Therapy"
 label card_cook_meal_scenario:
-    scene bg vn-3
+    scene vn-3
 
     show mi
 

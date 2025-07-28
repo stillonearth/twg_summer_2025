@@ -343,9 +343,9 @@ fn spawn_thoughts_panel(commands: &mut Commands, asset_server: &Res<AssetServer>
                     border: UiRect::all(Val::Px(1.0)),
                     ..default()
                 })
-                .insert(BorderRadius::all(Val::Px(60.0))) // Circular border
-                .insert(BorderColor(UIColors::ACCENT.with_alpha(0.3)))
-                .insert(BackgroundColor(UIColors::BACKGROUND.with_alpha(0.5)))
+                // .insert(BorderRadius::all(Val::Px(60.0))) // Circular border
+                // .insert(BorderColor(UIColors::ACCENT.with_alpha(0.3)))
+                // .insert(BackgroundColor(UIColors::BACKGROUND.with_alpha(0.5)))
                 .with_children(|avatar_container| {
                     avatar_container.spawn((
                         ImageNode::new(asset_server.load("avatars/avatar_anxious.png")),
@@ -354,7 +354,7 @@ fn spawn_thoughts_panel(commands: &mut Commands, asset_server: &Res<AssetServer>
                             height: Val::Percent(100.0),
                             ..default()
                         },
-                        BorderRadius::all(Val::Px(58.0)), // Slightly smaller radius for the image
+                        // BorderRadius::all(Val::Px(58.0)), // Slightly smaller radius for the image
                         AvatarImage,
                     ));
                 });

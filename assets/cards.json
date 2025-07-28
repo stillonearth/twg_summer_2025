@@ -1,343 +1,1322 @@
-{
-  "scenarios": [
-    {
-      "id": 0,
-      "card_name": "Sleep",
-      "scenario_id": "peaceful_night",
-      "title": "Peaceful Night",
-      "card_type": "card",
-      "setup": "Player character stands in bedroom at night, exhausted from the day. The bed looks inviting with moonlight streaming through the window.",
-      "image_prompt": "visual novel background, cozy bedroom at night, soft moonlight streaming through window, unmade bed with warm blankets, nightstand with digital clock, peaceful atmosphere, floating dream symbols in air, blue and purple color palette, detailed bedroom interior"
+[
+  {
+    "name": "Sleep",
+    "description": "Get a full night's rest",
+    "effect": "Restores a large amount of sleep and provides some health benefits. Takes 8 hours but leaves you well-rested.",
+    "category": "sleep",
+    "conditions": {
+      "min_sleep": 0,
+      "max_sleep": 70,
+      "time_of_day": ["Night", "LateNight"],
+      "required_objects": ["bed"]
     },
-    {
-      "id": 1,
-      "card_name": "Quick Nap",
-      "scenario_id": "afternoon_rest",
-      "title": "Afternoon Rest",
-      "card_type": "card",
-      "setup": "Character feels drowsy in the afternoon, finding a comfortable spot on the couch or chair for a quick power nap.",
-      "image_prompt": "visual novel background, comfortable living room in afternoon, golden sunlight streaming through window, cozy couch with soft cushions, warm orange and yellow lighting, dust motes in sunbeam, peaceful domestic setting"
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 0,
+      "food_cost": 0,
+      "time_cost": 8.0,
+      "additional_costs": []
     },
-    {
-      "id": 2,
-      "card_name": "Rest in Bed",
-      "scenario_id": "restless_lying",
-      "title": "Restless Rest",
-      "card_type": "card",
-      "setup": "Character lies in bed unable to sleep, mind racing with thoughts and worries while trying to rest.",
-      "image_prompt": "visual novel background, dimly lit bedroom at twilight, rumpled bed sheets, thought bubbles and worry symbols floating in air, shadows on ceiling, restless atmosphere, muted gray and blue colors, clock showing late hour"
+    "effects": {
+      "sleep": 60,
+      "health": 10,
+      "mental": 0,
+      "food": 0
     },
-    {
-      "id": 3,
-      "card_name": "Cook Meal",
-      "scenario_id": "kitchen_therapy",
-      "title": "Kitchen Therapy",
-      "card_type": "card",
-      "setup": "Player stands in kitchen with fresh ingredients, finding comfort and purpose in the familiar cooking routine.",
-      "image_prompt": "visual novel background, bright modern kitchen, steam rising from stovetop, colorful fresh vegetables scattered on counter, warm golden lighting, organized cooking utensils, clean workspace, therapeutic cooking atmosphere"
+    "status_effects": [],
+    "card_type": "BasicNeed",
+    "availability": "Always",
+    "flavor_text": "In dreams, we find the peace that daylight steals.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, peaceful bedroom scene with character sleeping in cozy bed, soft moonlight through window, dreamy blue and purple color palette, floating dream bubbles, serene expression, warm blankets, nightstand with clock showing late hours, collectible card game art",
+    "id": 0
+  },
+  {
+    "name": "Quick Nap",
+    "description": "Short rest to recover energy",
+    "effect": "A quick 2-hour nap that restores moderate sleep and gives a small mental boost. Good for afternoon tiredness.",
+    "category": "sleep",
+    "conditions": {
+      "min_sleep": 0,
+      "max_sleep": 80,
+      "time_of_day": ["Afternoon", "Evening"]
     },
-    {
-      "id": 4,
-      "card_name": "Grab Snacks",
-      "scenario_id": "guilty_snacking",
-      "title": "Guilty Snacking",
-      "card_type": "card",
-      "setup": "Character quickly grabs junk food from fridge or pantry, seeking immediate satisfaction despite knowing it's unhealthy.",
-      "image_prompt": "visual novel background, kitchen with open refrigerator casting cool blue light, junk food packages and snacks visible on shelves, dim ambient lighting, slightly messy counter, late night snacking atmosphere"
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 0,
+      "food_cost": 0,
+      "time_cost": 2.0,
+      "additional_costs": []
     },
-    {
-      "id": 5,
-      "card_name": "Order Delivery",
-      "scenario_id": "delivery_call",
-      "title": "The Usual Order",
-      "card_type": "card",
-      "setup": "Character sits with phone, surrounded by takeout menus, ordering food delivery again instead of cooking.",
-      "image_prompt": "visual novel background, living room or kitchen table with scattered takeout menus, glowing phone screen, delivery app interface visible, dim evening lighting, modern apartment setting, convenience food atmosphere"
+    "effects": {
+      "sleep": 25,
+      "health": 0,
+      "mental": 5,
+      "food": 0
     },
-    {
-      "id": 6,
-      "card_name": "Drink Water",
-      "scenario_id": "simple_hydration",
-      "title": "Simple Hydration",
-      "card_type": "card",
-      "setup": "Character takes a moment for basic self-care by drinking water, a simple but important act.",
-      "image_prompt": "visual novel background, clean kitchen or bathroom sink area, clear glass of water with droplets, bright clean lighting, minimalist composition, refreshing atmosphere, simple health-focused environment"
+    "status_effects": [],
+    "card_type": "BasicNeed",
+    "availability": "Always",
+    "flavor_text": "Sometimes twenty minutes can save your sanity.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character curled up on couch or chair for quick nap, afternoon sunlight streaming in, soft orange and yellow tones, small 'zzz' symbols floating above head, casual clothes, relaxed pose, cozy living room setting, collectible card game art",
+    "id": 1
+  },
+  {
+    "name": "Rest in Bed",
+    "description": "Lie down without sleeping",
+    "effect": "Lying in bed while awake. Restores a little sleep but costs mental energy and actually makes you feel worse mentally.",
+    "category": "sleep",
+    "conditions": {
+      "min_sleep": 0,
+      "max_sleep": 90,
+      "required_objects": ["bed"],
+      "forbidden_mood": "Manic"
     },
-    {
-      "id": 7,
-      "card_name": "Take Shower",
-      "scenario_id": "cleansing_ritual",
-      "title": "Cleansing Ritual",
-      "card_type": "card",
-      "setup": "Character enters bathroom for a proper shower, seeking both physical cleanliness and mental refreshment.",
-      "image_prompt": "visual novel background, modern bathroom with shower stall, steam effects, clean white tiles, soft lighting, towels hanging nearby, refreshing and clean atmosphere, water droplets on glass"
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 5,
+      "food_cost": 0,
+      "time_cost": 1.0,
+      "additional_costs": []
     },
-    {
-      "id": 8,
-      "card_name": "Basic Hygiene",
-      "scenario_id": "morning_routine",
-      "title": "Morning Routine",
-      "card_type": "card",
-      "setup": "Character performs basic hygiene tasks like brushing teeth and washing face, small steps toward self-care.",
-      "image_prompt": "visual novel background, bathroom mirror and sink area, toothbrush and hygiene items on counter, morning lighting through small window, clean white and blue color scheme, basic self-care setting"
+    "effects": {
+      "sleep": 10,
+      "health": 0,
+      "mental": -5,
+      "food": 0
     },
-    {
-      "id": 9,
-      "card_name": "Skip Hygiene",
-      "scenario_id": "avoiding_mirror",
-      "title": "Avoiding the Mirror",
-      "card_type": "card",
-      "setup": "Character can't bring themselves to face basic hygiene today, avoiding their reflection and self-care.",
-      "image_prompt": "visual novel background, bathroom with mirror turned away or covered, dim lighting, hygiene items unused on counter, avoidance atmosphere, muted gray and brown colors, neglected self-care environment"
+    "status_effects": [],
+    "card_type": "BasicNeed",
+    "availability": "Always",
+    "flavor_text": "The mind races while the body lies still.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character lying in bed wide awake staring at ceiling, restless expression, darker muted colors, scattered thoughts visualized as small floating icons, messy hair, rumpled sheets, bedroom at twilight, melancholic mood, collectible card game art",
+    "id": 2
+  },
+  {
+    "name": "Cook Meal",
+    "description": "Prepare proper food",
+    "effect": "Takes effort and time to cook, but provides substantial food, health, and mental benefits. Also gives you motivation for a while.",
+    "category": "food",
+    "conditions": {
+      "min_mental": 20,
+      "min_health": 15,
+      "required_objects": ["kitchen"]
     },
-    {
-      "id": 10,
-      "card_name": "Watch Shows",
-      "scenario_id": "normal_viewing",
-      "title": "Normal Viewing",
-      "card_type": "card",
-      "setup": "Character settles in for regular TV watching to unwind and escape into other people's stories.",
-      "image_prompt": "visual novel background, comfortable living room with TV screen glowing, cozy couch setup, evening atmosphere, remote control nearby, snacks on coffee table, relaxing entertainment environment"
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 10,
+      "food_cost": 0,
+      "time_cost": 1.5,
+      "additional_costs": []
     },
-    {
-      "id": 11,
-      "card_name": "Binge Series",
-      "scenario_id": "marathon_session",
-      "title": "Marathon Session",
-      "card_type": "card",
-      "setup": "Character settles in for an extended binge watching session that will consume most of the day.",
-      "image_prompt": "visual novel background, dark living room with bright TV screen dominating, multiple empty food containers scattered around, tissues and blankets everywhere, time passage indicators, marathon viewing setup"
+    "effects": {
+      "sleep": 0,
+      "health": 15,
+      "mental": 10,
+      "food": 50
     },
-    {
-      "id": 12,
-      "card_name": "Channel Surf",
-      "scenario_id": "mindless_clicking",
-      "title": "Mindless Clicking",
-      "card_type": "card",
-      "setup": "Character mindlessly flips through channels without finding anything engaging, wasting time.",
-      "image_prompt": "visual novel background, living room with TV showing static or random channel flashes, remote control prominent, bored atmosphere, dim lighting, empty feeling, repetitive channel surfing environment"
+    "status_effects": [
+      {
+        "effect": "Motivated",
+        "duration": 2,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "BasicNeed",
+    "availability": "Always",
+    "flavor_text": "The smell of garlic and onions is the first step back to humanity.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character happily cooking in kitchen, steam rising from pots, vibrant vegetables and ingredients scattered around, warm golden lighting, chef's apron, satisfied smile, aromatic visual effects, organized kitchen counter, collectible card game art",
+    "id": 3
+  },
+  {
+    "name": "Grab Snacks",
+    "description": "Quick junk food",
+    "effect": "Fast and easy food that fills you up a bit but is unhealthy and makes you hungrier later.",
+    "category": "food",
+    "conditions": {
+      "min_food": 0,
+      "max_food": 80,
+      "required_objects": ["fridge"]
     },
-    {
-      "id": 13,
-      "card_name": "Watch News",
-      "scenario_id": "staying_informed",
-      "title": "Staying Informed",
-      "card_type": "card",
-      "setup": "Character watches news to stay informed about current events, despite knowing it will worsen their mood.",
-      "image_prompt": "visual novel background, living room with news broadcast on TV screen showing breaking news ticker, morning or evening news setting, coffee cup nearby, serious news atmosphere, red and blue news graphics"
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 0,
+      "food_cost": 0,
+      "time_cost": 0.25,
+      "additional_costs": []
     },
-    {
-      "id": 14,
-      "card_name": "Play Games",
-      "scenario_id": "gaming_session",
-      "title": "Gaming Session",
-      "card_type": "card",
-      "setup": "Character engages in enjoyable gaming to relax, have fun, and escape into digital worlds.",
-      "image_prompt": "visual novel background, gaming setup with console and TV showing colorful game screen, controller nearby, energetic gaming atmosphere, vibrant colors from game display, comfortable gaming chair"
+    "effects": {
+      "sleep": 0,
+      "health": -5,
+      "mental": 0,
+      "food": 20
     },
-    {
-      "id": 15,
-      "card_name": "Gaming Marathon",
-      "scenario_id": "excessive_gaming",
-      "title": "Lost in the Game",
-      "card_type": "card",
-      "setup": "Character begins an extended gaming session that will consume most of the day and night.",
-      "image_prompt": "visual novel background, intensive gaming setup with multiple energy drink cans, bright screen glow dominating room, day/night cycle visible through window, time distortion effects, obsessive gaming environment"
+    "status_effects": [
+      {
+        "effect": "Hungry",
+        "duration": 3,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "BasicNeed",
+    "availability": "Always",
+    "flavor_text": "Empty calories for an empty soul.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character reaching into fridge or pantry for snacks, dim lighting, junk food packages visible, slightly guilty expression, casual pajamas or loungewear, cool blue refrigerator light, quick grabbing motion, collectible card game art",
+    "id": 4
+  },
+  {
+    "name": "Order Delivery",
+    "description": "Get food delivered",
+    "effect": "Convenient food delivery that provides good nutrition but requires mental effort to order and makes you feel worse about yourself.",
+    "category": "food",
+    "conditions": {
+      "min_mental": 10,
+      "required_objects": ["phone"]
     },
-    {
-      "id": 16,
-      "card_name": "Retro Games",
-      "scenario_id": "nostalgic_gaming",
-      "title": "Nostalgic Gaming",
-      "card_type": "card",
-      "setup": "Character plays classic games for comfort and nostalgia, returning to simpler times.",
-      "image_prompt": "visual novel background, vintage gaming setup with old console, pixelated retro games on screen, warm nostalgic lighting, classic gaming memorabilia, cozy retro gaming atmosphere with 8-bit aesthetics"
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 15,
+      "food_cost": 0,
+      "time_cost": 0.5,
+      "additional_costs": []
     },
-    {
-      "id": 17,
-      "card_name": "Rage Quit",
-      "scenario_id": "gaming_frustration",
-      "title": "Gaming Frustration",
-      "card_type": "card",
-      "setup": "Character becomes too frustrated with gaming and quits angrily, throwing the controller.",
-      "image_prompt": "visual novel background, gaming area with game over screen visible, controller thrown aside, frustrated gaming environment, red color scheme, scattered gaming equipment, anger and frustration atmosphere"
+    "effects": {
+      "sleep": 0,
+      "health": 0,
+      "mental": -10,
+      "food": 40
     },
-    {
-      "id": 18,
-      "card_name": "Browse Internet",
-      "scenario_id": "casual_browsing",
-      "title": "Casual Browsing",
-      "card_type": "card",
-      "setup": "Character spends time casually browsing the internet with multiple tabs open, achieving little productivity.",
-      "image_prompt": "visual novel background, desk with computer showing multiple browser tabs open, soft computer screen glow, modern room setting, messy desktop with various website windows, casual internet browsing environment"
+    "status_effects": [],
+    "card_type": "BasicNeed",
+    "availability": "Always",
+    "flavor_text": "Hello, yes, the usual please... again.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character on phone ordering food, sitting at table or couch, takeout menus scattered around, tired expression, modern apartment setting, phone glowing, delivery app interface visible, neutral colors with phone screen glow, collectible card game art",
+    "id": 5
+  },
+  {
+    "name": "Drink Water",
+    "description": "Stay hydrated",
+    "effect": "Simple hydration that provides a small health boost. Quick and always beneficial.",
+    "category": "food",
+    "conditions": {},
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 0,
+      "food_cost": 0,
+      "time_cost": 0.1,
+      "additional_costs": []
     },
-    {
-      "id": 19,
-      "card_name": "Social Media",
-      "scenario_id": "social_comparison",
-      "title": "Social Comparison",
-      "card_type": "card",
-      "setup": "Character scrolls through social media, comparing their life to others' highlight reels and feeling inadequate.",
-      "image_prompt": "visual novel background, computer or phone screen showing social media feeds with perfect lifestyle posts, comparison imagery, bright social media interface contrasting with dim room, isolating atmosphere"
+    "effects": {
+      "sleep": 0,
+      "health": 5,
+      "mental": 0,
+      "food": 0
     },
-    {
-      "id": 20,
-      "card_name": "Crash Sleep",
-      "scenario_id": "exhaustion_collapse",
-      "title": "Exhaustion Collapse",
-      "card_type": "crisis",
-      "conditions": {
-        "sleep": "<=15",
-        "crisis_level": "Severe"
+    "status_effects": [],
+    "card_type": "BasicNeed",
+    "availability": "Always",
+    "flavor_text": "The simplest acts of self-care are often the hardest.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character drinking clear water from glass, refreshing blue water effects, clean minimalist composition, sparkling water droplets, peaceful expression, bright clean lighting, simple background, health-focused imagery, collectible card game art",
+    "id": 6
+  },
+  {
+    "name": "Take Shower",
+    "description": "Clean yourself properly",
+    "effect": "Requires some energy but significantly improves both health and mental state. Also gives you focus for a while.",
+    "category": "hygiene",
+    "conditions": {
+      "min_mental": 15,
+      "min_health": 10,
+      "required_objects": ["bathroom"]
+    },
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 10,
+      "food_cost": 0,
+      "time_cost": 0.75,
+      "additional_costs": []
+    },
+    "effects": {
+      "sleep": 0,
+      "health": 20,
+      "mental": 15,
+      "food": 0
+    },
+    "status_effects": [
+      {
+        "effect": "Focused",
+        "duration": 3,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "BasicNeed",
+    "availability": "Always",
+    "flavor_text": "Hot water washes away more than just dirt.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, silhouette of character in shower with steam clouds, water droplets, refreshing blue and white color scheme, bathroom tiles visible, cleansing water effects, rejuvenating atmosphere, privacy maintained with steam, collectible card game art",
+    "id": 7
+  },
+  {
+    "name": "Basic Hygiene",
+    "description": "Brush teeth, wash face",
+    "effect": "Quick basic hygiene routine that improves health and mental state with minimal effort. Small but important self-care.",
+    "category": "hygiene",
+    "conditions": {
+      "min_mental": 5,
+      "required_objects": ["bathroom"]
+    },
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 5,
+      "food_cost": 0,
+      "time_cost": 0.25,
+      "additional_costs": []
+    },
+    "effects": {
+      "sleep": 0,
+      "health": 10,
+      "mental": 5,
+      "food": 0
+    },
+    "status_effects": [],
+    "card_type": "BasicNeed",
+    "availability": "Always",
+    "flavor_text": "Small steps toward feeling human again.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character at bathroom mirror brushing teeth or washing face, morning routine setting, toothbrush and sink visible, clean white and blue colors, focused expression, bathroom counter with hygiene items, collectible card game art",
+    "id": 8
+  },
+  {
+    "name": "Skip Hygiene",
+    "description": "Can't be bothered today",
+    "effect": "Avoiding hygiene when you can't muster the energy. Saves time but makes you feel worse and become overwhelmed.",
+    "category": "hygiene",
+    "conditions": {
+      "max_mental": 30
+    },
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 0,
+      "food_cost": 0,
+      "time_cost": 0,
+      "additional_costs": []
+    },
+    "effects": {
+      "sleep": 0,
+      "health": -5,
+      "mental": -10,
+      "food": 0
+    },
+    "status_effects": [
+      {
+        "effect": "Overwhelmed",
+        "duration": 2,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "BasicNeed",
+    "availability": "ConditionalOnly",
+    "flavor_text": "The mirror judges, so I look away.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character avoiding mirror or turning away from bathroom, disheveled appearance, muted gray and brown colors, slouched posture, messy hair, tired expression, avoiding eye contact with reflection, collectible card game art",
+    "id": 9
+  },
+  {
+    "name": "Watch Shows",
+    "description": "Normal TV viewing",
+    "effect": "Relaxing entertainment that improves your mood but makes you a bit tired. Good moderate screen time.",
+    "category": "tv",
+    "conditions": {
+      "min_mental": 10,
+      "required_objects": ["tv"]
+    },
+    "costs": {
+      "sleep_cost": 5,
+      "health_cost": 0,
+      "mental_cost": 0,
+      "food_cost": 0,
+      "time_cost": 2.0,
+      "additional_costs": []
+    },
+    "effects": {
+      "sleep": -5,
+      "health": 0,
+      "mental": 10,
+      "food": 0
+    },
+    "status_effects": [],
+    "card_type": "Entertainment",
+    "availability": "Always",
+    "flavor_text": "Other people's stories help me forget my own.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character relaxing on couch watching TV, colorful screen glow illuminating face, comfortable position, snacks nearby, evening atmosphere, warm living room colors, remote in hand, content expression, collectible card game art",
+    "id": 10
+  },
+  {
+    "name": "Binge Series",
+    "description": "Marathon viewing session",
+    "effect": "An unhealthy 6-hour binge that feels good mentally but severely hurts your health, sleep, and hunger. Becomes addictive and locks your sleep.",
+    "category": "tv",
+    "conditions": {
+      "max_mental": 60,
+      "required_objects": ["tv"]
+    },
+    "costs": {
+      "sleep_cost": 15,
+      "health_cost": 10,
+      "mental_cost": 0,
+      "food_cost": 15,
+      "time_cost": 6.0,
+      "additional_costs": ["LockResource(Sleep, 2)"]
+    },
+    "effects": {
+      "sleep": -15,
+      "health": -10,
+      "mental": 15,
+      "food": -15
+    },
+    "status_effects": [
+      {
+        "effect": "Addicted",
+        "duration": 3,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "Entertainment",
+    "availability": "ConditionalOnly",
+    "flavor_text": "Just one more episode... she said, twelve hours ago.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character surrounded by empty food containers and tissues, multiple episodes playing, disheveled appearance from long viewing session, dark room with bright TV screen, time progression clock overlay, zombie-like expression, collectible card game art",
+    "id": 11
+  },
+  {
+    "name": "Channel Surf",
+    "description": "Mindlessly flip channels",
+    "effect": "Wasting time flipping through channels when you can't focus. Kills time but makes you feel worse mentally.",
+    "category": "tv",
+    "conditions": {
+      "max_mental": 40,
+      "required_objects": ["tv"]
+    },
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 0,
+      "food_cost": 0,
+      "time_cost": 1.0,
+      "additional_costs": []
+    },
+    "effects": {
+      "sleep": 0,
+      "health": 0,
+      "mental": -5,
+      "food": 0
+    },
+    "status_effects": [],
+    "card_type": "Entertainment",
+    "availability": "ConditionalOnly",
+    "flavor_text": "Click. Nothing. Click. Nothing. Click. Still nothing.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character mindlessly clicking remote control, TV showing static or random channel flashes, bored vacant expression, slumped position, repetitive motion lines around remote, dim room lighting, empty feeling, collectible card game art",
+    "id": 12
+  },
+  {
+    "name": "Watch News",
+    "description": "Stay informed about the world",
+    "effect": "Trying to stay informed but the news significantly worsens your mental state and makes you anxious. Requires mental energy too.",
+    "category": "tv",
+    "conditions": {
+      "min_mental": 20,
+      "required_objects": ["tv"],
+      "time_of_day": ["EarlyMorning", "Morning", "Evening"]
+    },
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 5,
+      "food_cost": 0,
+      "time_cost": 1.0,
+      "additional_costs": []
+    },
+    "effects": {
+      "sleep": 0,
+      "health": 0,
+      "mental": -15,
+      "food": 0
+    },
+    "status_effects": [
+      {
+        "effect": "Anxious",
+        "duration": 3,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "Entertainment",
+    "availability": "Always",
+    "flavor_text": "Breaking News: Everything is terrible, and here's why.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character watching news with concerned expression, TV showing news ticker or reporter, red and alarming color scheme from news graphics, stress lines on character's face, morning coffee or evening setting, worried body language, collectible card game art",
+    "id": 13
+  },
+  {
+    "name": "Play Games",
+    "description": "Enjoy some gaming",
+    "effect": "Healthy gaming that significantly improves your mental state and gives you focus. Makes you a bit tired and hungry but very worthwhile.",
+    "category": "gaming",
+    "conditions": {
+      "min_mental": 15,
+      "min_health": 10,
+      "required_objects": ["gameconsole"]
+    },
+    "costs": {
+      "sleep_cost": 10,
+      "health_cost": 0,
+      "mental_cost": 0,
+      "food_cost": 5,
+      "time_cost": 3.0,
+      "additional_costs": []
+    },
+    "effects": {
+      "sleep": -10,
+      "health": 0,
+      "mental": 20,
+      "food": 0
+    },
+    "status_effects": [
+      {
+        "effect": "Focused",
+        "duration": 2,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "Entertainment",
+    "availability": "Always",
+    "flavor_text": "In digital worlds, I can be the hero.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character actively gaming with controller, focused expression, colorful game screen reflected in eyes, energetic posture, game console visible, vibrant gaming setup, immersed in virtual world, collectible card game art",
+    "id": 14
+  },
+  {
+    "name": "Gaming Marathon",
+    "description": "All-day gaming session",
+    "effect": "An extreme 12-hour gaming binge that feels amazing mentally but severely damages your health, sleep, and hunger. Becomes addictive and locks your health.",
+    "category": "gaming",
+    "conditions": {
+      "max_mental": 40,
+      "min_sleep": 30,
+      "required_objects": ["gameconsole"]
+    },
+    "costs": {
+      "sleep_cost": 25,
+      "health_cost": 20,
+      "mental_cost": 0,
+      "food_cost": 15,
+      "time_cost": 12.0,
+      "additional_costs": [
+        "LockResource(Health, 3)",
+        "AddNegativeCard(exhaustion)"
+      ]
+    },
+    "effects": {
+      "sleep": -25,
+      "health": -20,
+      "mental": 25,
+      "food": -15
+    },
+    "status_effects": [
+      {
+        "effect": "Addicted",
+        "duration": 5,
+        "intensity": 1.0
       },
-      "setup": "Character's body finally gives out from extreme exhaustion and collapses into unconscious sleep.",
-      "image_prompt": "visual novel background, room where someone has collapsed from exhaustion, scattered items around, dramatic lighting showing extreme fatigue aftermath, crisis atmosphere with dark shadows, exhaustion visualization"
+      {
+        "effect": "Exhausted",
+        "duration": 3,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "Entertainment",
+    "availability": "ConditionalOnly",
+    "flavor_text": "Day and night blur together in the blue glow.",
+    "one_time_use": false,
+    "cooldown": 5,
+    "prompt": "pixel art anime style, character hunched over gaming setup for hours, multiple empty energy drink cans, red tired eyes, intense blue screen glow, day/night cycle in background window, unhealthy obsessed expression, time distortion effects, collectible card game art",
+    "id": 15
+  },
+  {
+    "name": "Retro Games",
+    "description": "Play old favorites",
+    "effect": "Nostalgic gaming that improves your mental state and makes you feel stable and grounded. Requires some mental energy but very comforting.",
+    "category": "gaming",
+    "conditions": {
+      "min_mental": 25,
+      "required_objects": ["gameconsole"]
     },
-    {
-      "id": 21,
-      "card_name": "Mental Breakdown",
-      "scenario_id": "complete_breakdown",
-      "title": "The Breaking Point",
-      "card_type": "crisis",
-      "conditions": {
-        "mental": "<=10",
-        "crisis_level": "Critical"
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 5,
+      "food_cost": 0,
+      "time_cost": 2.0,
+      "additional_costs": []
+    },
+    "effects": {
+      "sleep": 0,
+      "health": 0,
+      "mental": 15,
+      "food": 0
+    },
+    "status_effects": [
+      {
+        "effect": "Stable",
+        "duration": 2,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "Entertainment",
+    "availability": "Always",
+    "flavor_text": "Simpler times, simpler games, simpler me.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character playing classic pixelated games on old console, nostalgic warm color palette, vintage gaming setup, peaceful smile, retro 8-bit graphics on screen, cozy atmosphere, childhood memories floating around, collectible card game art",
+    "id": 16
+  },
+  {
+    "name": "Rage Quit",
+    "description": "Game is too frustrating",
+    "effect": "Getting so frustrated with a game that you quit angrily. Costs mental energy and significantly worsens your mood, making you feel overwhelmed.",
+    "category": "gaming",
+    "conditions": {
+      "max_mental": 50,
+      "required_objects": ["gameconsole"]
+    },
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 10,
+      "food_cost": 0,
+      "time_cost": 0.5,
+      "additional_costs": []
+    },
+    "effects": {
+      "sleep": 0,
+      "health": 0,
+      "mental": -20,
+      "food": 0
+    },
+    "status_effects": [
+      {
+        "effect": "Overwhelmed",
+        "duration": 2,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "Entertainment",
+    "availability": "ConditionalOnly",
+    "flavor_text": "This game is stupid! *throws controller across room*",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character angrily throwing controller, red angry face, game over screen visible, steam coming from ears, dramatic motion lines, scattered gaming equipment, frustrated outburst, intense red color scheme, collectible card game art",
+    "id": 17
+  },
+  {
+    "name": "Browse Internet",
+    "description": "General computer use",
+    "effect": "Casual internet browsing that slightly improves your mood with minimal effort. Light entertainment that requires some mental energy.",
+    "category": "computer",
+    "conditions": {
+      "min_mental": 10,
+      "required_objects": ["computer"]
+    },
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 5,
+      "food_cost": 0,
+      "time_cost": 2.0,
+      "additional_costs": []
+    },
+    "effects": {
+      "sleep": 0,
+      "health": 0,
+      "mental": 5,
+      "food": 0
+    },
+    "status_effects": [],
+    "card_type": "Entertainment",
+    "availability": "Always",
+    "flavor_text": "Seventeen tabs open, zero productivity achieved.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character at computer with multiple browser tabs open, casual browsing posture, soft computer screen glow, messy desktop with icons, random websites visible, relaxed expression, modern room setting, collectible card game art",
+    "id": 18
+  },
+  {
+    "name": "Social Media",
+    "description": "Check social platforms",
+    "effect": "Checking social media that requires some mental effort but significantly worsens your mood and makes you anxious by comparing yourself to others.",
+    "category": "computer",
+    "conditions": {
+      "min_mental": 5,
+      "required_objects": ["computer"]
+    },
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 10,
+      "food_cost": 0,
+      "time_cost": 1.5,
+      "additional_costs": []
+    },
+    "effects": {
+      "sleep": 0,
+      "health": 0,
+      "mental": -15,
+      "food": 0
+    },
+    "status_effects": [
+      {
+        "effect": "Anxious",
+        "duration": 2,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "Entertainment",
+    "availability": "Always",
+    "flavor_text": "Everyone else's highlight reel vs. my behind-the-scenes.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character scrolling through social media feeds, envious or sad expression, perfect lifestyle posts visible on screen, comparison arrows between screen and character, muted colors contrasting bright feed, isolation feeling, collectible card game art",
+    "id": 19
+  },
+  {
+    "name": "Crash Sleep",
+    "description": "Collapse from exhaustion",
+    "effect": "Emergency sleep when you're completely exhausted. Restores a lot of sleep but hurts your health and leaves you exhausted. Only available during severe crisis.",
+    "category": "crisis",
+    "conditions": {
+      "max_sleep": 15,
+      "crisis_level": "Severe"
+    },
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 10,
+      "mental_cost": 0,
+      "food_cost": 0,
+      "time_cost": 12.0,
+      "additional_costs": []
+    },
+    "effects": {
+      "sleep": 80,
+      "health": -10,
+      "mental": 0,
+      "food": 0
+    },
+    "status_effects": [
+      {
+        "effect": "Exhausted",
+        "duration": 2,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "Crisis",
+    "availability": "CrisisOnly",
+    "flavor_text": "Help. Please. I can't do this alone anymore.",
+    "one_time_use": false,
+    "cooldown": 7,
+    "prompt": "pixel art anime style, character desperately holding phone making emergency call, tears in eyes, vulnerable expression, reaching out gesture, lifeline connection visual, warm supportive colors emerging from darkness, hope breaking through, collectible card game art",
+    "id": 20
+  },
+  {
+    "name": "Mental Breakdown",
+    "description": "Everything becomes too much",
+    "effect": "Complete emotional collapse that severely damages your mental health and creates long-lasting depression and overwhelm. A crisis state that adds trauma cards.",
+    "category": "crisis",
+    "conditions": {
+      "max_mental": 10,
+      "crisis_level": "Critical"
+    },
+    "costs": {
+      "sleep_cost": 20,
+      "health_cost": 20,
+      "mental_cost": 0,
+      "food_cost": 0,
+      "time_cost": 4.0,
+      "additional_costs": ["AddNegativeCard(trauma)", "AddNegativeCard(trauma)"]
+    },
+    "effects": {
+      "sleep": 0,
+      "health": -20,
+      "mental": -50,
+      "food": 0
+    },
+    "status_effects": [
+      {
+        "effect": "Depressed",
+        "duration": 7,
+        "intensity": 2.0
       },
-      "setup": "Character experiences a complete mental and emotional breakdown when everything becomes too much to handle.",
-      "image_prompt": "visual novel background, room in complete emotional chaos with shattered glass effects, overwhelming storm visualization, dark stormy colors, intense crisis atmosphere, emotional dam bursting environment"
+      {
+        "effect": "Overwhelmed",
+        "duration": 5,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "Crisis",
+    "availability": "CrisisOnly",
+    "flavor_text": "The dam breaks. Everything floods out at once.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character in complete emotional collapse, tears streaming, hands on head, shattered glass effects around, overwhelming chaos visualization, dark stormy colors, emotional dam bursting, intense crisis moment, collectible card game art",
+    "id": 21
+  },
+  {
+    "name": "Morning Anxiety",
+    "description": "Dread the day ahead",
+    "effect": "Waking up with dread about the day ahead. Significantly worsens your mental state and makes you anxious for hours. Only happens in early morning when already struggling.",
+    "category": "time_specific",
+    "conditions": {
+      "max_mental": 40,
+      "time_of_day": ["EarlyMorning"]
     },
-    {
-      "id": 22,
-      "card_name": "Morning Anxiety",
-      "scenario_id": "dawn_dread",
-      "title": "Dawn Dread",
-      "card_type": "card",
-      "setup": "Character wakes up filled with anxiety and dread about the day ahead, morning sunlight feeling ominous.",
-      "image_prompt": "visual novel background, bedroom in early morning with ominous sunlight casting long shadows, anxious atmosphere, overwhelming daily task symbols in air, yellow morning light contrasting dark mood, dread-filled dawn"
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 0,
+      "food_cost": 0,
+      "time_cost": 1.0,
+      "additional_costs": []
     },
-    {
-      "id": 23,
-      "card_name": "3AM Thoughts",
-      "scenario_id": "existential_night",
-      "title": "3AM Existential Crisis",
-      "card_type": "card",
-      "setup": "Character lies awake at 3AM consumed by existential dread and overwhelming thoughts about life.",
-      "image_prompt": "visual novel background, dark bedroom at 3AM with only clock light visible, existential thought symbols floating in darkness, deep purple and black color scheme, insomnia atmosphere, philosophical dread environment"
+    "effects": {
+      "sleep": 0,
+      "health": 0,
+      "mental": -20,
+      "food": 0
     },
-    {
-      "id": 24,
-      "card_name": "Force Exercise",
-      "scenario_id": "reluctant_workout",
-      "title": "Reluctant Workout",
-      "card_type": "card",
-      "setup": "Character forces themselves to exercise despite lack of motivation, pushing through mental resistance.",
-      "image_prompt": "visual novel background, home gym or workout space with exercise equipment, motivational struggle atmosphere, morning or afternoon lighting, determined but strained environment, self-improvement setting"
+    "status_effects": [
+      {
+        "effect": "Anxious",
+        "duration": 4,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "TimeSpecific",
+    "availability": "ConditionalOnly",
+    "flavor_text": "Another day. Another chance to fail.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character waking up with dread, morning sunlight casting ominous shadows, anxious expression looking at clock, overwhelming daily tasks visualized as storm clouds, yellow morning light contrasting dark mood, collectible card game art",
+    "id": 22
+  },
+  {
+    "name": "3AM Thoughts",
+    "description": "Existential dread hits",
+    "effect": "Late-night existential crisis that severely worsens your mental state and sleep while causing insomnia and anxiety. The worst time for deep thoughts.",
+    "category": "time_specific",
+    "conditions": {
+      "max_sleep": 40,
+      "time_of_day": ["LateNight"]
     },
-    {
-      "id": 25,
-      "card_name": "Procrastinate Everything",
-      "scenario_id": "avoidance_spiral",
-      "title": "Avoidance Spiral",
-      "card_type": "card",
-      "setup": "Character actively avoids all responsibilities and tasks, putting everything off until tomorrow.",
-      "image_prompt": "visual novel background, desk or workspace with pile of ignored tasks and responsibilities, calendar showing 'tomorrow' highlighted, guilt and anxiety clouds forming, procrastination visualization with time slipping away"
+    "costs": {
+      "sleep_cost": 20,
+      "health_cost": 0,
+      "mental_cost": 0,
+      "food_cost": 0,
+      "time_cost": 2.0,
+      "additional_costs": []
     },
-    {
-      "id": 26,
-      "card_name": "Emergency Medical Visit",
-      "scenario_id": "medical_crisis",
-      "title": "Medical Crisis",
-      "card_type": "crisis",
-      "conditions": {
-        "health": "<=20",
-        "crisis_level": "Severe"
+    "effects": {
+      "sleep": -20,
+      "health": 0,
+      "mental": -25,
+      "food": 0
+    },
+    "status_effects": [
+      {
+        "effect": "Insomnia",
+        "duration": 2,
+        "intensity": 1.0
       },
-      "setup": "Character seeks urgent medical care when health issues can no longer be ignored or managed alone.",
-      "image_prompt": "visual novel background, hospital or urgent care waiting room, clinical lighting, medical setting with sterile white and blue colors, health crisis atmosphere, professional medical environment"
+      {
+        "effect": "Anxious",
+        "duration": 3,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "TimeSpecific",
+    "availability": "ConditionalOnly",
+    "flavor_text": "3 AM: When the universe whispers all its cruelest truths.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character lying awake at 3AM staring at ceiling, dark room with only clock light, existential thought bubbles floating, deep purple and black color scheme, insomnia visualization, philosophical dread atmosphere, collectible card game art",
+    "id": 23
+  },
+  {
+    "name": "Force Exercise",
+    "description": "Push yourself to work out",
+    "effect": "Forcing yourself to exercise when you have enough energy. Costs mental effort and food but significantly improves health and gives you motivation.",
+    "category": "self_improvement",
+    "conditions": {
+      "min_health": 30,
+      "min_mental": 25,
+      "forbidden_mood": "Depressed",
+      "time_of_day": ["Morning", "Afternoon"]
     },
-    {
-      "id": 27,
-      "card_name": "Rock Bottom Epiphany",
-      "scenario_id": "transformative_moment",
-      "title": "The Turning Point",
-      "card_type": "crisis",
-      "conditions": {
-        "crisis_level": "Critical"
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 15,
+      "food_cost": 10,
+      "time_cost": 2.0,
+      "additional_costs": []
+    },
+    "effects": {
+      "sleep": -10,
+      "health": 25,
+      "mental": 5,
+      "food": 0
+    },
+    "status_effects": [
+      {
+        "effect": "Motivated",
+        "duration": 4,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "BasicNeed",
+    "availability": "Always",
+    "flavor_text": "No pain, no gain. The pain is real though.",
+    "one_time_use": false,
+    "cooldown": 2,
+    "prompt": "pixel art anime style, character forcing themselves to exercise despite reluctance, determined but strained expression, sweat droplets, gym or home workout setting, pushing through discomfort, motivational energy aura, struggle and determination, collectible card game art",
+    "id": 24
+  },
+  {
+    "name": "Procrastinate Everything",
+    "description": "Avoid all responsibilities",
+    "effect": "Putting off all your responsibilities when overwhelmed. Wastes a lot of time and significantly worsens your mental state while making you feel overwhelmed and guilty.",
+    "category": "avoidance",
+    "conditions": {
+      "max_mental": 40
+    },
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 0,
+      "food_cost": 0,
+      "time_cost": 4.0,
+      "additional_costs": ["AddNegativeCard(guilt)"]
+    },
+    "effects": {
+      "sleep": 0,
+      "health": 0,
+      "mental": -20,
+      "food": 0
+    },
+    "status_effects": [
+      {
+        "effect": "Overwhelmed",
+        "duration": 3,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "Entertainment",
+    "availability": "ConditionalOnly",
+    "flavor_text": "I'll do it tomorrow. I always do it tomorrow.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character avoiding pile of tasks and responsibilities, turning away from to-do lists, tomorrow calendar highlighted, guilt and anxiety clouds forming, procrastination visualization with time slipping away, collectible card game art",
+    "id": 25
+  },
+  {
+    "name": "Emergency Medical Visit",
+    "description": "Seek urgent medical care",
+    "effect": "Going to the hospital when your health is critically low. Significantly improves health but causes anxiety and costs mental energy and food. Long wait time.",
+    "category": "crisis",
+    "conditions": {
+      "max_health": 20,
+      "crisis_level": "Severe"
+    },
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 25,
+      "food_cost": 0,
+      "time_cost": 6.0,
+      "additional_costs": []
+    },
+    "effects": {
+      "sleep": 0,
+      "health": 40,
+      "mental": -15,
+      "food": -10
+    },
+    "status_effects": [
+      {
+        "effect": "Anxious",
+        "duration": 3,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "Crisis",
+    "availability": "CrisisOnly",
+    "flavor_text": "When ignoring it stops being an option.",
+    "one_time_use": false,
+    "cooldown": 10,
+    "prompt": "pixel art anime style, character at hospital or urgent care, worried expression in waiting room, medical setting with clinical lighting, health crisis moment, seeking professional help, sterile white and blue medical colors, collectible card game art",
+    "id": 26
+  },
+  {
+    "name": "Rock Bottom Epiphany",
+    "description": "Hit bottom, find clarity",
+    "effect": "A transformative moment when you hit rock bottom but find clarity and motivation. Consumes all your mental and sleep but gives you significant boosts to everything and strong motivation. One-time use only.",
+    "category": "crisis",
+    "conditions": {
+      "crisis_level": "Critical"
+    },
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 0,
+      "food_cost": 0,
+      "time_cost": 3.0,
+      "additional_costs": [
+        "ConsumeAllOfResource(Mental)",
+        "ConsumeAllOfResource(Sleep)"
+      ]
+    },
+    "effects": {
+      "sleep": 25,
+      "health": 25,
+      "mental": 25,
+      "food": 25
+    },
+    "status_effects": [
+      {
+        "effect": "Motivated",
+        "duration": 7,
+        "intensity": 2.0
       },
-      "setup": "Character hits absolute rock bottom but finds unexpected clarity and hope for transformation.",
-      "image_prompt": "visual novel background, dark void with single ray of transformative light breaking through, phoenix rising metaphor visualization, golden light emerging from darkness, rebirth symbolism, hope breaking through despair"
+      {
+        "effect": "Focused",
+        "duration": 5,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "Crisis",
+    "availability": "CrisisOnly",
+    "flavor_text": "Sometimes you have to lose everything to find yourself.",
+    "one_time_use": true,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character at lowest point but with sudden clarity light breaking through darkness, phoenix rising from ashes metaphor, transformative moment, despair turning to hope, golden light emerging from dark void, rebirth symbolism, collectible card game art",
+    "id": 27
+  },
+  {
+    "name": "Self-Care Sunday",
+    "description": "Perfect day of restoration",
+    "effect": "A comprehensive self-care day that requires high stats and mental energy but significantly improves all your stats and makes you stable and motivated. Has a weekly cooldown.",
+    "category": "combo",
+    "conditions": {
+      "min_sleep": 60,
+      "min_health": 60,
+      "min_mental": 60,
+      "min_food": 60,
+      "time_of_day": ["Morning", "Afternoon"],
+      "required_objects": ["bathroom", "kitchen"]
     },
-    {
-      "id": 28,
-      "card_name": "Self-Care Sunday",
-      "scenario_id": "perfect_care_day",
-      "title": "Perfect Self-Care Day",
-      "card_type": "card",
-      "setup": "Character dedicates an entire day to comprehensive self-care and restoration when they have the energy.",
-      "image_prompt": "visual novel background, spa-like home environment with wellness items arranged beautifully, golden hour lighting, peaceful self-care setting, holistic wellness atmosphere, restoration and renewal environment"
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 20,
+      "food_cost": 10,
+      "time_cost": 6.0,
+      "additional_costs": []
     },
-    {
-      "id": 29,
-      "card_name": "Productive Morning",
-      "scenario_id": "perfect_morning",
-      "title": "Perfect Morning Routine",
-      "card_type": "card",
-      "setup": "Character executes a perfect, productive morning routine when well-rested and motivated.",
-      "image_prompt": "visual novel background, bright morning kitchen and bathroom combo, fresh sunrise through windows, organized morning routine setup, energetic atmosphere, bright optimistic colors, productive morning environment"
+    "effects": {
+      "sleep": 20,
+      "health": 25,
+      "mental": 30,
+      "food": 15
     },
-    {
-      "id": 30,
-      "card_name": "Isolation Spiral",
-      "scenario_id": "social_withdrawal",
-      "title": "Social Withdrawal",
-      "card_type": "card",
-      "setup": "Character withdraws completely from all social contact, finding people exhausting and silence safer.",
-      "image_prompt": "visual novel background, isolated apartment with closed curtains, phone notifications ignored and piling up, dark room with separation from outside world, muted grays and blues, self-imposed isolation environment"
-    },
-    {
-      "id": 31,
-      "card_name": "Answer Call",
-      "scenario_id": "breaking_silence",
-      "title": "Breaking the Silence",
-      "card_type": "card",
-      "setup": "Character overcomes anxiety and social fatigue to actually answer a phone call from someone.",
-      "image_prompt": "visual novel background, room with ringing phone casting warm light, connection breaking through isolation, communication atmosphere, breaking social barrier environment, warm communication colors"
-    },
-    {
-      "id": 32,
-      "card_name": "Ignore Everyone",
-      "scenario_id": "silence_world",
-      "title": "Silencing the World",
-      "card_type": "card",
-      "setup": "Character actively ignores all attempts at social contact, overwhelmed by social demands.",
-      "image_prompt": "visual novel background, room with multiple notification sources being actively avoided, defensive atmosphere, social demands being pushed away, overwhelmed avoidance environment, muted defensive colors"
-    },
-    {
-      "id": 33,
-      "card_name": "Panic Eating",
-      "scenario_id": "stress_binge",
-      "title": "Stress Binge",
-      "card_type": "crisis",
-      "conditions": {
-        "food": "<=20",
-        "mental": "<=30",
-        "crisis_level": "Moderate"
+    "status_effects": [
+      {
+        "effect": "Stable",
+        "duration": 5,
+        "intensity": 1.0
       },
-      "setup": "Character desperately binges on food to cope with overwhelming stress and emotional emptiness.",
-      "image_prompt": "visual novel background, kitchen or dining area with multiple empty food containers and wrappers scattered everywhere, chaotic eating scene, stress-eating environment, orange-red crisis tones, compulsive behavior aftermath"
+      {
+        "effect": "Motivated",
+        "duration": 3,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "ComboCard",
+    "availability": "Always",
+    "flavor_text": "Today, I choose me.",
+    "one_time_use": false,
+    "cooldown": 7,
+    "prompt": "pixel art anime style, character enjoying perfect self-care day montage, spa-like atmosphere, healthy meal prep, relaxation activities, golden hour lighting, peaceful facial expression, wellness activities combined, holistic care visualization, collectible card game art",
+    "id": 28
+  },
+  {
+    "name": "Productive Morning",
+    "description": "Start the day right",
+    "effect": "A great morning routine that requires good sleep and some mental energy but improves health, mental state, and food while giving you focus for hours.",
+    "category": "combo",
+    "conditions": {
+      "min_sleep": 70,
+      "min_mental": 50,
+      "time_of_day": ["EarlyMorning", "Morning"],
+      "required_objects": ["bathroom", "kitchen"]
     },
-    {
-      "id": 34,
-      "card_name": "Hide Under Blanket",
-      "scenario_id": "blanket_fortress",
-      "title": "Blanket Fortress",
-      "card_type": "crisis",
-      "conditions": {
-        "mental": "<=25",
-        "crisis_level": "Mild"
-      },
-      "setup": "Character retreats completely under blankets to hide from the world and create a safe space.",
-      "image_prompt": "visual novel background, bedroom with blankets forming a complete cocoon or fort on bed, dark room with minimal light seeping through, isolation sanctuary, muted blues and grays, protective barrier atmosphere"
-    }
-  ]
-}
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 15,
+      "food_cost": 0,
+      "time_cost": 3.0,
+      "additional_costs": []
+    },
+    "effects": {
+      "sleep": 0,
+      "health": 15,
+      "mental": 25,
+      "food": 20
+    },
+    "status_effects": [
+      {
+        "effect": "Focused",
+        "duration": 6,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "ComboCard",
+    "availability": "Always",
+    "flavor_text": "The early bird catches the worm, and inner peace.",
+    "one_time_use": false,
+    "cooldown": 3,
+    "prompt": "pixel art anime style, character having perfect morning routine sequence, fresh sunrise through window, energetic and focused expression, healthy breakfast and shower combo, organized morning activities, bright optimistic colors, collectible card game art",
+    "id": 29
+  },
+  {
+    "name": "Isolation Spiral",
+    "description": "Withdraw from everyone",
+    "effect": "Withdrawing from all social contact when struggling. Hurts your health and mental state significantly while making you depressed and adding loneliness to your life.",
+    "category": "social",
+    "conditions": {
+      "max_mental": 30,
+      "forbidden_mood": "Content"
+    },
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 0,
+      "food_cost": 0,
+      "time_cost": 2.0,
+      "additional_costs": ["AddNegativeCard(loneliness)"]
+    },
+    "effects": {
+      "sleep": 0,
+      "health": -5,
+      "mental": -15,
+      "food": 0
+    },
+    "status_effects": [
+      {
+        "effect": "Depressed",
+        "duration": 4,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "Social",
+    "availability": "ConditionalOnly",
+    "flavor_text": "People are exhausting. Silence is safer.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character alone in dark room avoiding all contact, phone notifications ignored, closed curtains, isolated from world, spiral of loneliness visualization, muted grays and blues, self-imposed isolation, collectible card game art",
+    "id": 30
+  },
+  {
+    "name": "Answer Call",
+    "description": "Actually talk to someone",
+    "effect": "Making the effort to answer a phone call and talk to someone. Costs some sleep and mental energy but improves your mental state and makes you feel stable.",
+    "category": "social",
+    "conditions": {
+      "min_mental": 15,
+      "required_objects": ["phone"]
+    },
+    "costs": {
+      "sleep_cost": 10,
+      "health_cost": 0,
+      "mental_cost": 15,
+      "food_cost": 0,
+      "time_cost": 1.0,
+      "additional_costs": []
+    },
+    "effects": {
+      "sleep": 0,
+      "health": 0,
+      "mental": 15,
+      "food": 0
+    },
+    "status_effects": [
+      {
+        "effect": "Stable",
+        "duration": 2,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "Social",
+    "availability": "Always",
+    "flavor_text": "Hello? Yes, I'm still alive. Barely.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character reluctantly but successfully answering phone call, mixed expression of effort and relief, phone conversation taking place, connection visualization, breaking isolation barrier, warm communication colors, collectible card game art",
+    "id": 31
+  },
+  {
+    "name": "Ignore Everyone",
+    "description": "Silence the world",
+    "effect": "Avoiding all social contact and ignoring calls/messages when overwhelmed. Quick avoidance that worsens your mental state and makes you feel overwhelmed.",
+    "category": "social",
+    "conditions": {
+      "max_mental": 40
+    },
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 0,
+      "food_cost": 0,
+      "time_cost": 0.5,
+      "additional_costs": []
+    },
+    "effects": {
+      "sleep": 0,
+      "health": 0,
+      "mental": -10,
+      "food": 0
+    },
+    "status_effects": [
+      {
+        "effect": "Overwhelmed",
+        "duration": 2,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "Social",
+    "availability": "ConditionalOnly",
+    "flavor_text": "If I don't answer, the problem doesn't exist.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character actively ignoring ringing phone and messages, hands over ears, overwhelmed by social demands, notification bubbles being pushed away, defensive posture, muted avoidance colors, collectible card game art",
+    "id": 32
+  },
+  {
+    "name": "Panic Eating",
+    "description": "Stress-induced binge eating",
+    "effect": "Compulsively eating large amounts when stressed and hungry. Fills you up completely but significantly hurts your health and mental state, making you sick and locking your food stat.",
+    "category": "crisis",
+    "conditions": {
+      "max_food": 20,
+      "max_mental": 30,
+      "crisis_level": "Moderate"
+    },
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 15,
+      "mental_cost": 10,
+      "food_cost": 0,
+      "time_cost": 1.0,
+      "additional_costs": ["LockResource(Food, 3)"]
+    },
+    "effects": {
+      "sleep": 0,
+      "health": -15,
+      "mental": -10,
+      "food": 60
+    },
+    "status_effects": [
+      {
+        "effect": "Sick",
+        "duration": 2,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "Crisis",
+    "availability": "CrisisOnly",
+    "flavor_text": "If I can't fill the emptiness inside, I'll fill my stomach.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character frantically eating large amounts of food, distressed expression, food wrappers everywhere, compulsive eating motion, emotional turmoil visible, kitchen chaos, stress eating behavior, crisis orange-red tones, collectible card game art",
+    "id": 33
+  },
+  {
+    "name": "Hide Under Blanket",
+    "description": "Retreat from everything",
+    "effect": "Hiding under blankets to escape the world when struggling. Provides some sleep but worsens your mental state and makes you feel depressed. A mild crisis response.",
+    "category": "crisis",
+    "conditions": {
+      "max_mental": 25,
+      "crisis_level": "Mild"
+    },
+    "costs": {
+      "sleep_cost": 0,
+      "health_cost": 0,
+      "mental_cost": 5,
+      "food_cost": 0,
+      "time_cost": 3.0,
+      "additional_costs": []
+    },
+    "effects": {
+      "sleep": 10,
+      "health": 0,
+      "mental": -5,
+      "food": 0
+    },
+    "status_effects": [
+      {
+        "effect": "Depressed",
+        "duration": 2,
+        "intensity": 1.0
+      }
+    ],
+    "card_type": "Crisis",
+    "availability": "CrisisOnly",
+    "flavor_text": "Under here, the world can't hurt me.",
+    "one_time_use": false,
+    "cooldown": null,
+    "prompt": "pixel art anime style, character completely hidden under blankets forming a cocoon, only small shape visible on bed, dark room with minimal light, isolation and safety seeking, muted blues and grays, protective barrier from world, collectible card game art",
+    "id": 34
+  }
+]

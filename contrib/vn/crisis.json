@@ -1,0 +1,1121 @@
+{
+  "mental_crisis_scenarios": [
+    {
+      "id": "hearing_voices_001",
+      "card_name": "Hearing Voices",
+      "scenario_id": "auditory_hallucinations",
+      "title": "The Voices Begin",
+      "card_type": "crisis",
+      "trigger_conditions": {
+        "mental_health": "<=5",
+        "crisis_level": "Critical",
+        "status_effects_present": ["Depressed", "Overwhelmed"],
+        "consecutive_low_mental_days": ">=3",
+        "time_of_day": ["LateNight", "EarlyMorning"]
+      },
+      "setup": "Character begins experiencing auditory hallucinations - hearing voices that aren't there, becoming confused about what's real.",
+      "progression": {
+        "stage_1": {
+          "description": "Faint whispers that could be mistaken for neighbors or TV",
+          "mental_health_threshold": "<=8",
+          "effects": {
+            "mental": -15,
+            "sleep": -10
+          }
+        },
+        "stage_2": {
+          "description": "Clear voices giving commentary or instructions",
+          "mental_health_threshold": "<=5",
+          "effects": {
+            "mental": -25,
+            "sleep": -20,
+            "health": -10
+          }
+        },
+        "stage_3": {
+          "description": "Multiple voices, becoming overwhelming and frightening",
+          "mental_health_threshold": "<=2",
+          "effects": {
+            "mental": -35,
+            "sleep": -30,
+            "health": -15
+          }
+        }
+      },
+      "dialogue_progression": [
+        "Did someone just call my name?",
+        "I can hear people talking... but there's no one here.",
+        "The voices are getting clearer. They know things about me.",
+        "They won't stop talking. I can't make them stop.",
+        "They're telling me what to do. Should I listen?"
+      ],
+      "image_prompt": "visual novel background, empty room with sound wave visualizations floating in air, multiple voice bubble symbols scattered around, distorted audio atmosphere, reality distortion effects, disturbing auditory hallucination environment",
+      "status_effects_applied": [
+        {
+          "effect": "Paranoid",
+          "duration": 5,
+          "intensity": 2.0
+        },
+        {
+          "effect": "Insomnia",
+          "duration": 3,
+          "intensity": 1.5
+        }
+      ],
+      "recovery_requirements": {
+        "minimum_mental_health": 30,
+        "required_cards": ["Call for Help", "Emergency Medical Visit"],
+        "status_effects_needed": ["Stable", "Focused"]
+      }
+    },
+    {
+      "id": "kitchen_noises_002",
+      "card_name": "Kitchen Phantoms",
+      "scenario_id": "phantom_kitchen_sounds",
+      "title": "Sounds from Empty Spaces",
+      "card_type": "crisis",
+      "trigger_conditions": {
+        "mental_health": "<=8",
+        "crisis_level": "Severe",
+        "available_objects": ["kitchen"],
+        "time_of_day": ["Night", "LateNight"],
+        "isolation_status": true
+      },
+      "setup": "Character hears mysterious cooking sounds, footsteps, and kitchen activity when no one else is home.",
+      "progression": {
+        "stage_1": {
+          "description": "Occasional sounds - maybe pipes or neighbors",
+          "mental_health_threshold": "<=12",
+          "effects": {
+            "mental": -8,
+            "sleep": -5
+          }
+        },
+        "stage_2": {
+          "description": "Clear cooking sounds - pots, pans, running water",
+          "mental_health_threshold": "<=8",
+          "effects": {
+            "mental": -15,
+            "sleep": -12,
+            "food": -5
+          }
+        },
+        "stage_3": {
+          "description": "Full phantom dinner preparation sounds",
+          "mental_health_threshold": "<=5",
+          "effects": {
+            "mental": -25,
+            "sleep": -20,
+            "health": -8
+          }
+        }
+      },
+      "dialogue_progression": [
+        "Is someone in the kitchen?",
+        "I definitely heard dishes clinking... but I live alone.",
+        "The water is running. I didn't turn it on.",
+        "Someone's cooking dinner. I can smell it now.",
+        "I should check the kitchen... but I'm afraid of what I'll find."
+      ],
+      "image_prompt": "visual novel background, empty kitchen viewed from doorway with sound effect visualizations, mysterious noise indicators, shadowy kitchen atmosphere, phantom sound waves, disturbing empty space with implied presence",
+      "investigation_options": [
+        {
+          "choice": "Go check the kitchen",
+          "outcome": "confirms_hallucination",
+          "mental_cost": 10,
+          "reality_check": true
+        },
+        {
+          "choice": "Ignore the sounds",
+          "outcome": "sounds_intensify",
+          "mental_cost": 15,
+          "paranoia_increase": true
+        },
+        {
+          "choice": "Call someone for reassurance",
+          "outcome": "partial_relief",
+          "mental_cost": 5,
+          "requires_phone": true
+        }
+      ],
+      "status_effects_applied": [
+        {
+          "effect": "Paranoid",
+          "duration": 4,
+          "intensity": 1.5
+        },
+        {
+          "effect": "Anxious",
+          "duration": 6,
+          "intensity": 1.0
+        }
+      ]
+    },
+    {
+      "id": "neighbor_communication_003",
+      "card_name": "The Neighbors Know",
+      "scenario_id": "paranoid_neighbor_communication",
+      "title": "They're Trying to Tell Me Something",
+      "card_type": "crisis",
+      "trigger_conditions": {
+        "mental_health": "<=10",
+        "crisis_level": "Severe",
+        "social_isolation_days": ">=5",
+        "status_effects_present": ["Paranoid", "Depressed"]
+      },
+      "setup": "Character becomes convinced that neighbors are trying to communicate through walls, sounds, or subtle signs.",
+      "progression": {
+        "stage_1": {
+          "description": "Noticing patterns in neighbor sounds",
+          "mental_health_threshold": "<=15",
+          "effects": {
+            "mental": -10,
+            "sleep": -8
+          }
+        },
+        "stage_2": {
+          "description": "Believing sounds are intentional messages",
+          "mental_health_threshold": "<=10",
+          "effects": {
+            "mental": -18,
+            "sleep": -15,
+            "health": -5
+          }
+        },
+        "stage_3": {
+          "description": "Complex communication system delusions",
+          "mental_health_threshold": "<=7",
+          "effects": {
+            "mental": -25,
+            "sleep": -20,
+            "health": -10
+          }
+        }
+      },
+      "dialogue_progression": [
+        "They're being awfully loud tonight... almost like a pattern.",
+        "Three knocks, pause, two knocks. That's not random.",
+        "They know I can hear them. They're trying to tell me something.",
+        "The pattern is getting more complex. It's definitely a code.",
+        "They're warning me about something. I need to decode this."
+      ],
+      "image_prompt": "visual novel background, apartment walls with mysterious symbols or patterns, communication attempt visualizations through walls, paranoid atmosphere, neighbor presence implications, wall communication environment",
+      "delusion_mechanics": {
+        "pattern_recognition": {
+          "normal_sounds": ["footsteps", "TV", "music", "doors"],
+          "interpreted_as": [
+            "morse_code",
+            "warnings",
+            "surveillance",
+            "conspiracy"
+          ]
+        },
+        "escalation_triggers": [
+          "any_neighbor_noise_during_night",
+          "isolation_for_more_than_8_hours",
+          "mental_health_below_8"
+        ]
+      },
+      "status_effects_applied": [
+        {
+          "effect": "Paranoid",
+          "duration": 7,
+          "intensity": 2.0
+        },
+        {
+          "effect": "Obsessive",
+          "duration": 5,
+          "intensity": 1.5
+        }
+      ]
+    },
+    {
+      "id": "mirror_conversations_004",
+      "card_name": "Mirror Talks Back",
+      "scenario_id": "reflection_dialogue",
+      "title": "Conversations with Myself",
+      "card_type": "crisis",
+      "trigger_conditions": {
+        "mental_health": "<=7",
+        "crisis_level": "Critical",
+        "required_objects": ["bathroom"],
+        "status_effects_present": ["Depressed", "Paranoid"],
+        "consecutive_isolation_hours": ">=12"
+      },
+      "setup": "Character begins having conversations with their reflection, believing it responds independently and has its own thoughts.",
+      "progression": {
+        "stage_1": {
+          "description": "Talking to reflection for comfort",
+          "mental_health_threshold": "<=10",
+          "effects": {
+            "mental": -5,
+            "health": -3
+          }
+        },
+        "stage_2": {
+          "description": "Reflection seems to respond with different expressions",
+          "mental_health_threshold": "<=7",
+          "effects": {
+            "mental": -15,
+            "health": -8,
+            "sleep": -10
+          }
+        },
+        "stage_3": {
+          "description": "Full conversations with reflection as separate entity",
+          "mental_health_threshold": "<=4",
+          "effects": {
+            "mental": -30,
+            "health": -15,
+            "sleep": -20
+          }
+        }
+      },
+      "dialogue_progression": [
+        "At least you understand me, don't you?",
+        "Did you just... did your expression change?",
+        "You're not copying me exactly. You're thinking for yourself.",
+        "Tell me what I should do. You know me better than anyone.",
+        "Why are you looking at me like that? What do you see?"
+      ],
+      "mirror_dialogue": [
+        {
+          "player": "I don't know what to do anymore.",
+          "reflection": "You're stronger than you think.",
+          "stage": 1
+        },
+        {
+          "player": "Everyone has abandoned me.",
+          "reflection": "I'm still here. I'll never leave you.",
+          "stage": 2
+        },
+        {
+          "player": "Am I losing my mind?",
+          "reflection": "Does it matter? We have each other.",
+          "stage": 3
+        }
+      ],
+      "image_prompt": "visual novel background, bathroom or bedroom with prominent mirror showing distorted or separate reflection, conversation bubble effects, reality distortion around mirror, disturbing reflection environment, psychological break visualization",
+      "reality_distortion_effects": [
+        "reflection_delay",
+        "different_expressions",
+        "mouth_movements_don't_match",
+        "reflection_speaks_first"
+      ],
+      "status_effects_applied": [
+        {
+          "effect": "Dissociative",
+          "duration": 6,
+          "intensity": 2.0
+        },
+        {
+          "effect": "Paranoid",
+          "duration": 4,
+          "intensity": 1.5
+        }
+      ]
+    },
+    {
+      "id": "wall_whispers_005",
+      "card_name": "Voices in the Walls",
+      "scenario_id": "wall_voice_hallucinations",
+      "title": "They're Inside the Walls",
+      "card_type": "crisis",
+      "trigger_conditions": {
+        "mental_health": "<=6",
+        "crisis_level": "Critical",
+        "time_of_day": ["LateNight", "EarlyMorning"],
+        "status_effects_present": ["Paranoid", "Insomnia"],
+        "sleep": "<=20"
+      },
+      "setup": "Character hears whispers and voices coming from inside the walls of their home, creating intense paranoia and fear.",
+      "progression": {
+        "stage_1": {
+          "description": "Faint scratching and movement sounds",
+          "mental_health_threshold": "<=10",
+          "effects": {
+            "mental": -12,
+            "sleep": -15
+          }
+        },
+        "stage_2": {
+          "description": "Clear whispers and murmured conversations",
+          "mental_health_threshold": "<=6",
+          "effects": {
+            "mental": -20,
+            "sleep": -25,
+            "health": -8
+          }
+        },
+        "stage_3": {
+          "description": "Multiple voices discussing the character",
+          "mental_health_threshold": "<=3",
+          "effects": {
+            "mental": -35,
+            "sleep": -30,
+            "health": -15
+          }
+        }
+      },
+      "dialogue_progression": [
+        "There's something moving in the walls.",
+        "I can hear them whispering. What are they saying?",
+        "They're talking about me. They know I can hear them.",
+        "There are so many voices now. They're everywhere.",
+        "They're planning something. I need to get out."
+      ],
+      "wall_voice_content": [
+        "whispered_name_repetition",
+        "judgment_about_character",
+        "conspiracy_discussions",
+        "threats_and_warnings",
+        "overlapping_multiple_conversations"
+      ],
+      "image_prompt": "visual novel background, room walls with whisper visualization effects seeping through, sound wave patterns emerging from walls, disturbing wall atmosphere, phantom voice environment, reality distortion in domestic space",
+      "escape_attempts": [
+        {
+          "action": "Press ear to wall to listen closer",
+          "outcome": "voices_become_clearer_and_more_threatening",
+          "mental_cost": 15
+        },
+        {
+          "action": "Bang on walls to make them stop",
+          "outcome": "voices_laugh_and_multiply",
+          "mental_cost": 20,
+          "health_cost": 5
+        },
+        {
+          "action": "Leave the room",
+          "outcome": "voices_follow_to_other_rooms",
+          "mental_cost": 10
+        }
+      ],
+      "status_effects_applied": [
+        {
+          "effect": "Paranoid",
+          "duration": 8,
+          "intensity": 2.5
+        },
+        {
+          "effect": "Terrified",
+          "duration": 4,
+          "intensity": 2.0
+        },
+        {
+          "effect": "Insomnia",
+          "duration": 5,
+          "intensity": 1.5
+        }
+      ]
+    },
+    {
+      "id": "tv_communication_006",
+      "card_name": "The TV Knows",
+      "scenario_id": "interactive_television_delusion",
+      "title": "It's Talking Directly to Me",
+      "card_type": "crisis",
+      "trigger_conditions": {
+        "mental_health": "<=8",
+        "crisis_level": "Severe",
+        "required_objects": ["tv"],
+        "status_effects_present": ["Paranoid", "Obsessive"],
+        "isolation_hours": ">=6"
+      },
+      "setup": "Character becomes convinced that television programs are communicating directly with them, responding to their thoughts and actions.",
+      "progression": {
+        "stage_1": {
+          "description": "Noticing coincidental relevance in programs",
+          "mental_health_threshold": "<=12",
+          "effects": {
+            "mental": -8,
+            "sleep": -5
+          }
+        },
+        "stage_2": {
+          "description": "Believing programs are customized for them",
+          "mental_health_threshold": "<=8",
+          "effects": {
+            "mental": -15,
+            "sleep": -12,
+            "food": -8
+          }
+        },
+        "stage_3": {
+          "description": "Two-way communication with TV personalities",
+          "mental_health_threshold": "<=5",
+          "effects": {
+            "mental": -25,
+            "sleep": -20,
+            "health": -10
+          }
+        }
+      },
+      "dialogue_progression": [
+        "That news anchor just looked right at me.",
+        "This show is about my exact situation. That's not a coincidence.",
+        "They're talking to me through the TV. I need to pay attention.",
+        "The characters are asking me questions. I should answer.",
+        "They can see me through the screen. They know everything."
+      ],
+      "tv_interaction_delusions": [
+        "news_anchors_making_eye_contact",
+        "commercials_addressing_character_directly",
+        "show_plots_mirroring_character_life",
+        "characters_waiting_for_responses",
+        "tv_personalities_giving_advice"
+      ],
+      "image_prompt": "visual novel background, living room with TV screen showing distorted or interactive content, communication effects between viewer and screen, paranoid media environment, interactive television atmosphere, reality distortion technology",
+      "response_behaviors": [
+        {
+          "behavior": "talking_back_to_tv",
+          "escalation": "expecting_responses",
+          "mental_cost": 10
+        },
+        {
+          "behavior": "following_tv_instructions",
+          "escalation": "dangerous_compliance",
+          "mental_cost": 20,
+          "health_risk": true
+        },
+        {
+          "behavior": "trying_to_enter_tv_world",
+          "escalation": "complete_break_from_reality",
+          "mental_cost": 35
+        }
+      ],
+      "status_effects_applied": [
+        {
+          "effect": "Delusional",
+          "duration": 6,
+          "intensity": 2.0
+        },
+        {
+          "effect": "Obsessive",
+          "duration": 5,
+          "intensity": 1.5
+        }
+      ]
+    }
+  ],
+  "health_crisis_scenarios": [
+    {
+      "id": "health_collapse_007",
+      "card_name": "Physical Collapse",
+      "scenario_id": "health_system_failure",
+      "title": "My Body is Giving Up",
+      "card_type": "crisis",
+      "trigger_conditions": {
+        "health": "<=5",
+        "crisis_level": "Critical",
+        "consecutive_low_health_turns": ">=3"
+      },
+      "setup": "Character's physical health has deteriorated to dangerous levels, experiencing severe symptoms that can't be ignored.",
+      "progression": {
+        "stage_1": {
+          "description": "Persistent fatigue and weakness",
+          "health_threshold": "<=15",
+          "effects": {
+            "health": -10,
+            "mental": -8,
+            "sleep": -5
+          }
+        },
+        "stage_2": {
+          "description": "Severe pain and difficulty functioning",
+          "health_threshold": "<=10",
+          "effects": {
+            "health": -15,
+            "mental": -15,
+            "sleep": -12,
+            "food": -8
+          }
+        },
+        "stage_3": {
+          "description": "Physical collapse and emergency symptoms",
+          "health_threshold": "<=5",
+          "effects": {
+            "health": -25,
+            "mental": -20,
+            "sleep": -20,
+            "food": -15
+          }
+        }
+      },
+      "dialogue_progression": [
+        "I can barely get out of bed anymore.",
+        "Every movement hurts. Something is seriously wrong.",
+        "I can't ignore this anymore. I need help.",
+        "My body is shutting down. This is an emergency.",
+        "I'm scared I might not recover from this."
+      ],
+      "image_prompt": "visual novel background, bedroom or living room with medical emergency atmosphere, scattered medications, thermometer and health monitoring devices, dim lighting suggesting illness, crisis health environment with exhaustion visualization",
+      "physical_symptoms": [
+        "severe_chest_pain",
+        "difficulty_breathing",
+        "extreme_fatigue",
+        "persistent_fever",
+        "loss_of_consciousness_episodes"
+      ],
+      "status_effects_applied": [
+        {
+          "effect": "Sick",
+          "duration": 7,
+          "intensity": 2.5
+        },
+        {
+          "effect": "Exhausted",
+          "duration": 5,
+          "intensity": 2.0
+        },
+        {
+          "effect": "Anxious",
+          "duration": 4,
+          "intensity": 1.5
+        }
+      ],
+      "forced_actions": ["Emergency Medical Visit"],
+      "recovery_requirements": {
+        "minimum_health": 40,
+        "medical_intervention": true,
+        "rest_periods": 3
+      }
+    },
+    {
+      "id": "chronic_pain_008",
+      "card_name": "Chronic Pain Episode",
+      "scenario_id": "persistent_pain_crisis",
+      "title": "The Pain Won't Stop",
+      "card_type": "crisis",
+      "trigger_conditions": {
+        "health": "<=20",
+        "crisis_level": "Moderate",
+        "status_effects_present": ["Sick", "Exhausted"],
+        "consecutive_low_health_days": ">=2"
+      },
+      "setup": "Character experiences a severe chronic pain flare-up that makes normal activities impossible.",
+      "progression": {
+        "manageable_pain": {
+          "description": "Constant ache that interferes with concentration",
+          "health_threshold": "<=25",
+          "effects": {
+            "health": -8,
+            "mental": -10,
+            "sleep": -12
+          }
+        },
+        "severe_pain": {
+          "description": "Debilitating pain that prevents most activities",
+          "health_threshold": "<=15",
+          "effects": {
+            "health": -15,
+            "mental": -18,
+            "sleep": -20,
+            "food": -10
+          }
+        }
+      },
+      "image_prompt": "visual novel background, dim bedroom with character's living space adapted for pain management, heating pads, pillows arranged for comfort, medication bottles, pain management environment",
+      "status_effects_applied": [
+        {
+          "effect": "Chronic_Pain",
+          "duration": 8,
+          "intensity": 2.0
+        },
+        {
+          "effect": "Depressed",
+          "duration": 5,
+          "intensity": 1.5
+        }
+      ]
+    }
+  ],
+  "food_crisis_scenarios": [
+    {
+      "id": "starvation_crisis_009",
+      "card_name": "Severe Malnutrition",
+      "scenario_id": "starvation_emergency",
+      "title": "I Haven't Eaten in Days",
+      "card_type": "crisis",
+      "trigger_conditions": {
+        "food": "<=5",
+        "crisis_level": "Critical",
+        "consecutive_zero_food_turns": ">=4"
+      },
+      "setup": "Character has gone without proper nutrition for extended periods, leading to dangerous malnutrition.",
+      "progression": {
+        "stage_1": {
+          "description": "Persistent hunger and weakness",
+          "food_threshold": "<=20",
+          "effects": {
+            "food": -5,
+            "health": -8,
+            "mental": -10,
+            "sleep": -8
+          }
+        },
+        "stage_2": {
+          "description": "Severe weakness and cognitive impairment",
+          "food_threshold": "<=10",
+          "effects": {
+            "food": -10,
+            "health": -15,
+            "mental": -18,
+            "sleep": -15
+          }
+        },
+        "stage_3": {
+          "description": "Starvation symptoms and medical emergency",
+          "food_threshold": "<=5",
+          "effects": {
+            "food": -15,
+            "health": -25,
+            "mental": -25,
+            "sleep": -20
+          }
+        }
+      },
+      "dialogue_progression": [
+        "I can't remember the last time I had a real meal.",
+        "I'm too weak to even cook. My hands are shaking.",
+        "Food seems pointless now. I've lost my appetite completely.",
+        "I think I'm forgetting how to eat. Nothing tastes right.",
+        "I need help. I can't do this alone anymore."
+      ],
+      "image_prompt": "visual novel background, empty kitchen with bare refrigerator and cupboards, empty plates and bowls visible, stark lighting emphasizing emptiness, malnutrition crisis atmosphere",
+      "physical_symptoms": [
+        "extreme_weakness",
+        "dizziness_and_fainting",
+        "hair_loss",
+        "cold_sensitivity",
+        "cognitive_impairment"
+      ],
+      "status_effects_applied": [
+        {
+          "effect": "Starving",
+          "duration": 6,
+          "intensity": 2.5
+        },
+        {
+          "effect": "Weak",
+          "duration": 8,
+          "intensity": 2.0
+        },
+        {
+          "effect": "Confused",
+          "duration": 4,
+          "intensity": 1.5
+        }
+      ],
+      "forced_actions": ["Emergency Medical Visit"],
+      "recovery_requirements": {
+        "gradual_refeeding": true,
+        "medical_supervision": true,
+        "minimum_food": 60
+      }
+    },
+    {
+      "id": "eating_disorder_010",
+      "card_name": "Eating Disorder Episode",
+      "scenario_id": "disordered_eating_crisis",
+      "title": "I Can't Control This",
+      "card_type": "crisis",
+      "trigger_conditions": {
+        "food": ["<=15", ">=85"],
+        "crisis_level": "Severe",
+        "status_effects_present": ["Anxious", "Obsessive"],
+        "recent_cards_played": ["Panic Eating", "Skip Meals"]
+      },
+      "setup": "Character experiences severe disordered eating patterns that have spiraled out of control.",
+      "variants": {
+        "restrictive": {
+          "description": "Severe food restriction and avoidance",
+          "trigger": "food <= 15",
+          "effects": {
+            "food": -20,
+            "health": -15,
+            "mental": -12
+          }
+        },
+        "binge": {
+          "description": "Compulsive overeating episodes",
+          "trigger": "food >= 85",
+          "effects": {
+            "food": 30,
+            "health": -20,
+            "mental": -18
+          }
+        }
+      },
+      "image_prompt": "visual novel background, kitchen in chaotic state with evidence of disordered eating - either completely empty or filled with binge eating aftermath, emotional eating crisis environment",
+      "status_effects_applied": [
+        {
+          "effect": "Eating_Disorder",
+          "duration": 10,
+          "intensity": 2.0
+        },
+        {
+          "effect": "Shame",
+          "duration": 6,
+          "intensity": 2.5
+        }
+      ]
+    },
+    {
+      "id": "food_poisoning_011",
+      "card_name": "Severe Food Poisoning",
+      "scenario_id": "food_contamination_crisis",
+      "title": "Something I Ate is Making Me Sick",
+      "card_type": "crisis",
+      "trigger_conditions": {
+        "health": "<=25",
+        "food": "<=30",
+        "recent_cards_played": ["Grab Snacks", "Order Delivery"],
+        "crisis_level": "Moderate"
+      },
+      "setup": "Character suffers from severe food poisoning, unable to keep food down and rapidly losing strength.",
+      "progression": {
+        "onset": {
+          "description": "Nausea and stomach discomfort",
+          "effects": {
+            "food": -15,
+            "health": -10,
+            "mental": -8
+          }
+        },
+        "acute": {
+          "description": "Severe vomiting and dehydration",
+          "effects": {
+            "food": -25,
+            "health": -20,
+            "mental": -15,
+            "sleep": -12
+          }
+        }
+      },
+      "image_prompt": "visual novel background, bathroom or bedroom with signs of illness, medication and water nearby, sick day atmosphere with tissues and comfort items",
+      "status_effects_applied": [
+        {
+          "effect": "Food_Poisoned",
+          "duration": 5,
+          "intensity": 2.0
+        },
+        {
+          "effect": "Dehydrated",
+          "duration": 4,
+          "intensity": 1.5
+        }
+      ]
+    }
+  ],
+  "sleep_crisis_scenarios": [
+    {
+      "id": "severe_insomnia_012",
+      "card_name": "Total Insomnia",
+      "scenario_id": "chronic_sleeplessness",
+      "title": "I Haven't Slept in Days",
+      "card_type": "crisis",
+      "trigger_conditions": {
+        "sleep": "<=5",
+        "crisis_level": "Critical",
+        "consecutive_zero_sleep_turns": ">=5",
+        "status_effects_present": ["Insomnia", "Anxious"]
+      },
+      "setup": "Character has been unable to sleep for multiple days, experiencing severe sleep deprivation symptoms.",
+      "progression": {
+        "stage_1": {
+          "description": "Difficulty falling asleep, restless nights",
+          "sleep_threshold": "<=20",
+          "effects": {
+            "sleep": -8,
+            "mental": -10,
+            "health": -5
+          }
+        },
+        "stage_2": {
+          "description": "No sleep for 24+ hours, hallucinations begin",
+          "sleep_threshold": "<=10",
+          "effects": {
+            "sleep": -15,
+            "mental": -20,
+            "health": -12,
+            "food": -8
+          }
+        },
+        "stage_3": {
+          "description": "Multiple days without sleep, severe impairment",
+          "sleep_threshold": "<=5",
+          "effects": {
+            "sleep": -25,
+            "mental": -30,
+            "health": -20,
+            "food": -15
+          }
+        }
+      },
+      "dialogue_progression": [
+        "I can't turn my mind off. It just keeps racing.",
+        "It's been two days. I'm starting to see things that aren't there.",
+        "I can't tell if I'm awake or dreaming anymore.",
+        "My body is exhausted but my brain won't stop.",
+        "I'm afraid if I don't sleep soon, something terrible will happen."
+      ],
+      "image_prompt": "visual novel background, bedroom at various times showing passage of sleepless nights, rumpled bed never slept in, exhaustion visualization with time distortion effects, severe insomnia environment",
+      "hallucination_effects": [
+        "shadow_people_in_peripheral_vision",
+        "hearing_voices_calling_name",
+        "objects_moving_when_not_looking",
+        "time_distortion_and_confusion"
+      ],
+      "status_effects_applied": [
+        {
+          "effect": "Severe_Insomnia",
+          "duration": 8,
+          "intensity": 3.0
+        },
+        {
+          "effect": "Hallucinating",
+          "duration": 5,
+          "intensity": 2.0
+        },
+        {
+          "effect": "Exhausted",
+          "duration": 6,
+          "intensity": 2.5
+        }
+      ],
+      "forced_actions": ["Emergency Medical Visit", "Crash Sleep"],
+      "recovery_requirements": {
+        "minimum_sleep": 50,
+        "medical_intervention": true,
+        "sleep_medication": true
+      }
+    },
+    {
+      "id": "sleep_paralysis_013",
+      "card_name": "Sleep Paralysis Episode",
+      "scenario_id": "paralysis_terror",
+      "title": "I Can't Move, Can't Breathe",
+      "card_type": "crisis",
+      "trigger_conditions": {
+        "sleep": "<=15",
+        "mental": "<=25",
+        "status_effects_present": ["Anxious", "Exhausted"],
+        "time_of_day": ["LateNight", "EarlyMorning"]
+      },
+      "setup": "Character experiences terrifying sleep paralysis episodes with vivid hallucinations.",
+      "progression": {
+        "awareness": {
+          "description": "Waking up but unable to move or speak",
+          "effects": {
+            "sleep": -10,
+            "mental": -15,
+            "health": -5
+          }
+        },
+        "hallucinations": {
+          "description": "Terrifying visions while paralyzed",
+          "effects": {
+            "sleep": -20,
+            "mental": -25,
+            "health": -10
+          }
+        }
+      },
+      "dialogue_progression": [
+        "I'm awake but I can't move. There's something in the room.",
+        "I can see everything but my body won't respond.",
+        "There's a dark figure at the foot of my bed.",
+        "I'm trying to scream but no sound comes out.",
+        "This feels like dying. I'm so scared."
+      ],
+      "image_prompt": "visual novel background, dark bedroom from character's paralyzed perspective, shadowy figures or presence implied, terror and helplessness atmosphere, sleep paralysis horror environment",
+      "hallucination_types": [
+        "intruder_in_room",
+        "dark_figure_on_chest",
+        "feeling_of_being_watched",
+        "sense_of_malevolent_presence"
+      ],
+      "status_effects_applied": [
+        {
+          "effect": "Sleep_Paralysis",
+          "duration": 3,
+          "intensity": 2.5
+        },
+        {
+          "effect": "Terrified",
+          "duration": 5,
+          "intensity": 2.0
+        },
+        {
+          "effect": "Traumatized",
+          "duration": 4,
+          "intensity": 1.5
+        }
+      ]
+    },
+    {
+      "id": "hypersomnia_014",
+      "card_name": "Cannot Stay Awake",
+      "scenario_id": "excessive_sleeping_crisis",
+      "title": "I Can't Stop Sleeping",
+      "card_type": "crisis",
+      "trigger_conditions": {
+        "sleep": ">=90",
+        "mental": "<=20",
+        "health": "<=30",
+        "status_effects_present": ["Depressed", "Exhausted"],
+        "consecutive_high_sleep_turns": ">=4"
+      },
+      "setup": "Character cannot stay awake for normal periods, sleeping excessively as escape from depression.",
+      "progression": {
+        "extended_sleep": {
+          "description": "Sleeping 12-16 hours per day",
+          "effects": {
+            "sleep": 10,
+            "mental": -12,
+            "health": -8,
+            "food": -15
+          }
+        },
+        "constant_sleep": {
+          "description": "Only awake for 4-6 hours per day",
+          "effects": {
+            "sleep": 20,
+            "mental": -20,
+            "health": -15,
+            "food": -25
+          }
+        }
+      },
+      "dialogue_progression": [
+        "I just want to sleep all the time. It's the only escape.",
+        "I've been awake for two hours and I'm already exhausted.",
+        "Sleep is the only place where nothing hurts.",
+        "I'm missing entire days. Time doesn't mean anything anymore.",
+        "I'm disappearing into sleep. Maybe that's for the best."
+      ],
+      "image_prompt": "visual novel background, bedroom with perpetually unmade bed, closed curtains blocking daylight, depression sleep environment with time passage indicators showing excessive sleeping",
+      "status_effects_applied": [
+        {
+          "effect": "Hypersomnia",
+          "duration": 7,
+          "intensity": 2.0
+        },
+        {
+          "effect": "Depressed",
+          "duration": 8,
+          "intensity": 2.5
+        },
+        {
+          "effect": "Isolated",
+          "duration": 6,
+          "intensity": 2.0
+        }
+      ]
+    },
+    {
+      "id": "nightmare_disorder_015",
+      "card_name": "Recurring Nightmares",
+      "scenario_id": "chronic_nightmares",
+      "title": "The Dreams Won't Stop",
+      "card_type": "crisis",
+      "trigger_conditions": {
+        "sleep": "<=30",
+        "mental": "<=25",
+        "status_effects_present": ["Anxious", "Traumatized"],
+        "consecutive_nightmare_nights": ">=3"
+      },
+      "setup": "Character is trapped in a cycle of recurring nightmares that make sleep terrifying and unrerefreshing.",
+      "nightmare_themes": [
+        "being_chased_by_unknown_threat",
+        "loved_ones_in_danger",
+        "reliving_traumatic_memories",
+        "endless_falling_or_drowning",
+        "being_trapped_or_buried_alive"
+      ],
+      "progression": {
+        "occasional": {
+          "description": "Bad dreams 2-3 times per week",
+          "effects": {
+            "sleep": -8,
+            "mental": -10,
+            "health": -5
+          }
+        },
+        "nightly": {
+          "description": "Nightmares every night, afraid to sleep",
+          "effects": {
+            "sleep": -20,
+            "mental": -18,
+            "health": -12
+          }
+        }
+      },
+      "image_prompt": "visual novel background, bedroom with signs of disturbed sleep, sheets tangled from restless movement, dream imagery bleeding into reality, nightmare atmosphere with dark undertones",
+      "status_effects_applied": [
+        {
+          "effect": "Nightmare_Disorder",
+          "duration": 8,
+          "intensity": 2.0
+        },
+        {
+          "effect": "Sleep_Anxiety",
+          "duration": 6,
+          "intensity": 1.5
+        }
+      ]
+    }
+  ],
+  "crisis_system_integration": {
+    "trigger_checks": {
+      "mental_health_monitoring": {
+        "check_frequency": "every_turn",
+        "threshold_alerts": [5, 8, 10, 15],
+        "cascading_effects": true
+      },
+      "status_effect_combinations": {
+        "high_risk_combinations": [
+          ["Depressed", "Paranoid", "Insomnia"],
+          ["Overwhelmed", "Anxious", "Isolated"],
+          ["Paranoid", "Obsessive", "Terrified"]
+        ]
+      },
+      "environmental_factors": {
+        "isolation_duration": "trigger_multiplier",
+        "sleep_deprivation": "reality_distortion_increase",
+        "time_of_day": "hallucination_intensity_modifier"
+      }
+    },
+    "recovery_system": {
+      "intervention_cards": [
+        "Call for Help",
+        "Emergency Medical Visit",
+        "Rock Bottom Epiphany"
+      ],
+      "stabilization_requirements": {
+        "minimum_mental_health": 25,
+        "required_sleep": 40,
+        "social_contact": true,
+        "medication_compliance": true
+      },
+      "gradual_recovery": {
+        "stage_1": "reality_testing_exercises",
+        "stage_2": "hallucination_management",
+        "stage_3": "full_stabilization"
+      }
+    },
+    "prevention_mechanics": {
+      "early_warning_signs": [
+        "mental_health_below_15_for_2_turns",
+        "isolation_for_more_than_24_hours",
+        "sleep_below_30_consistently"
+      ],
+      "protective_factors": [
+        "social_contact_within_12_hours",
+        "medication_adherence",
+        "regular_sleep_schedule",
+        "professional_help_accessibility"
+      ]
+    }
+  }
+}

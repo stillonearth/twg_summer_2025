@@ -116,6 +116,7 @@ pub struct ActionCompletedEvent {
 #[derive(Event)]
 pub struct CutsceneStartEvent {
     pub cutscene_id: String,
+    pub card_id: Option<u32>,
     pub trigger_reason: CutsceneTrigger,
 }
 
@@ -241,6 +242,8 @@ pub struct GameState {
     pub action_history: Vec<PlayerAction>,
     pub available_objects: Vec<String>,
     pub negative_card_count: u32,
+
+    pub shown_cutscenes: std::collections::HashSet<u32>,
 }
 
 impl Default for GameState {
@@ -275,6 +278,7 @@ impl Default for GameState {
                 "window".to_string(),
             ],
             negative_card_count: 0,
+            shown_cutscenes: std::collections::HashSet::new(),
         }
     }
 }
@@ -799,6 +803,12 @@ fn handle_card_selection(
     }
 }
 
+// Add this to your GameState struct:
+// shown_cutscenes: std::collections::HashSet<u32>,
+
+// And in the Default implementation for GameState:
+// shown_cutscenes: std::collections::HashSet::new(),
+
 fn handle_card_selection_success(
     mut card_selection_success_events: EventReader<CardSelectionSuccess>,
     mut phase_state: ResMut<GamePhaseState>,
@@ -811,22 +821,32 @@ fn handle_card_selection_success(
         if phase_state.cutscene_active {
             continue;
         }
-
         phase_state.selected_card_id = Some(event.0.id);
 
-        // Check if cutscene should be triggered based on card type
-        let should_trigger_cutscene =
-            matches!(event.0.card_type, CardType::Crisis | CardType::ComboCard);
-
+        // Apply card effects first
         let status_events = game_state.apply_card_effects(&event.0);
         for status_event in status_events {
             status_effect_events.write(status_event);
         }
 
+        // Check if cutscene for this card has already been shown
+        let cutscene_already_shown = game_state.shown_cutscenes.contains(&event.0.id);
+
+        // Check if cutscene should be triggered based on card type
+        let should_trigger_cutscene = !cutscene_already_shown
+            && match event.0.card_type {
+                CardType::Crisis | CardType::ComboCard => true, // Always show for these types
+                _ => rand::random::<f32>() < 0.6, // 60% probability for other card types
+            };
+
         if should_trigger_cutscene {
+            // Mark this cutscene as shown
+            game_state.shown_cutscenes.insert(event.0.id);
+
             cutscene_events.write(CutsceneStartEvent {
-                cutscene_id: format!("card_{}", event.0.id),
+                cutscene_id: format!("{}", event.0.id),
                 trigger_reason: CutsceneTrigger::CardEffect,
+                card_id: Some(event.0.id),
             });
         } else {
             phase_changed_events.write(PhaseChangedEvent {
@@ -939,9 +959,10 @@ fn handle_cutscene_trigger(
             "Starting cutscene: {} during {:?} phase",
             event.cutscene_id, phase_state.current_phase
         );
-
-        if let Some(rpy) = rpy_assets.get(scenario.id()) {
-            novel_events.write(EventStartScenario { ast: rpy.0.clone() });
+        if let Some(card_id) = event.card_id {
+            if let Some(rpy) = rpy_assets.get(scenario[card_id as usize].id()) {
+                novel_events.write(EventStartScenario { ast: rpy.0.clone() });
+            }
         }
     }
 }
@@ -1108,6 +1129,7 @@ fn handle_phase_changed_turn_over(
                 cutscene_events.write(CutsceneStartEvent {
                     cutscene_id,
                     trigger_reason: CutsceneTrigger::TurnEnd,
+                    card_id: None,
                 });
             } else {
                 turn_over_events.write(TurnOverEvent);

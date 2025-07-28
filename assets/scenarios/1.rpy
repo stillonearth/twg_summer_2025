@@ -3,16 +3,13 @@
 
 define mi = Character("Mi", color="#c8ffc8")
 
-# Character Image
-image mi = "mi.png"
-
 # Main Menu/Card Selection (simplified for this episode)
 label start:
     jump card_quick_nap_scenario
 
 # Quick Nap Card Scenario - "Afternoon Rest"
 label card_quick_nap_scenario:
-    scene bg vn-1
+    scene vn-1
 
     show mi
 

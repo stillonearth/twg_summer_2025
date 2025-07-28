@@ -3,9 +3,6 @@
 
 define mi = Character("Mi", color="#c8ffc8")
 
-# Character Image
-image mi = "mi.png"
-
 # Main Menu/Card Selection (simplified for this episode)
 label start:
     jump card_sleep_scenario

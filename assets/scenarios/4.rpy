@@ -3,16 +3,13 @@
 
 define mi = Character("Mi", color="#c8ffc8")
 
-# Character Image
-image mi = "mi.png"
-
 # Main Menu/Card Selection (simplified for this episode)
 label start:
     jump card_grab_snacks_scenario
 
 # Grab Snacks Card Scenario - "Guilty Snacking"
 label card_grab_snacks_scenario:
-    scene bg vn-4
+    scene vn-4
 
     show mi
 

@@ -1,0 +1,341 @@
+[
+  {
+    "id": 0,
+    "card_name": "Sleep",
+    "scenario_id": "peaceful_night",
+    "title": "Peaceful Night",
+    "card_type": "card",
+    "setup": "Player character stands in bedroom at night, exhausted from the day. The bed looks inviting with moonlight streaming through the window.",
+    "image_prompt": "visual novel background, cozy bedroom at night, soft moonlight streaming through window, unmade bed with warm blankets, nightstand with digital clock, peaceful atmosphere, floating dream symbols in air, blue and purple color palette, detailed bedroom interior"
+  },
+  {
+    "id": 1,
+    "card_name": "Quick Nap",
+    "scenario_id": "afternoon_rest",
+    "title": "Afternoon Rest",
+    "card_type": "card",
+    "setup": "Character feels drowsy in the afternoon, finding a comfortable spot on the couch or chair for a quick power nap.",
+    "image_prompt": "visual novel background, comfortable living room in afternoon, golden sunlight streaming through window, cozy couch with soft cushions, warm orange and yellow lighting, dust motes in sunbeam, peaceful domestic setting"
+  },
+  {
+    "id": 2,
+    "card_name": "Rest in Bed",
+    "scenario_id": "restless_lying",
+    "title": "Restless Rest",
+    "card_type": "card",
+    "setup": "Character lies in bed unable to sleep, mind racing with thoughts and worries while trying to rest.",
+    "image_prompt": "visual novel background, dimly lit bedroom at twilight, rumpled bed sheets, thought bubbles and worry symbols floating in air, shadows on ceiling, restless atmosphere, muted gray and blue colors, clock showing late hour"
+  },
+  {
+    "id": 3,
+    "card_name": "Cook Meal",
+    "scenario_id": "kitchen_therapy",
+    "title": "Kitchen Therapy",
+    "card_type": "card",
+    "setup": "Player stands in kitchen with fresh ingredients, finding comfort and purpose in the familiar cooking routine.",
+    "image_prompt": "visual novel background, bright modern kitchen, steam rising from stovetop, colorful fresh vegetables scattered on counter, warm golden lighting, organized cooking utensils, clean workspace, therapeutic cooking atmosphere"
+  },
+  {
+    "id": 4,
+    "card_name": "Grab Snacks",
+    "scenario_id": "guilty_snacking",
+    "title": "Guilty Snacking",
+    "card_type": "card",
+    "setup": "Character quickly grabs junk food from fridge or pantry, seeking immediate satisfaction despite knowing it's unhealthy.",
+    "image_prompt": "visual novel background, kitchen with open refrigerator casting cool blue light, junk food packages and snacks visible on shelves, dim ambient lighting, slightly messy counter, late night snacking atmosphere"
+  },
+  {
+    "id": 5,
+    "card_name": "Order Delivery",
+    "scenario_id": "delivery_call",
+    "title": "The Usual Order",
+    "card_type": "card",
+    "setup": "Character sits with phone, surrounded by takeout menus, ordering food delivery again instead of cooking.",
+    "image_prompt": "visual novel background, living room or kitchen table with scattered takeout menus, glowing phone screen, delivery app interface visible, dim evening lighting, modern apartment setting, convenience food atmosphere"
+  },
+  {
+    "id": 6,
+    "card_name": "Drink Water",
+    "scenario_id": "simple_hydration",
+    "title": "Simple Hydration",
+    "card_type": "card",
+    "setup": "Character takes a moment for basic self-care by drinking water, a simple but important act.",
+    "image_prompt": "visual novel background, clean kitchen or bathroom sink area, clear glass of water with droplets, bright clean lighting, minimalist composition, refreshing atmosphere, simple health-focused environment"
+  },
+  {
+    "id": 7,
+    "card_name": "Take Shower",
+    "scenario_id": "cleansing_ritual",
+    "title": "Cleansing Ritual",
+    "card_type": "card",
+    "setup": "Character enters bathroom for a proper shower, seeking both physical cleanliness and mental refreshment.",
+    "image_prompt": "visual novel background, modern bathroom with shower stall, steam effects, clean white tiles, soft lighting, towels hanging nearby, refreshing and clean atmosphere, water droplets on glass"
+  },
+  {
+    "id": 8,
+    "card_name": "Basic Hygiene",
+    "scenario_id": "morning_routine",
+    "title": "Morning Routine",
+    "card_type": "card",
+    "setup": "Character performs basic hygiene tasks like brushing teeth and washing face, small steps toward self-care.",
+    "image_prompt": "visual novel background, bathroom mirror and sink area, toothbrush and hygiene items on counter, morning lighting through small window, clean white and blue color scheme, basic self-care setting"
+  },
+  {
+    "id": 9,
+    "card_name": "Skip Hygiene",
+    "scenario_id": "avoiding_mirror",
+    "title": "Avoiding the Mirror",
+    "card_type": "card",
+    "setup": "Character can't bring themselves to face basic hygiene today, avoiding their reflection and self-care.",
+    "image_prompt": "visual novel background, bathroom with mirror turned away or covered, dim lighting, hygiene items unused on counter, avoidance atmosphere, muted gray and brown colors, neglected self-care environment"
+  },
+  {
+    "id": 10,
+    "card_name": "Watch Shows",
+    "scenario_id": "normal_viewing",
+    "title": "Normal Viewing",
+    "card_type": "card",
+    "setup": "Character settles in for regular TV watching to unwind and escape into other people's stories.",
+    "image_prompt": "visual novel background, comfortable living room with TV screen glowing, cozy couch setup, evening atmosphere, remote control nearby, snacks on coffee table, relaxing entertainment environment"
+  },
+  {
+    "id": 11,
+    "card_name": "Binge Series",
+    "scenario_id": "marathon_session",
+    "title": "Marathon Session",
+    "card_type": "card",
+    "setup": "Character settles in for an extended binge watching session that will consume most of the day.",
+    "image_prompt": "visual novel background, dark living room with bright TV screen dominating, multiple empty food containers scattered around, tissues and blankets everywhere, time passage indicators, marathon viewing setup"
+  },
+  {
+    "id": 12,
+    "card_name": "Channel Surf",
+    "scenario_id": "mindless_clicking",
+    "title": "Mindless Clicking",
+    "card_type": "card",
+    "setup": "Character mindlessly flips through channels without finding anything engaging, wasting time.",
+    "image_prompt": "visual novel background, living room with TV showing static or random channel flashes, remote control prominent, bored atmosphere, dim lighting, empty feeling, repetitive channel surfing environment"
+  },
+  {
+    "id": 13,
+    "card_name": "Watch News",
+    "scenario_id": "staying_informed",
+    "title": "Staying Informed",
+    "card_type": "card",
+    "setup": "Character watches news to stay informed about current events, despite knowing it will worsen their mood.",
+    "image_prompt": "visual novel background, living room with news broadcast on TV screen showing breaking news ticker, morning or evening news setting, coffee cup nearby, serious news atmosphere, red and blue news graphics"
+  },
+  {
+    "id": 14,
+    "card_name": "Play Games",
+    "scenario_id": "gaming_session",
+    "title": "Gaming Session",
+    "card_type": "card",
+    "setup": "Character engages in enjoyable gaming to relax, have fun, and escape into digital worlds.",
+    "image_prompt": "visual novel background, gaming setup with console and TV showing colorful game screen, controller nearby, energetic gaming atmosphere, vibrant colors from game display, comfortable gaming chair"
+  },
+  {
+    "id": 15,
+    "card_name": "Gaming Marathon",
+    "scenario_id": "excessive_gaming",
+    "title": "Lost in the Game",
+    "card_type": "card",
+    "setup": "Character begins an extended gaming session that will consume most of the day and night.",
+    "image_prompt": "visual novel background, intensive gaming setup with multiple energy drink cans, bright screen glow dominating room, day/night cycle visible through window, time distortion effects, obsessive gaming environment"
+  },
+  {
+    "id": 16,
+    "card_name": "Retro Games",
+    "scenario_id": "nostalgic_gaming",
+    "title": "Nostalgic Gaming",
+    "card_type": "card",
+    "setup": "Character plays classic games for comfort and nostalgia, returning to simpler times.",
+    "image_prompt": "visual novel background, vintage gaming setup with old console, pixelated retro games on screen, warm nostalgic lighting, classic gaming memorabilia, cozy retro gaming atmosphere with 8-bit aesthetics"
+  },
+  {
+    "id": 17,
+    "card_name": "Rage Quit",
+    "scenario_id": "gaming_frustration",
+    "title": "Gaming Frustration",
+    "card_type": "card",
+    "setup": "Character becomes too frustrated with gaming and quits angrily, throwing the controller.",
+    "image_prompt": "visual novel background, gaming area with game over screen visible, controller thrown aside, frustrated gaming environment, red color scheme, scattered gaming equipment, anger and frustration atmosphere"
+  },
+  {
+    "id": 18,
+    "card_name": "Browse Internet",
+    "scenario_id": "casual_browsing",
+    "title": "Casual Browsing",
+    "card_type": "card",
+    "setup": "Character spends time casually browsing the internet with multiple tabs open, achieving little productivity.",
+    "image_prompt": "visual novel background, desk with computer showing multiple browser tabs open, soft computer screen glow, modern room setting, messy desktop with various website windows, casual internet browsing environment"
+  },
+  {
+    "id": 19,
+    "card_name": "Social Media",
+    "scenario_id": "social_comparison",
+    "title": "Social Comparison",
+    "card_type": "card",
+    "setup": "Character scrolls through social media, comparing their life to others' highlight reels and feeling inadequate.",
+    "image_prompt": "visual novel background, computer or phone screen showing social media feeds with perfect lifestyle posts, comparison imagery, bright social media interface contrasting with dim room, isolating atmosphere"
+  },
+  {
+    "id": 20,
+    "card_name": "Crash Sleep",
+    "scenario_id": "exhaustion_collapse",
+    "title": "Exhaustion Collapse",
+    "card_type": "crisis",
+    "conditions": {
+      "sleep": "<=15",
+      "crisis_level": "Severe"
+    },
+    "setup": "Character's body finally gives out from extreme exhaustion and collapses into unconscious sleep.",
+    "image_prompt": "visual novel background, room where someone has collapsed from exhaustion, scattered items around, dramatic lighting showing extreme fatigue aftermath, crisis atmosphere with dark shadows, exhaustion visualization"
+  },
+  {
+    "id": 21,
+    "card_name": "Mental Breakdown",
+    "scenario_id": "complete_breakdown",
+    "title": "The Breaking Point",
+    "card_type": "crisis",
+    "conditions": {
+      "mental": "<=10",
+      "crisis_level": "Critical"
+    },
+    "setup": "Character experiences a complete mental and emotional breakdown when everything becomes too much to handle.",
+    "image_prompt": "visual novel background, room in complete emotional chaos with shattered glass effects, overwhelming storm visualization, dark stormy colors, intense crisis atmosphere, emotional dam bursting environment"
+  },
+  {
+    "id": 22,
+    "card_name": "Morning Anxiety",
+    "scenario_id": "dawn_dread",
+    "title": "Dawn Dread",
+    "card_type": "card",
+    "setup": "Character wakes up filled with anxiety and dread about the day ahead, morning sunlight feeling ominous.",
+    "image_prompt": "visual novel background, bedroom in early morning with ominous sunlight casting long shadows, anxious atmosphere, overwhelming daily task symbols in air, yellow morning light contrasting dark mood, dread-filled dawn"
+  },
+  {
+    "id": 23,
+    "card_name": "3AM Thoughts",
+    "scenario_id": "existential_night",
+    "title": "3AM Existential Crisis",
+    "card_type": "card",
+    "setup": "Character lies awake at 3AM consumed by existential dread and overwhelming thoughts about life.",
+    "image_prompt": "visual novel background, dark bedroom at 3AM with only clock light visible, existential thought symbols floating in darkness, deep purple and black color scheme, insomnia atmosphere, philosophical dread environment"
+  },
+  {
+    "id": 24,
+    "card_name": "Force Exercise",
+    "scenario_id": "reluctant_workout",
+    "title": "Reluctant Workout",
+    "card_type": "card",
+    "setup": "Character forces themselves to exercise despite lack of motivation, pushing through mental resistance.",
+    "image_prompt": "visual novel background, home gym or workout space with exercise equipment, motivational struggle atmosphere, morning or afternoon lighting, determined but strained environment, self-improvement setting"
+  },
+  {
+    "id": 25,
+    "card_name": "Procrastinate Everything",
+    "scenario_id": "avoidance_spiral",
+    "title": "Avoidance Spiral",
+    "card_type": "card",
+    "setup": "Character actively avoids all responsibilities and tasks, putting everything off until tomorrow.",
+    "image_prompt": "visual novel background, desk or workspace with pile of ignored tasks and responsibilities, calendar showing 'tomorrow' highlighted, guilt and anxiety clouds forming, procrastination visualization with time slipping away"
+  },
+  {
+    "id": 26,
+    "card_name": "Emergency Medical Visit",
+    "scenario_id": "medical_crisis",
+    "title": "Medical Crisis",
+    "card_type": "crisis",
+    "conditions": {
+      "health": "<=20",
+      "crisis_level": "Severe"
+    },
+    "setup": "Character seeks urgent medical care when health issues can no longer be ignored or managed alone.",
+    "image_prompt": "visual novel background, hospital or urgent care waiting room, clinical lighting, medical setting with sterile white and blue colors, health crisis atmosphere, professional medical environment"
+  },
+  {
+    "id": 27,
+    "card_name": "Rock Bottom Epiphany",
+    "scenario_id": "transformative_moment",
+    "title": "The Turning Point",
+    "card_type": "crisis",
+    "conditions": {
+      "crisis_level": "Critical"
+    },
+    "setup": "Character hits absolute rock bottom but finds unexpected clarity and hope for transformation.",
+    "image_prompt": "visual novel background, dark void with single ray of transformative light breaking through, phoenix rising metaphor visualization, golden light emerging from darkness, rebirth symbolism, hope breaking through despair"
+  },
+  {
+    "id": 28,
+    "card_name": "Self-Care Sunday",
+    "scenario_id": "perfect_care_day",
+    "title": "Perfect Self-Care Day",
+    "card_type": "card",
+    "setup": "Character dedicates an entire day to comprehensive self-care and restoration when they have the energy.",
+    "image_prompt": "visual novel background, spa-like home environment with wellness items arranged beautifully, golden hour lighting, peaceful self-care setting, holistic wellness atmosphere, restoration and renewal environment"
+  },
+  {
+    "id": 29,
+    "card_name": "Productive Morning",
+    "scenario_id": "perfect_morning",
+    "title": "Perfect Morning Routine",
+    "card_type": "card",
+    "setup": "Character executes a perfect, productive morning routine when well-rested and motivated.",
+    "image_prompt": "visual novel background, bright morning kitchen and bathroom combo, fresh sunrise through windows, organized morning routine setup, energetic atmosphere, bright optimistic colors, productive morning environment"
+  },
+  {
+    "id": 30,
+    "card_name": "Isolation Spiral",
+    "scenario_id": "social_withdrawal",
+    "title": "Social Withdrawal",
+    "card_type": "card",
+    "setup": "Character withdraws completely from all social contact, finding people exhausting and silence safer.",
+    "image_prompt": "visual novel background, isolated apartment with closed curtains, phone notifications ignored and piling up, dark room with separation from outside world, muted grays and blues, self-imposed isolation environment"
+  },
+  {
+    "id": 31,
+    "card_name": "Answer Call",
+    "scenario_id": "breaking_silence",
+    "title": "Breaking the Silence",
+    "card_type": "card",
+    "setup": "Character overcomes anxiety and social fatigue to actually answer a phone call from someone.",
+    "image_prompt": "visual novel background, room with ringing phone casting warm light, connection breaking through isolation, communication atmosphere, breaking social barrier environment, warm communication colors"
+  },
+  {
+    "id": 32,
+    "card_name": "Ignore Everyone",
+    "scenario_id": "silence_world",
+    "title": "Silencing the World",
+    "card_type": "card",
+    "setup": "Character actively ignores all attempts at social contact, overwhelmed by social demands.",
+    "image_prompt": "visual novel background, room with multiple notification sources being actively avoided, defensive atmosphere, social demands being pushed away, overwhelmed avoidance environment, muted defensive colors"
+  },
+  {
+    "id": 33,
+    "card_name": "Panic Eating",
+    "scenario_id": "stress_binge",
+    "title": "Stress Binge",
+    "card_type": "crisis",
+    "conditions": {
+      "food": "<=20",
+      "mental": "<=30",
+      "crisis_level": "Moderate"
+    },
+    "setup": "Character desperately binges on food to cope with overwhelming stress and emotional emptiness.",
+    "image_prompt": "visual novel background, kitchen or dining area with multiple empty food containers and wrappers scattered everywhere, chaotic eating scene, stress-eating environment, orange-red crisis tones, compulsive behavior aftermath"
+  },
+  {
+    "id": 34,
+    "card_name": "Hide Under Blanket",
+    "scenario_id": "blanket_fortress",
+    "title": "Blanket Fortress",
+    "card_type": "crisis",
+    "conditions": {
+      "mental": "<=25",
+      "crisis_level": "Mild"
+    },
+    "setup": "Character retreats completely under blankets to hide from the world and create a safe space.",
+    "image_prompt": "visual novel background, bedroom with blankets forming a complete cocoon or fort on bed, dark room with minimal light seeping through, isolation sanctuary, muted blues and grays, protective barrier atmosphere"
+  }
+]
