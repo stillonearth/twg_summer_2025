@@ -1,10 +1,11 @@
+use crate::AppState;
 use crate::cards::ActivityCard;
 use crate::logic::{ActionCompletedEvent, CutsceneEndEvent, CutsceneStartEvent, GamePhaseState};
 use crate::navigation::{GridPos, MovePlayerCommand, TileSize};
 use crate::sprites::{
-    get_animation_indices, AnimatedCharacterSprite, AnimatedCharacterType, AnimationDirection,
-    AnimationState, AnimationTimer, AnimationType, CharacterAnimation, PLAYER_ASSET_SHEET_1,
-    SHEET_1_COLUMNS, SHEET_1_ROWS,
+    AnimatedCharacterSprite, AnimatedCharacterType, AnimationDirection, AnimationState,
+    AnimationTimer, AnimationType, CharacterAnimation, PLAYER_ASSET_SHEET_1, SHEET_1_COLUMNS,
+    SHEET_1_ROWS, get_animation_indices,
 };
 use avian2d::prelude::*;
 use bevy::prelude::*;
@@ -29,7 +30,8 @@ impl Plugin for PlayerPlugin {
                     handle_cutscene_start,
                     handle_cutscene_end,
                     handle_player_destination_reached,
-                ),
+                )
+                    .run_if(in_state(AppState::Game)),
             );
     }
 }

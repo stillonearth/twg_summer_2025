@@ -4,15 +4,16 @@ use bevy::color::palettes::css::*;
 use bevy::prelude::*;
 use bevy_defer::AsyncCommandsExtension;
 use bevy_defer::AsyncWorld;
-use bevy_la_mesa::events::{CardPress, DeckShuffle, DrawToHand, PlaceCardOnTable, RenderDeck};
 use bevy_la_mesa::CardMetadata;
+use bevy_la_mesa::events::{CardPress, DeckShuffle, DrawToHand, PlaceCardOnTable, RenderDeck};
 use bevy_la_mesa::{Card, CardOnTable, Hand, PlayArea};
 use bevy_la_mesa::{DeckArea, HandArea};
-use bevy_tweening::lens::TransformPositionLens;
 use bevy_tweening::Animator;
 use bevy_tweening::Tween;
+use bevy_tweening::lens::TransformPositionLens;
 use serde::{Deserialize, Deserializer, Serialize};
 
+use crate::AppState;
 use crate::logic::CardSelectionSuccess;
 use crate::logic::CutsceneEndEvent;
 use crate::logic::CutsceneStartEvent;
@@ -30,7 +31,7 @@ pub struct DragCardsInHandDown {
 
 impl Plugin for CardSystemPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, setup)
+        app.add_systems(OnEnter(AppState::Game), setup)
             .add_event::<DragCardsInHandDown>()
             .add_systems(
                 Update,
@@ -42,7 +43,8 @@ impl Plugin for CardSystemPlugin {
                     handle_cutscene_start,
                     handle_cutscene_end,
                     handle_drag_cards_in_hand_down,
-                ),
+                )
+                    .run_if(in_state(AppState::Game)),
             );
     }
 }
@@ -109,13 +111,25 @@ fn setup(
     commands.spawn((
         Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
         MeshMaterial3d(materials.add(Color::srgb_u8(124, 144, 255))),
-        Transform::from_translation(Vec3::new(5.1, 16.0, -0.55)),
+        Transform::from_translation(Vec3::new(5.1, 16.0, -1.8)),
         PlayArea {
             marker: 1,
             player: 1,
         },
         Name::new("Play Area 1".to_string()),
-        Visibility::Hidden,
+        // Visibility::Hidden,
+    ));
+
+    commands.spawn((
+        Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
+        MeshMaterial3d(materials.add(Color::srgb_u8(124, 144, 255))),
+        Transform::from_translation(Vec3::new(5.1, 16.0, 1.8)),
+        PlayArea {
+            marker: 2,
+            player: 1,
+        },
+        Name::new("Play Area 1".to_string()),
+        // Visibility::Hidden,
     ));
 }
 

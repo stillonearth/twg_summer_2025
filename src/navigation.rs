@@ -3,6 +3,7 @@ use rand::Rng;
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap, HashSet};
 
+use crate::AppState;
 use crate::{game_objects::WalkableTile, player::PlayerMarker};
 
 const TILE_SIZE: f32 = 32.0;
@@ -19,7 +20,9 @@ impl Plugin for NavigationGridPlugin {
             .add_systems(
                 Update,
                 (
-                    (setup_walkable_tile_handlers, setup_navigation_grid).chain(),
+                    (setup_walkable_tile_handlers, setup_navigation_grid)
+                        .chain()
+                        .run_if(in_state(AppState::Game)),
                     handle_navigation_event,
                     handle_go_to_random_tile,
                 ),

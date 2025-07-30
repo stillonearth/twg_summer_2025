@@ -1,15 +1,21 @@
 use bevy::prelude::*;
-use bevy_novel::{events::EventNovelEnd, rpy_asset_loader::Rpy, NovelText};
+use bevy_novel::{NovelText, events::EventNovelEnd, rpy_asset_loader::Rpy};
 
-use crate::logic::{CutsceneEndEvent, CutsceneStartEvent};
+use crate::{
+    AppState,
+    logic::{CutsceneEndEvent, CutsceneStartEvent},
+};
 
 pub struct CutscenePlugin;
 
 impl Plugin for CutscenePlugin {
     fn build(&self, app: &mut App) {
         // Initialize app state and resources
-        app.add_systems(Startup, load_scenario)
-            .add_systems(Update, (start_visual_novel, handle_novel_end));
+        app.add_systems(OnEnter(AppState::Game), load_scenario)
+            .add_systems(
+                Update,
+                (start_visual_novel, handle_novel_end).run_if(in_state(AppState::Game)),
+            );
     }
 }
 

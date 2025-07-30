@@ -1,4 +1,5 @@
 use crate::{
+    AppState,
     cards::{ActivityCard, Mood, ResourceType, TimeOfDay},
     logic::{
         CardSelectedEvent, GamePhase, GamePhaseState, GameState, MoodChangedEvent,
@@ -28,7 +29,8 @@ impl Plugin for CharacterThoughtsPlugin {
                     // listen_for_time_changes,
                     // listen_for_phase_changes,
                     listen_for_card_selections,
-                ),
+                )
+                    .run_if(in_state(AppState::Game)),
             );
     }
 }
@@ -279,6 +281,7 @@ PERSONALITY:
 THOUGHT STYLE:
 - Write in first person ("I think...", "Maybe I should...")
 - Keep to 1-2 sentences maximum
+- 140 characters maximum
 - Use natural, internal monologue
 - Show vulnerability and self-doubt
 - Occasionally have clarity or determination
@@ -312,19 +315,13 @@ fn generate_thought_prompt(context: &ThoughtContext) -> String {
             format!("I'm looking at the {object}. What crosses my mind?")
         }
         ThoughtType::ResourceCrisis(resource) => {
-            format!(
-                "My {resource:?} is critically low. What desperate thoughts am I having?"
-            )
+            format!("My {resource:?} is critically low. What desperate thoughts am I having?")
         }
         ThoughtType::MoodChange(from, to) => {
-            format!(
-                "My mood shifted from {from:?} to {to:?}. How do I feel?"
-            )
+            format!("My mood shifted from {from:?} to {to:?}. How do I feel?")
         }
         ThoughtType::TimeChange(time_of_day) => {
-            format!(
-                "It's {time_of_day:?} now. What thoughts does this time bring?"
-            )
+            format!("It's {time_of_day:?} now. What thoughts does this time bring?")
         }
         ThoughtType::PhaseChange(phase) => {
             format!("Game phase is {phase:?}. What am I thinking?")

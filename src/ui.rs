@@ -1,4 +1,5 @@
 use crate::{
+    AppState,
     cards::{CrisisLevel, Mood, ResourceType, StatusEffect},
     logic::{
         ActiveStatusEffect, CutsceneEndEvent, CutsceneStartEvent, GamePhase, GamePhaseState,
@@ -13,10 +14,11 @@ pub struct GameUIPlugin;
 impl Plugin for GameUIPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<UpdateThoughtsEvent>()
-            .add_systems(Startup, setup_ui)
+            .add_systems(OnEnter(AppState::Game), setup_ui)
             .add_systems(
                 Update,
-                (update_displays, update_character_thoughts, handle_events),
+                (update_displays, update_character_thoughts, handle_events)
+                    .run_if(in_state(AppState::Game)),
             );
     }
 }
@@ -359,35 +361,56 @@ fn spawn_thoughts_panel(commands: &mut Commands, asset_server: &Res<AssetServer>
                     ));
                 });
 
-            // Thoughts text container
+            // Thoughts section container
             parent
                 .spawn(Node {
-                    width: Val::Px(600.0),
-                    min_height: Val::Px(80.0),
-                    max_height: Val::Px(130.0),
-                    padding: UiRect::all(Val::Px(16.0)),
-                    justify_content: JustifyContent::Default,
-                    align_items: AlignItems::Default,
-                    border: UiRect::all(Val::Px(1.0)),
+                    flex_direction: FlexDirection::Column,
+                    align_items: AlignItems::Start,
                     ..default()
                 })
-                // .insert(BorderRadius::all(Val::Px(8.0)))
-                // .insert(BackgroundColor(UIColors::BACKGROUND.with_alpha(0.7)))
-                // .insert(BorderColor(UIColors::ACCENT.with_alpha(0.2)))
-                .with_children(|panel| {
-                    panel.spawn((
-                        Text::new("A new day to survive..."),
+                .with_children(|thoughts_section| {
+                    // Character thoughts label
+                    thoughts_section.spawn((
+                        Text::new("Character Thoughts"),
                         TextFont {
-                            font_size: 16.0,
+                            font_size: 12.0,
                             ..default()
                         },
-                        TextColor(UIColors::THOUGHTS_TEXT),
-                        CharacterThoughts::default(),
+                        TextColor(UIColors::TEXT_DIM),
+                        Node {
+                            margin: UiRect::bottom(Val::Px(4.0)),
+                            ..default()
+                        },
                     ));
+
+                    // Thoughts text container
+                    thoughts_section
+                        .spawn(Node {
+                            width: Val::Px(600.0),
+                            min_height: Val::Px(80.0),
+                            max_height: Val::Px(130.0),
+                            justify_content: JustifyContent::Start,
+                            align_items: AlignItems::Start,
+                            border: UiRect::all(Val::Px(1.0)),
+                            ..default()
+                        })
+                        // .insert(BorderRadius::all(Val::Px(8.0)))
+                        // .insert(BackgroundColor(UIColors::BACKGROUND.with_alpha(0.7)))
+                        // .insert(BorderColor(UIColors::ACCENT.with_alpha(0.2)))
+                        .with_children(|panel| {
+                            panel.spawn((
+                                Text::new("A new day to survive..."),
+                                TextFont {
+                                    font_size: 14.0,
+                                    ..default()
+                                },
+                                TextColor(UIColors::THOUGHTS_TEXT),
+                                CharacterThoughts::default(),
+                            ));
+                        });
                 });
         });
 }
-
 fn spawn_text_section<T: Component>(
     parent: &mut ChildSpawnerCommands,
     text: &str,

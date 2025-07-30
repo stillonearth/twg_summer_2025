@@ -4,10 +4,10 @@ use bevy_la_mesa::Card;
 use bevy_novel::{events::EventStartScenario, rpy_asset_loader::Rpy};
 use std::collections::HashMap;
 
-use crate::cards::*;
 use crate::cutscene::ScenarioHandle;
 use crate::game_objects::NavigateToObjectEvent;
 use crate::navigation::GoToRandomTile;
+use crate::{AppState, cards::*};
 
 pub struct GameLogicPlugin;
 
@@ -52,7 +52,7 @@ impl Plugin for GameLogicPlugin {
                     handle_end_game_check,
                     handle_daily_reset,
                 )
-                    .chain(),
+                    .run_if(in_state(AppState::Game)),
             );
     }
 }
@@ -283,6 +283,13 @@ impl Default for GameState {
     }
 }
 
+#[derive(Clone)]
+pub struct PendingCutscene {
+    pub cutscene_id: String,
+    pub card_id: Option<u32>,
+    pub trigger_reason: CutsceneTrigger,
+}
+
 #[derive(Resource)]
 pub struct GamePhaseState {
     pub current_phase: GamePhase,
@@ -292,6 +299,7 @@ pub struct GamePhaseState {
     pub selected_card_id: Option<u32>,
     pub pending_cutscene: Option<String>,
     pub cutscene_active: bool,
+    pub pending_post_action_cutscene: Option<PendingCutscene>,
 }
 
 impl Default for GamePhaseState {
@@ -304,6 +312,7 @@ impl Default for GamePhaseState {
             selected_card_id: None,
             pending_cutscene: None,
             cutscene_active: false,
+            pending_post_action_cutscene: None, // NEW
         }
     }
 }
@@ -803,17 +812,10 @@ fn handle_card_selection(
     }
 }
 
-// Add this to your GameState struct:
-// shown_cutscenes: std::collections::HashSet<u32>,
-
-// And in the Default implementation for GameState:
-// shown_cutscenes: std::collections::HashSet::new(),
-
 fn handle_card_selection_success(
     mut card_selection_success_events: EventReader<CardSelectionSuccess>,
     mut phase_state: ResMut<GamePhaseState>,
     mut phase_changed_events: EventWriter<PhaseChangedEvent>,
-    mut cutscene_events: EventWriter<CutsceneStartEvent>,
     mut status_effect_events: EventWriter<StatusEffectAppliedEvent>,
     mut game_state: ResMut<GameState>,
 ) {
@@ -821,6 +823,7 @@ fn handle_card_selection_success(
         if phase_state.cutscene_active {
             continue;
         }
+
         phase_state.selected_card_id = Some(event.0.id);
 
         // Apply card effects first
@@ -843,16 +846,18 @@ fn handle_card_selection_success(
             // Mark this cutscene as shown
             game_state.shown_cutscenes.insert(event.0.id);
 
-            cutscene_events.write(CutsceneStartEvent {
+            // Store cutscene to be triggered after action instead of triggering now
+            phase_state.pending_post_action_cutscene = Some(PendingCutscene {
                 cutscene_id: format!("{}", event.0.id),
-                trigger_reason: CutsceneTrigger::CardEffect,
                 card_id: Some(event.0.id),
-            });
-        } else {
-            phase_changed_events.write(PhaseChangedEvent {
-                new_phase: GamePhase::CharacterAction,
+                trigger_reason: CutsceneTrigger::CardEffect,
             });
         }
+
+        // Always proceed to character action phase
+        phase_changed_events.write(PhaseChangedEvent {
+            new_phase: GamePhase::CharacterAction,
+        });
     }
 }
 
@@ -989,8 +994,9 @@ fn handle_cutscene_end(
                 turn_over_events.write(TurnOverEvent {});
             }
             GamePhase::CharacterAction => {
-                action_completed_events.write(ActionCompletedEvent {
-                    card_played: ActivityCard::default(),
+                // If we just finished a post-action cutscene, proceed to turn over
+                phase_changed_events.write(PhaseChangedEvent {
+                    new_phase: GamePhase::TurnOver,
                 });
             }
             GamePhase::CardSelection => {
@@ -1008,7 +1014,7 @@ fn handle_cutscene_end(
 fn handle_character_action_phase(
     mut commands: Commands,
     mut phase_changed_events: EventReader<PhaseChangedEvent>,
-    mut navigation_events: EventWriter<NavigateToObjectEvent>,
+    mut _navigation_events: EventWriter<NavigateToObjectEvent>,
     phase_state: Res<GamePhaseState>,
     activity_cards_handle: Option<Res<ActivityCardsHandle>>,
     activity_cards_assets: Res<Assets<ActivityCards>>,
@@ -1053,16 +1059,17 @@ fn handle_character_action_phase(
 
 fn handle_action_completion(
     mut action_completed_events: EventReader<ActionCompletedEvent>,
-    phase_state: ResMut<GamePhaseState>,
+    mut phase_state: ResMut<GamePhaseState>,
     mut phase_changed_events: EventWriter<PhaseChangedEvent>,
     mut game_step_events: EventWriter<GameStepEvent>,
+    mut cutscene_events: EventWriter<CutsceneStartEvent>,
 ) {
     for event in action_completed_events.read() {
         if phase_state.cutscene_active {
             continue;
         }
 
-        info!("Action completed, transitioning to TurnOver phase");
+        info!("Action completed");
 
         // Apply time cost from played card
         game_step_events.write(GameStepEvent {
@@ -1073,9 +1080,23 @@ fn handle_action_completion(
             food_change: 0.0,
         });
 
-        phase_changed_events.write(PhaseChangedEvent {
-            new_phase: GamePhase::TurnOver,
-        });
+        // Check if there's a pending cutscene to trigger after the action
+        if let Some(pending_cutscene) = phase_state.pending_post_action_cutscene.take() {
+            info!(
+                "Triggering cutscene after action: {}",
+                pending_cutscene.cutscene_id
+            );
+            cutscene_events.write(CutsceneStartEvent {
+                cutscene_id: pending_cutscene.cutscene_id,
+                card_id: pending_cutscene.card_id,
+                trigger_reason: pending_cutscene.trigger_reason,
+            });
+        } else {
+            // No cutscene pending, proceed directly to turn over
+            phase_changed_events.write(PhaseChangedEvent {
+                new_phase: GamePhase::TurnOver,
+            });
+        }
     }
 }
 
