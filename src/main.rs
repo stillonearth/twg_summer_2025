@@ -13,7 +13,10 @@ use bevy_llm::LLMPlugin;
 use bevy_novel::{NovelBackground, NovelImage, NovelPlugin, NovelText};
 
 use crate::{
-    cards::{ActivityCard, ActivityCards, ActivityCardsHandle, CardSystemPlugin},
+    cards::{
+        ActivityCard, ActivityCards, ActivityCardsHandle, CardSystemPlugin, GameCard,
+        SchizophrenicCards, SchizophrenicCardsHandle,
+    },
     cutscene::CutscenePlugin,
     cutscene_menu::GameMenuPlugin,
     logic::{CutsceneEndEvent, CutsceneStartEvent, GameLogicPlugin},
@@ -68,6 +71,10 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
 
     let activity_cards_handle = ActivityCardsHandle(asset_server.load("cards.json"));
     commands.insert_resource(activity_cards_handle);
+
+    let schizphrenic_cards_handle =
+        SchizophrenicCardsHandle(asset_server.load("schizophrenic-cards.json"));
+    commands.insert_resource(schizphrenic_cards_handle);
 }
 
 fn startup_game(
@@ -153,7 +160,7 @@ fn main() {
                     ..default()
                 }),
             MeshPickingPlugin,
-            LaMesaPlugin::<ActivityCard>::default(),
+            LaMesaPlugin::<GameCard>::default(),
             game_objects::GameObjectsPlugin,
             TiledMapPlugin::default(),
             TiledPhysicsPlugin::<TiledPhysicsAvianBackend>::default(),
@@ -163,13 +170,14 @@ fn main() {
             },
             WorldInspectorPlugin::default().run_if(input_toggle_active(false, KeyCode::Escape)),
             navigation::NavigationGridPlugin {},
-            JsonAssetPlugin::<ActivityCards>::new(&["json"]),
             AsyncPlugin::default_settings(),
             LLMPlugin,
             HuiPlugin,
             NovelPlugin {},
         ))
         .add_plugins((
+            JsonAssetPlugin::<ActivityCards>::new(&["json"]),
+            JsonAssetPlugin::<SchizophrenicCards>::new(&["json"]),
             CharacterThoughtsPlugin,
             AudioPlugin,
             CutscenePlugin,

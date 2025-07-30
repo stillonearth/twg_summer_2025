@@ -1,5 +1,5 @@
 use crate::AppState;
-use crate::cards::ActivityCard;
+use crate::cards::{ActivityCard, GameCard};
 use crate::logic::{ActionCompletedEvent, CutsceneEndEvent, CutsceneStartEvent, GamePhaseState};
 use crate::navigation::{GridPos, MovePlayerCommand, TileSize};
 use crate::sprites::{
@@ -221,17 +221,21 @@ pub fn handle_player_destination_reached(
     mut destination_events: EventReader<PlayerDestinationReachedEvent>,
     mut ew_action_completed: EventWriter<ActionCompletedEvent>,
     phase_state: Res<GamePhaseState>,
-    q_cards: Query<(Entity, &Card<ActivityCard>)>,
+    q_cards: Query<(Entity, &Card<GameCard>)>,
 ) {
     for _ in destination_events.read() {
         if let Some(selected_card_id) = phase_state.selected_card_id
             && let Some(card) = q_cards
                 .iter()
-                .find(|(_, card)| card.data.id == selected_card_id)
+                .find(|(_, card)| card.data.id() == selected_card_id)
         {
+            println!("{:?}", card.1.data.clone());
+
             ew_action_completed.write(ActionCompletedEvent {
                 card_played: card.1.data.clone(),
             });
+        } else {
+            println!("error here");
         }
     }
 }

@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use avian2d::math::PI;
 use bevy::color::palettes::css::*;
 use bevy::prelude::*;
 use bevy_defer::AsyncCommandsExtension;
@@ -14,6 +15,7 @@ use bevy_tweening::lens::TransformPositionLens;
 use serde::{Deserialize, Deserializer, Serialize};
 
 use crate::AppState;
+use crate::logic::AdversaryCardDrawnEvent;
 use crate::logic::CardSelectionSuccess;
 use crate::logic::CutsceneEndEvent;
 use crate::logic::CutsceneStartEvent;
@@ -29,20 +31,29 @@ pub struct DragCardsInHandDown {
     pub player: usize,
 }
 
+#[derive(Event)]
+pub struct DragCardsInHandUp {
+    pub player: usize,
+}
+
 impl Plugin for CardSystemPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(AppState::Game), setup)
             .add_event::<DragCardsInHandDown>()
+            .add_event::<DragCardsInHandUp>()
             .add_systems(
                 Update,
                 (
-                    init_deck,
-                    handle_card_draw_phase.after(init_deck),
+                    init_player_deck,
+                    handle_player_card_draw_phase.after(init_player_deck),
+                    init_adversary_deck,
+                    handle_adversary_card_draw_phase.after(init_adversary_deck),
                     handle_card_selection_attempt,
                     handle_card_selection_success,
                     handle_cutscene_start,
                     handle_cutscene_end,
                     handle_drag_cards_in_hand_down,
+                    handle_drag_cards_in_hand_up,
                 )
                     .run_if(in_state(AppState::Game)),
             );
@@ -52,7 +63,7 @@ impl Plugin for CardSystemPlugin {
 pub fn handle_drag_cards_in_hand_down(
     mut commands: Commands,
     mut er_drag_cards: EventReader<DragCardsInHandDown>,
-    mut q_hand_cards: Query<(Entity, &mut Transform, &Card<ActivityCard>, &Hand)>,
+    mut q_hand_cards: Query<(Entity, &mut Transform, &Card<GameCard>, &Hand)>,
 ) {
     for event in er_drag_cards.read() {
         // Find all cards in the specified player's hand
@@ -64,6 +75,30 @@ pub fn handle_drag_cards_in_hand_down(
                     TransformPositionLens {
                         start: transform.translation,
                         end: transform.translation - Vec3::new(0.0, 0.0, -5.0),
+                    },
+                );
+
+                commands.entity(entity).insert((Animator::new(tween)));
+            }
+        }
+    }
+}
+
+pub fn handle_drag_cards_in_hand_up(
+    mut commands: Commands,
+    mut er_drag_cards: EventReader<DragCardsInHandUp>,
+    mut q_hand_cards: Query<(Entity, &mut Transform, &Card<GameCard>, &Hand)>,
+) {
+    for event in er_drag_cards.read() {
+        // Find all cards in the specified player's hand
+        for (entity, transform, _card, hand) in q_hand_cards.iter_mut() {
+            if hand.player == event.player {
+                let tween = Tween::new(
+                    EaseFunction::CubicIn,
+                    Duration::from_millis(300),
+                    TransformPositionLens {
+                        start: transform.translation,
+                        end: transform.translation - Vec3::new(0.0, 0.0, 5.0),
                     },
                 );
 
@@ -97,11 +132,31 @@ fn setup(
         Visibility::Hidden,
     ));
 
+    commands.spawn((
+        Name::new("Deck 2 -- Play Cards"),
+        Transform::from_translation(Vec3::new(14.0, 0.0, -8.0))
+            .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
+        DeckArea { marker: 2 },
+        Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
+        MeshMaterial3d(materials.add(Color::srgb_u8(124, 144, 255))),
+        Visibility::Hidden,
+    ));
+
     // Hand Area
     commands.spawn((
         Name::new("HandArea - Player 1"),
         Transform::from_translation(Vec3::new(-5.3, 15.7, 3.4)),
         HandArea { player: 1 },
+        Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
+        MeshMaterial3d(materials.add(Color::srgb_u8(124, 144, 255))),
+        Visibility::Hidden,
+    ));
+
+    commands.spawn((
+        Name::new("HandArea - Player 2"),
+        Transform::from_translation(Vec3::new(-5.3, 15.7, -4.0))
+            .with_rotation(Quat::from_rotation_y(PI)),
+        HandArea { player: 2 },
         Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
         MeshMaterial3d(materials.add(Color::srgb_u8(124, 144, 255))),
         Visibility::Hidden,
@@ -125,17 +180,16 @@ fn setup(
         MeshMaterial3d(materials.add(Color::srgb_u8(124, 144, 255))),
         Transform::from_translation(Vec3::new(5.1, 16.0, 1.8)),
         PlayArea {
-            marker: 2,
-            player: 1,
+            marker: 1,
+            player: 2,
         },
         Name::new("Play Area 2".to_string()),
         Visibility::Hidden,
     ));
 }
 
-/// Initialize the game by loading and rendering the activity cards deck
-fn init_deck(
-    mut ew_render_deck: EventWriter<RenderDeck<ActivityCard>>,
+fn init_player_deck(
+    mut ew_render_deck: EventWriter<RenderDeck<GameCard>>,
     q_decks: Query<(Entity, &DeckArea)>,
     activity_cards_handle: Option<Res<ActivityCardsHandle>>,
     activity_cards_assets: Res<Assets<ActivityCards>>,
@@ -147,15 +201,17 @@ fn init_deck(
     }
 
     let Some(activity_cards_handle) = activity_cards_handle else {
-        warn!("ActivityCardsHandle resource not found");
+        warn!("GameCardsHandle resource not found");
         return;
     };
 
     if let Some(activity_cards) = activity_cards_assets.get(activity_cards_handle.id()) {
-        let available_cards = game_state.filter_cards(activity_cards);
+        // Filter to only activity cards
+        let game_cards = GameCard::from_activity_cards(activity_cards.0.clone());
+        let available_cards = game_state.filter_cards(&game_cards);
 
-        if let Some((deck_entity, _)) = q_decks.iter().next() {
-            ew_render_deck.write(RenderDeck::<ActivityCard> {
+        if let Some((deck_entity, _)) = q_decks.iter().find(|(_, deck)| deck.marker == 1) {
+            ew_render_deck.write(RenderDeck::<GameCard> {
                 deck_entity,
                 deck: available_cards,
             });
@@ -163,17 +219,96 @@ fn init_deck(
     }
 }
 
-/// Handle the card draw phase - shuffle deck and draw cards
-fn handle_card_draw_phase(
+fn handle_player_card_draw_phase(
     mut commands: Commands,
     phase_state: Res<GamePhaseState>,
     q_decks: Query<(Entity, &DeckArea)>,
-    q_cards_on_table: Query<(Entity, &Card<ActivityCard>, &CardOnTable)>,
+    q_cards_on_table: Query<(Entity, &Card<GameCard>, &CardOnTable)>,
     mut last_turn: Local<u32>,
     mut phase_changed_events: EventWriter<PhaseChangedEvent>,
 ) {
     // Only trigger when we enter the CardDraw phase
     if phase_state.current_phase != GamePhase::CardDraw {
+        return;
+    }
+    // Prevent triggering multiple times for the same turn
+    if *last_turn == phase_state.turn_number {
+        return;
+    }
+    if let Some((deck_entity, _)) = q_decks.iter().find(|(_, deck)| deck.marker == 1) {
+        let n_cards_on_table = q_cards_on_table.iter().len();
+        let cards_to_draw = 5 - n_cards_on_table;
+        if cards_to_draw <= 0 {
+            warn!("No cards to draw, table is full");
+            return;
+        }
+        *last_turn = phase_state.turn_number;
+        // Draw cards after a delay
+        commands.spawn_task(move || async move {
+            AsyncWorld.sleep(1.0).await;
+            // Shuffle the deck first
+            AsyncWorld.send_event(DeckShuffle {
+                deck_entity,
+                duration: 50,
+            })?;
+            AsyncWorld.sleep(2.0).await;
+            // Send draw event
+            AsyncWorld.send_event(DrawToHand {
+                deck_entity,
+                num_cards: cards_to_draw,
+                player: 1,
+            })?;
+            // Send phase event
+            AsyncWorld.send_event(CardDrawnEvent {
+                card_count: cards_to_draw,
+            })?;
+            Ok(())
+        });
+        phase_changed_events.write(PhaseChangedEvent {
+            new_phase: GamePhase::CardSelection,
+        });
+    }
+}
+
+fn init_adversary_deck(
+    mut ew_render_deck: EventWriter<RenderDeck<GameCard>>,
+    q_decks: Query<(Entity, &DeckArea)>,
+    schizophrenic_cards_handle: Option<Res<SchizophrenicCardsHandle>>,
+    schizophrenic_cards_assets: Res<Assets<SchizophrenicCards>>,
+    phase_state: Res<GamePhaseState>,
+) {
+    if phase_state.current_phase != GamePhase::AdversaryCardDraw {
+        return;
+    }
+
+    let Some(schizophrenic_cards_handle) = schizophrenic_cards_handle else {
+        warn!("GameCardsHandle resource not found");
+        return;
+    };
+
+    if let Some(schizophrenic_cards) =
+        schizophrenic_cards_assets.get(schizophrenic_cards_handle.id())
+    {
+        let game_cards = GameCard::from_schizophrenic_cards(schizophrenic_cards.0.clone());
+        if let Some((deck_entity, _)) = q_decks.iter().find(|(_, deck)| deck.marker == 2) {
+            ew_render_deck.write(RenderDeck::<GameCard> {
+                deck_entity,
+                deck: game_cards,
+            });
+        }
+    }
+}
+
+fn handle_adversary_card_draw_phase(
+    mut commands: Commands,
+    phase_state: Res<GamePhaseState>,
+    q_decks: Query<(Entity, &DeckArea)>,
+    q_cards_on_table: Query<(Entity, &Card<GameCard>, &CardOnTable)>,
+    mut last_turn: Local<u32>,
+    mut phase_changed_events: EventWriter<PhaseChangedEvent>,
+) {
+    // Only trigger when we enter the AdversaryCardDraw phase
+    if phase_state.current_phase != GamePhase::AdversaryCardDraw {
         return;
     }
 
@@ -182,51 +317,51 @@ fn handle_card_draw_phase(
         return;
     }
 
-    let Some((deck_entity, _)) = q_decks.iter().next() else {
-        warn!("No deck found for card draw");
-        return;
-    };
+    // Find the adversary deck (marker 2)
+    if let Some((deck_entity, _)) = q_decks.iter().find(|(_, deck)| deck.marker == 2) {
+        let n_cards_on_table = q_cards_on_table.iter().len();
+        let cards_to_draw = 5 - n_cards_on_table;
 
-    let n_cards_on_table = q_cards_on_table.iter().len();
-    let cards_to_draw = 5 - n_cards_on_table;
+        if cards_to_draw <= 0 {
+            warn!("No cards to draw, table is full");
+            return;
+        }
 
-    if cards_to_draw <= 0 {
-        warn!("No cards to draw, table is full");
-        return;
+        *last_turn = phase_state.turn_number;
+
+        // Draw cards after a delay
+        commands.spawn_task(move || async move {
+            AsyncWorld.sleep(1.0).await;
+
+            // Shuffle the deck first
+            AsyncWorld.send_event(DeckShuffle {
+                deck_entity,
+                duration: 50,
+            })?;
+
+            AsyncWorld.sleep(2.0).await;
+
+            // Send draw event for adversary (player 2)
+            AsyncWorld.send_event(DrawToHand {
+                deck_entity,
+                num_cards: cards_to_draw,
+                player: 2,
+            })?;
+
+            // Send phase event
+            AsyncWorld.send_event(AdversaryCardDrawnEvent {
+                card_count: cards_to_draw,
+            })?;
+
+            Ok(())
+        });
+
+        phase_changed_events.write(PhaseChangedEvent {
+            new_phase: GamePhase::AdversaryCardSelection,
+        });
+    } else {
+        warn!("No adversary deck found for card draw");
     }
-
-    *last_turn = phase_state.turn_number;
-
-    // Draw cards after a delay
-    commands.spawn_task(move || async move {
-        AsyncWorld.sleep(1.0).await;
-
-        // Shuffle the deck first
-        AsyncWorld.send_event(DeckShuffle {
-            deck_entity,
-            duration: 50,
-        })?;
-
-        AsyncWorld.sleep(2.0).await;
-
-        // Send draw event
-        AsyncWorld.send_event(DrawToHand {
-            deck_entity,
-            num_cards: cards_to_draw,
-            player: 1,
-        })?;
-
-        // Send phase event
-        AsyncWorld.send_event(CardDrawnEvent {
-            card_count: cards_to_draw,
-        })?;
-
-        Ok(())
-    });
-
-    phase_changed_events.write(PhaseChangedEvent {
-        new_phase: GamePhase::CardSelection,
-    });
 }
 
 /// Handle placing card on table after selection
@@ -235,8 +370,8 @@ pub fn handle_card_selection_attempt(
     mut ew_card_selected: EventWriter<CardSelectedEvent>,
     phase_state: Res<GamePhaseState>,
     mut q_cards: ParamSet<(
-        Query<(Entity, &Card<ActivityCard>, &CardOnTable)>,
-        Query<(Entity, &Card<ActivityCard>, &Hand)>,
+        Query<(Entity, &Card<GameCard>, &CardOnTable)>,
+        Query<(Entity, &Card<GameCard>, &Hand)>,
     )>,
 ) {
     // Only place cards during CharacterAction phase
@@ -257,7 +392,11 @@ pub fn handle_card_selection_attempt(
         if let Ok((_, card, _)) = p1.get(event.entity)
             && n_cards_on_table < 1
         {
-            ew_card_selected.write(CardSelectedEvent(card.data.clone()));
+            println!("selected activity card {:?}", card.data);
+
+            if let CardVariant::Activity(activity_card) = &card.data.card_variant {
+                ew_card_selected.write(CardSelectedEvent(activity_card.clone()));
+            }
         }
     }
 }
@@ -268,15 +407,21 @@ pub fn handle_card_selection_success(
     mut er_card_selction_success: EventReader<CardSelectionSuccess>,
     mut ew_drag_cards: EventWriter<DragCardsInHandDown>,
     mut q_cards: ParamSet<(
-        Query<(Entity, &Card<ActivityCard>, &CardOnTable)>,
-        Query<(Entity, &Card<ActivityCard>, &Hand)>,
+        Query<(Entity, &Card<GameCard>, &CardOnTable)>,
+        Query<(Entity, &Card<GameCard>, &Hand)>,
     )>,
 ) {
     for event in er_card_selction_success.read() {
         let selected_card_entity = q_cards
             .p1()
             .iter()
-            .find(|(_, card, _)| card.data.id == event.0.id)
+            .find(|(_, card, _)| {
+                if let CardVariant::Activity(activity_card) = &card.data.card_variant {
+                    activity_card.id == event.0.id
+                } else {
+                    false
+                }
+            })
             .unwrap()
             .0;
 
@@ -295,7 +440,7 @@ pub fn handle_card_selection_success(
 fn handle_cutscene_start(
     mut commands: Commands,
     mut er_cutscene_start: EventReader<CutsceneStartEvent>,
-    q_cards: Query<(Entity, &Card<ActivityCard>)>,
+    q_cards: Query<(Entity, &Card<GameCard>)>,
 ) {
     for _ in er_cutscene_start.read() {
         for (entity, _) in q_cards.iter() {
@@ -307,7 +452,7 @@ fn handle_cutscene_start(
 fn handle_cutscene_end(
     mut commands: Commands,
     mut er_cutscene_start: EventReader<CutsceneEndEvent>,
-    q_cards: Query<(Entity, &Card<ActivityCard>)>,
+    q_cards: Query<(Entity, &Card<GameCard>)>,
 ) {
     for _ in er_cutscene_start.read() {
         for (entity, _) in q_cards.iter() {
@@ -316,7 +461,31 @@ fn handle_cutscene_end(
     }
 }
 
-// Card-related types and definitions
+// Unified Card System
+
+/// Unified card structure that can represent both activity and schizophrenic cards
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GameCard {
+    pub card_variant: CardVariant,
+}
+
+impl Default for GameCard {
+    fn default() -> Self {
+        Self {
+            card_variant: CardVariant::Activity(ActivityCard::default()),
+        }
+    }
+}
+
+/// Enum to distinguish between different card types
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(tag = "type")]
+pub enum CardVariant {
+    Activity(ActivityCard),
+    Schizophrenic(SchizophrenicCard),
+}
+
+// Activity Card Types
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct ActivityCard {
     pub id: u32,
@@ -332,6 +501,17 @@ pub struct ActivityCard {
     pub flavor_text: String,
     pub one_time_use: bool,
     pub cooldown: Option<u32>,
+}
+
+// Schizophrenic Card Types
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SchizophrenicCard {
+    pub id: u32,
+    pub card_name: String,
+    pub scenario_id: String,
+    pub title: String,
+    pub conditions: SpectrumConditions,
+    pub setup: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -377,6 +557,76 @@ pub struct StatusEffectApplication {
     pub intensity: f32,
 }
 
+// Conditions specific to spectrum cards
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct SpectrumConditions {
+    pub trigger_symptoms: Vec<TriggerSymptom>,
+}
+
+// Trigger symptoms enum
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum TriggerSymptom {
+    AuditoryHallucinations,
+    Paranoia,
+    VisualHallucinations,
+    ParanoidDelusions,
+    SocialWithdrawal,
+    SensoryProcessingIssues,
+    Anxiety,
+    Dissociation,
+    Derealization,
+    DisorganizedThinking,
+    CognitiveFragmentation,
+    SurveillanceAnxiety,
+    FlatAffect,
+    EmotionalWithdrawal,
+    DisorganizedSpeech,
+    CommunicationBreakdown,
+    CatatonicSymptoms,
+    MotorDisruption,
+    IdentityDisturbance,
+    SelfFragmentation,
+    DelusionalThinking,
+    ConspiracyBeliefs,
+    CommandHallucinations,
+    LossOfControl,
+    TemporalDisorientation,
+    TimeConfusion,
+    TelepathicDelusions,
+    BoundaryConfusion,
+    TactileHallucinations,
+    BodyDisturbance,
+    GrandioseDelusions,
+    InflatedSelfImportance,
+    IdeasOfReference,
+    SelfReferentialThinking,
+    ThoughtInsertion,
+    ForeignThoughts,
+    VisualDistortions,
+    SelfRecognitionIssues,
+    OlfactoryHallucinations,
+    SmellDisturbance,
+    ThoughtWithdrawal,
+    CognitiveTheft,
+    PersecutoryDelusions,
+    ParanoidFear,
+    Echolalia,
+    RepetitiveSpeech,
+    Depersonalization,
+    SelfDetachment,
+    GustatoryHallucinations,
+    TasteDisturbance,
+    Alogia,
+    SpeechPoverty,
+    Hypervigilance,
+    ParanoidAlertness,
+    BizarreBehavior,
+    UnusualCompulsions,
+    CognitiveOverload,
+    InformationFlooding,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
 pub enum CardType {
     #[default]
@@ -391,6 +641,7 @@ pub enum CardType {
     MemoryCard,
     ImpulseCard,
     ComboCard,
+    Spectrum, // New type for schizophrenic cards
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
@@ -463,15 +714,15 @@ pub enum Mood {
 
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum TimeOfDay {
-    EarlyMorning, // 5-9
-    Morning,      // 9-12
-    Afternoon,    // 12-17
-    Evening,      // 17-20
-    Night,        // 20-24
-    LateNight,    // 0-5
+    EarlyMorning,
+    Morning,
+    Afternoon,
+    Evening,
+    Night,
+    LateNight,
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq, PartialOrd, Ord)]
 pub enum CrisisLevel {
     None,
     Mild,
@@ -491,18 +742,102 @@ pub enum ResourceType {
 #[derive(Deserialize, Asset, TypePath, Deref, DerefMut)]
 pub struct ActivityCards(pub Vec<ActivityCard>);
 
-/// Resource for storing the handle to the activity cards asset
+#[derive(Deserialize, Asset, TypePath, Deref, DerefMut)]
+pub struct SchizophrenicCards(pub Vec<SchizophrenicCard>);
+
+#[derive(Asset, TypePath, Deref, DerefMut)]
+pub struct GameCards(pub Vec<ActivityCard>);
+
 #[derive(Resource, Deref, DerefMut)]
 pub struct ActivityCardsHandle(pub Handle<ActivityCards>);
 
-impl CardMetadata for ActivityCard {
-    type Output = ActivityCard;
+#[derive(Resource, Deref, DerefMut)]
+pub struct SchizophrenicCardsHandle(pub Handle<SchizophrenicCards>);
+
+impl CardMetadata for GameCard {
+    type Output = GameCard;
 
     fn front_image_filename(&self) -> String {
-        format!("cards/card-{}.png", self.id)
+        match &self.card_variant {
+            CardVariant::Activity(_) => format!("cards/card-{}.png", self.id()),
+            CardVariant::Schizophrenic(_) => format!("schizo_cards/card-{}.png", self.id()),
+        }
     }
 
     fn back_image_filename(&self) -> String {
-        "cards/Back_1.png".into()
+        match &self.card_variant {
+            CardVariant::Activity(_) => "cards/Back_1.png".into(),
+            CardVariant::Schizophrenic(_) => "cards/Back_5.png".into(),
+        }
+    }
+}
+
+impl GameCard {
+    pub fn id(&self) -> u32 {
+        match self.card_variant.clone() {
+            CardVariant::Activity(activity_card) => activity_card.clone().id,
+            CardVariant::Schizophrenic(schizophrenic_card) => schizophrenic_card.clone().id,
+        }
+    }
+
+    /// Convert a list of ActivityCards to GameCards
+    pub fn from_activity_cards(activity_cards: Vec<ActivityCard>) -> Vec<GameCard> {
+        activity_cards
+            .into_iter()
+            .map(|activity_card| GameCard {
+                card_variant: CardVariant::Activity(activity_card),
+            })
+            .collect()
+    }
+
+    /// Convert a list of SchizophrenicCards to GameCards
+    pub fn from_schizophrenic_cards(schizo_cards: Vec<SchizophrenicCard>) -> Vec<GameCard> {
+        schizo_cards
+            .into_iter()
+            .map(|schizo_card| GameCard {
+                card_variant: CardVariant::Schizophrenic(schizo_card),
+            })
+            .collect()
+    }
+
+    /// Convert both lists and combine them into a single GameCards collection
+    pub fn from_both_card_types(
+        activity_cards: Vec<ActivityCard>,
+        schizo_cards: Vec<SchizophrenicCard>,
+    ) -> Vec<GameCard> {
+        let mut game_cards = Self::from_activity_cards(activity_cards);
+        game_cards.extend(Self::from_schizophrenic_cards(schizo_cards));
+        game_cards
+    }
+
+    pub fn to_activity_card(&self) -> Option<&ActivityCard> {
+        match &self.card_variant {
+            CardVariant::Activity(activity_card) => Some(activity_card),
+            CardVariant::Schizophrenic(_) => None,
+        }
+    }
+
+    /// Extract SchizophrenicCard if this is a schizophrenic card
+    pub fn to_schizophrenic_card(&self) -> Option<&SchizophrenicCard> {
+        match &self.card_variant {
+            CardVariant::Activity(_) => None,
+            CardVariant::Schizophrenic(schizo_card) => Some(schizo_card),
+        }
+    }
+
+    /// Extract ActivityCard by consuming the GameCard
+    pub fn into_activity_card(self) -> Option<ActivityCard> {
+        match self.card_variant {
+            CardVariant::Activity(activity_card) => Some(activity_card),
+            CardVariant::Schizophrenic(_) => None,
+        }
+    }
+
+    /// Extract SchizophrenicCard by consuming the GameCard
+    pub fn into_schizophrenic_card(self) -> Option<SchizophrenicCard> {
+        match self.card_variant {
+            CardVariant::Activity(_) => None,
+            CardVariant::Schizophrenic(schizo_card) => Some(schizo_card),
+        }
     }
 }

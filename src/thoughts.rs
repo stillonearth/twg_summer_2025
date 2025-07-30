@@ -448,6 +448,8 @@ fn listen_for_phase_changes(
                 });
             }
             GamePhase::TurnOver => {}
+            GamePhase::AdversaryCardDraw => {}
+            GamePhase::AdversaryCardSelection => {}
         }
     }
 }

@@ -1,7 +1,8 @@
 use bevy::prelude::*;
 use bevy_defer::{AsyncCommandsExtension, AsyncWorld};
-use bevy_la_mesa::Card;
+use bevy_la_mesa::{Card, Hand};
 use bevy_novel::{events::EventStartScenario, rpy_asset_loader::Rpy};
+use rand::{Rng, rng};
 use std::collections::HashMap;
 
 use crate::cutscene::ScenarioHandle;
@@ -33,6 +34,10 @@ impl Plugin for GameLogicPlugin {
             .add_event::<StatusEffectExpiredEvent>()
             .add_event::<CrisisLevelChangedEvent>()
             .add_event::<EndGameEvent>()
+            // New adversary events
+            .add_event::<AdversaryCardDrawnEvent>()
+            .add_event::<AdversaryCardSelectedEvent>()
+            .add_event::<AdversaryActionCompletedEvent>()
             .add_systems(
                 Update,
                 (
@@ -43,6 +48,10 @@ impl Plugin for GameLogicPlugin {
                     handle_card_selection_success,
                     handle_character_action_phase,
                     handle_action_completion,
+                    handle_adversary_card_selection_phase,
+                    handle_adversary_card_draw,
+                    handle_adversary_card_selection,
+                    handle_adversary_action_completion,
                     handle_phase_changed_turn_over,
                     handle_turn_over,
                     handle_cutscene_trigger,
@@ -57,6 +66,90 @@ impl Plugin for GameLogicPlugin {
     }
 }
 
+// New adversary events
+#[derive(Event)]
+pub struct AdversaryCardDrawnEvent {
+    pub card_count: usize,
+}
+
+#[derive(Event)]
+pub struct AdversaryCardSelectedEvent {
+    pub card: SchizophrenicCard,
+}
+
+#[derive(Event)]
+pub struct AdversaryActionCompletedEvent {
+    pub card_played: SchizophrenicCard,
+}
+
+// Enhanced GamePhase enum with new adversary phases
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum GamePhase {
+    CardDraw,
+    CardSelection,
+    CharacterAction,
+    AdversaryCardDraw,
+    AdversaryCardSelection,
+    TurnOver,
+}
+
+#[derive(Debug, Clone)]
+pub struct AdversaryEffects {
+    pub player_sleep_change: f32,
+    pub player_health_change: f32,
+    pub player_mental_change: f32,
+    pub player_food_change: f32,
+    pub status_effects: Vec<StatusEffectApplication>,
+    pub environmental_changes: Vec<EnvironmentalChange>,
+}
+
+#[derive(Debug, Clone)]
+pub struct AdversaryConditions {
+    pub min_crisis_level: Option<CrisisLevel>,
+    pub max_crisis_level: Option<CrisisLevel>,
+    pub required_time_of_day: Option<Vec<TimeOfDay>>,
+    pub player_resource_thresholds: Option<ResourceThresholds>,
+    pub turn_number_range: Option<(u32, u32)>,
+}
+
+#[derive(Debug, Clone)]
+pub struct ResourceThresholds {
+    pub min_sleep: Option<f32>,
+    pub max_sleep: Option<f32>,
+    pub min_health: Option<f32>,
+    pub max_health: Option<f32>,
+    pub min_mental: Option<f32>,
+    pub max_mental: Option<f32>,
+    pub min_food: Option<f32>,
+    pub max_food: Option<f32>,
+}
+
+#[derive(Debug, Clone)]
+pub enum AdversaryCardType {
+    Crisis,        // Negative events that challenge the player
+    Environmental, // Changes to the game environment
+    Social,        // Social pressures or interactions
+    Random,        // Random events
+    Consequence,   // Direct consequences of player actions
+}
+
+#[derive(Debug, Clone)]
+pub enum EnvironmentalChange {
+    RemoveObject(String),
+    AddObject(String),
+    LockResource(ResourceType, u32), // Resource type and duration
+    WeatherChange(WeatherType),
+}
+
+#[derive(Debug, Clone)]
+pub enum WeatherType {
+    Sunny,
+    Rainy,
+    Stormy,
+    Cloudy,
+}
+
+// Rest of the existing events and structures remain the same...
 #[derive(Event)]
 pub struct StatusEffectAppliedEvent {
     pub effect: StatusEffect,
@@ -110,7 +203,7 @@ pub struct CardDrawnEvent {
 
 #[derive(Event)]
 pub struct ActionCompletedEvent {
-    pub card_played: ActivityCard,
+    pub card_played: GameCard,
 }
 
 #[derive(Event)]
@@ -156,7 +249,7 @@ pub struct DayChangedEvent {
     pub new_day: u32,
 }
 
-// Game Data Structures
+// Game Data Structures (existing ones remain the same)
 #[derive(Debug, Clone)]
 pub struct ActiveStatusEffect {
     pub effect: StatusEffect,
@@ -196,14 +289,6 @@ pub enum FailureReason {
     CascadeFailure,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum GamePhase {
-    CardDraw,
-    CardSelection,
-    CharacterAction,
-    TurnOver,
-}
-
 #[derive(Debug, Clone, PartialEq)]
 pub enum CutsceneTrigger {
     CardEffect,
@@ -211,9 +296,45 @@ pub enum CutsceneTrigger {
     TimeOfDay,
     ResourceThreshold,
     TurnEnd,
+    AdversaryAction, // New trigger type
 }
 
-// Game State
+// Enhanced GamePhaseState with adversary state
+#[derive(Resource)]
+pub struct GamePhaseState {
+    pub current_phase: GamePhase,
+    pub previous_phase: Option<GamePhase>,
+    pub turn_number: u32,
+    pub cards_drawn_count: usize,
+    pub selected_card_id: Option<u32>,
+    pub pending_cutscene: Option<String>,
+    pub cutscene_active: bool,
+    pub pending_post_action_cutscene: Option<PendingCutscene>,
+    // New adversary fields
+    pub adversary_cards_drawn: Vec<SchizophrenicCard>,
+    pub selected_adversary_card: Option<SchizophrenicCard>,
+    pub adversary_deck: Vec<SchizophrenicCard>, // Available adversary cards
+}
+
+impl Default for GamePhaseState {
+    fn default() -> Self {
+        Self {
+            current_phase: GamePhase::CardDraw,
+            previous_phase: None,
+            turn_number: 1,
+            cards_drawn_count: 0,
+            selected_card_id: None,
+            pending_cutscene: None,
+            cutscene_active: false,
+            pending_post_action_cutscene: None,
+            adversary_cards_drawn: Vec::new(),
+            selected_adversary_card: None,
+            adversary_deck: Vec::new(), // Will be loaded from JSON
+        }
+    }
+}
+
+// Enhanced GameState remains mostly the same but with new fields
 #[derive(Resource, Clone, Debug)]
 pub struct GameState {
     // Time
@@ -242,8 +363,19 @@ pub struct GameState {
     pub action_history: Vec<PlayerAction>,
     pub available_objects: Vec<String>,
     pub negative_card_count: u32,
-
     pub shown_cutscenes: std::collections::HashSet<u32>,
+
+    // New adversary-related fields
+    pub current_weather: WeatherType,
+    pub adversary_action_history: Vec<AdversaryAction>,
+}
+
+#[derive(Debug, Clone)]
+pub struct AdversaryAction {
+    pub turn: u32,
+    pub card_played: SchizophrenicCard,
+    pub effects_applied: AdversaryEffects,
+    pub timestamp: f32,
 }
 
 impl Default for GameState {
@@ -279,6 +411,8 @@ impl Default for GameState {
             ],
             negative_card_count: 0,
             shown_cutscenes: std::collections::HashSet::new(),
+            current_weather: WeatherType::Sunny,
+            adversary_action_history: Vec::new(),
         }
     }
 }
@@ -290,35 +424,9 @@ pub struct PendingCutscene {
     pub trigger_reason: CutsceneTrigger,
 }
 
-#[derive(Resource)]
-pub struct GamePhaseState {
-    pub current_phase: GamePhase,
-    pub previous_phase: Option<GamePhase>,
-    pub turn_number: u32,
-    pub cards_drawn_count: usize,
-    pub selected_card_id: Option<u32>,
-    pub pending_cutscene: Option<String>,
-    pub cutscene_active: bool,
-    pub pending_post_action_cutscene: Option<PendingCutscene>,
-}
-
-impl Default for GamePhaseState {
-    fn default() -> Self {
-        Self {
-            current_phase: GamePhase::CardDraw,
-            previous_phase: None,
-            turn_number: 1,
-            cards_drawn_count: 0,
-            selected_card_id: None,
-            pending_cutscene: None,
-            cutscene_active: false,
-            pending_post_action_cutscene: None, // NEW
-        }
-    }
-}
-
-// Game State Implementation
+// Implementation methods for adversary logic
 impl GameState {
+    // Existing methods remain the same...
     pub fn can_play_card(&self, card: &ActivityCard) -> (bool, Vec<String>) {
         let mut blocking_conditions = Vec::new();
 
@@ -463,12 +571,17 @@ impl GameState {
         (blocking_conditions.is_empty(), blocking_conditions)
     }
 
-    pub fn filter_cards(&self, cards: &[ActivityCard]) -> Vec<ActivityCard> {
+    pub fn filter_cards(&self, cards: &[GameCard]) -> Vec<GameCard> {
         cards
             .iter()
             .filter(|card| {
-                let (can_play, _) = self.can_play_card(card);
-                can_play
+                match &card.card_variant {
+                    CardVariant::Activity(activity_card) => {
+                        let (can_play, _) = self.can_play_card(activity_card);
+                        can_play
+                    }
+                    CardVariant::Schizophrenic(_) => false, // Don't include schizophrenic cards in activity filtering
+                }
             })
             .cloned()
             .collect()
@@ -761,6 +874,8 @@ impl GamePhaseState {
             GamePhase::CardDraw => "Card Draw",
             GamePhase::CardSelection => "Card Selection",
             GamePhase::CharacterAction => "Character Action",
+            GamePhase::AdversaryCardDraw => "Adversary Card Draw",
+            GamePhase::AdversaryCardSelection => "Adversary Card Selection",
             GamePhase::TurnOver => "Turn Over",
         }
     }
@@ -770,7 +885,113 @@ impl GamePhaseState {
     }
 }
 
-// System implementations
+fn handle_adversary_card_selection_phase(
+    mut phase_changed_events: EventReader<PhaseChangedEvent>,
+    mut adversary_card_selected_events: EventWriter<AdversaryCardSelectedEvent>,
+    mut phase_state: ResMut<GamePhaseState>,
+    q_cards: Query<(Entity, &Card<GameCard>, &Hand)>,
+) {
+    for event in phase_changed_events.read() {
+        if event.new_phase == GamePhase::AdversaryCardSelection {
+            info!("Entering Adversary Card Selection phase");
+
+            // Get all schizophrenic cards in adversary's hand (player 2)
+            let adversary_cards: Vec<_> = q_cards
+                .iter()
+                .filter(|(_, card, hand)| {
+                    hand.player == 2
+                        && matches!(card.data.card_variant, CardVariant::Schizophrenic(_))
+                })
+                .collect();
+
+            if adversary_cards.len() == 0 {
+                continue;
+            }
+
+            // Select a random card from adversary's hand
+            let mut rng = rand::thread_rng();
+            let random_index: usize = rng.gen_range(0..adversary_cards.len());
+            let (_, selected_card, _) = &adversary_cards[random_index];
+
+            // Extract the schizophrenic card data
+            if let Some(schizo_card) = selected_card.data.to_schizophrenic_card() {
+                info!("Adversary selected card: {}", schizo_card.card_name);
+
+                adversary_card_selected_events.write(AdversaryCardSelectedEvent {
+                    card: schizo_card.clone(),
+                });
+            }
+        }
+    }
+}
+
+fn handle_adversary_card_draw(
+    mut commands: Commands,
+    mut adversary_card_drawn_events: EventReader<AdversaryCardDrawnEvent>,
+) {
+    for _ in adversary_card_drawn_events.read() {
+        // Automatically proceed to adversary card selection
+        commands.spawn_task(move || async move {
+            AsyncWorld.sleep(3.0).await;
+            AsyncWorld.send_event(PhaseChangedEvent {
+                new_phase: GamePhase::AdversaryCardSelection,
+            })?;
+            Ok(())
+        });
+    }
+}
+
+fn handle_adversary_card_selection(
+    mut adversary_card_selected_events: EventReader<AdversaryCardSelectedEvent>,
+    mut adversary_action_completed_events: EventWriter<AdversaryActionCompletedEvent>,
+    mut status_effect_events: EventWriter<StatusEffectAppliedEvent>,
+    mut game_state: ResMut<GameState>,
+    mut ew_drag_cards: EventWriter<DragCardsInHandUp>,
+) {
+    for event in adversary_card_selected_events.read() {
+        info!("Adversary selected card: {}", event.card.title);
+
+        // Apply adversary card effects
+        // let status_events = game_state.apply_adversary_card_effects(&event.card);
+        // for status_event in status_events {
+        //     status_effect_events.write(status_event);
+        // }
+
+        // Signal that adversary action is complete
+        adversary_action_completed_events.write(AdversaryActionCompletedEvent {
+            card_played: event.card.clone(),
+        });
+
+        ew_drag_cards.write(DragCardsInHandUp { player: 2 });
+    }
+}
+
+fn handle_adversary_action_completion(
+    mut adversary_action_completed_events: EventReader<AdversaryActionCompletedEvent>,
+    mut phase_changed_events: EventWriter<PhaseChangedEvent>,
+    mut cutscene_events: EventWriter<CutsceneStartEvent>,
+) {
+    for event in adversary_action_completed_events.read() {
+        info!("Adversary action completed: {}", event.card_played.title);
+
+        let should_trigger_cutscene = false;
+
+        if should_trigger_cutscene {
+            cutscene_events.write(CutsceneStartEvent {
+                cutscene_id: format!("adversary_{}", event.card_played.id),
+                card_id: Some(event.card_played.id),
+                trigger_reason: CutsceneTrigger::AdversaryAction,
+            });
+        } else {
+            // No cutscene, proceed directly to turn over
+            phase_changed_events.write(PhaseChangedEvent {
+                new_phase: GamePhase::TurnOver,
+            });
+        }
+    }
+}
+
+// Modified existing systems to handle new phase flow
 fn handle_card_draw(
     mut card_drawn_events: EventReader<CardDrawnEvent>,
     mut phase_state: ResMut<GamePhaseState>,
@@ -990,11 +1211,14 @@ fn handle_cutscene_end(
         phase_state.pending_cutscene = None;
 
         match phase_state.current_phase {
-            // GamePhase::TurnOver => {
-            //     turn_over_events.write(TurnOverEvent {});
-            // }
             GamePhase::CharacterAction => {
-                // If we just finished a post-action cutscene, proceed to turn over
+                // If we just finished a post-action cutscene, proceed to adversary card draw
+                phase_changed_events.write(PhaseChangedEvent {
+                    new_phase: GamePhase::AdversaryCardDraw,
+                });
+            }
+            GamePhase::AdversaryCardSelection => {
+                // If we just finished an adversary cutscene, proceed to turn over
                 phase_changed_events.write(PhaseChangedEvent {
                     new_phase: GamePhase::TurnOver,
                 });
@@ -1071,31 +1295,35 @@ fn handle_action_completion(
 
         info!("Action completed");
 
-        // Apply time cost from played card
-        game_step_events.write(GameStepEvent {
-            time_delta: event.card_played.costs.time_cost * 3600.0, // Convert hours to seconds
-            sleep_change: 0.0,
-            health_change: 0.0,
-            mental_health_change: 0.0,
-            food_change: 0.0,
-        });
+        if let Some(card_played) = event.card_played.to_activity_card() {
+            // Apply time cost from played card
+            game_step_events.write(GameStepEvent {
+                time_delta: card_played.costs.time_cost * 3600.0, // Convert hours to seconds
+                sleep_change: 0.0,
+                health_change: 0.0,
+                mental_health_change: 0.0,
+                food_change: 0.0,
+            });
 
-        // Check if there's a pending cutscene to trigger after the action
-        if let Some(pending_cutscene) = phase_state.pending_post_action_cutscene.take() {
-            info!(
-                "Triggering cutscene after action: {}",
-                pending_cutscene.cutscene_id
-            );
-            cutscene_events.write(CutsceneStartEvent {
-                cutscene_id: pending_cutscene.cutscene_id,
-                card_id: pending_cutscene.card_id,
-                trigger_reason: pending_cutscene.trigger_reason,
-            });
+            // Check if there's a pending cutscene to trigger after the action
+            if let Some(pending_cutscene) = phase_state.pending_post_action_cutscene.take() {
+                info!(
+                    "Triggering cutscene after action: {}",
+                    pending_cutscene.cutscene_id
+                );
+                cutscene_events.write(CutsceneStartEvent {
+                    cutscene_id: pending_cutscene.cutscene_id,
+                    card_id: pending_cutscene.card_id,
+                    trigger_reason: pending_cutscene.trigger_reason,
+                });
+            } else {
+                // No cutscene pending, proceed to adversary phase
+                phase_changed_events.write(PhaseChangedEvent {
+                    new_phase: GamePhase::AdversaryCardDraw,
+                });
+            }
         } else {
-            // No cutscene pending, proceed directly to turn over
-            phase_changed_events.write(PhaseChangedEvent {
-                new_phase: GamePhase::TurnOver,
-            });
+            println!("ZZZ");
         }
     }
 }
@@ -1162,9 +1390,8 @@ fn handle_turn_over(
     mut turn_over_events: EventReader<TurnOverEvent>,
     mut phase_state: ResMut<GamePhaseState>,
     mut game_step_events: EventWriter<GameStepEvent>,
-    mut q_cards: ParamSet<(Query<(Entity, &Card<ActivityCard>)>,)>,
+    mut q_cards: ParamSet<(Query<(Entity, &Card<GameCard>)>,)>,
     mut ew_phase_change: EventWriter<PhaseChangedEvent>,
-    // mut ew_discard_card_to_deck: EventWriter<DiscardCardToDeck>,
 ) {
     for _ in turn_over_events.read() {
         if phase_state.cutscene_active {
@@ -1179,6 +1406,8 @@ fn handle_turn_over(
         // Clear phase state from previous turn
         phase_state.selected_card_id = None;
         phase_state.cards_drawn_count = 0;
+        phase_state.adversary_cards_drawn.clear();
+        phase_state.selected_adversary_card = None;
 
         // Increment turn number
         phase_state.turn_number += 1;

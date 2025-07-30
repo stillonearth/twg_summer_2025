@@ -66,10 +66,13 @@ impl UIColors {
         (Color::srgb(0.9, 0.6, 0.2), Color::srgb(0.6, 0.4, 0.2)), // Food
     ];
 
-    const PHASE_COLORS: [Color; 4] = [
+    const PHASE_COLORS: [Color; 7] = [
         Color::srgb(0.3, 0.8, 0.9), // Draw
         Color::srgb(0.9, 0.7, 0.3), // Select
         Color::srgb(0.7, 0.9, 0.4), // Action
+        Color::srgb(0.3, 0.8, 0.9), // Adversary Draw
+        Color::srgb(0.9, 0.7, 0.3), // Adversary Select
+        Color::srgb(0.7, 0.9, 0.4), // Adversary Action
         Color::srgb(0.9, 0.4, 0.8), // TurnOver
     ];
 
