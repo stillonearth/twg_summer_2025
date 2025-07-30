@@ -990,9 +990,9 @@ fn handle_cutscene_end(
         phase_state.pending_cutscene = None;
 
         match phase_state.current_phase {
-            GamePhase::TurnOver => {
-                turn_over_events.write(TurnOverEvent {});
-            }
+            // GamePhase::TurnOver => {
+            //     turn_over_events.write(TurnOverEvent {});
+            // }
             GamePhase::CharacterAction => {
                 // If we just finished a post-action cutscene, proceed to turn over
                 phase_changed_events.write(PhaseChangedEvent {
@@ -1152,8 +1152,6 @@ fn handle_phase_changed_turn_over(
                     trigger_reason: CutsceneTrigger::TurnEnd,
                     card_id: None,
                 });
-            } else {
-                turn_over_events.write(TurnOverEvent);
             }
         }
     }

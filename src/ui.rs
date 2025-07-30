@@ -3,7 +3,7 @@ use crate::{
     cards::{CrisisLevel, Mood, ResourceType, StatusEffect},
     logic::{
         ActiveStatusEffect, CutsceneEndEvent, CutsceneStartEvent, GamePhase, GamePhaseState,
-        GameState,
+        GameState, TurnOverEvent,
     },
     thoughts::ThoughtGeneratedEvent,
 };
@@ -14,10 +14,18 @@ pub struct GameUIPlugin;
 impl Plugin for GameUIPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<UpdateThoughtsEvent>()
+            .add_event::<EndTurnEvent>()
             .add_systems(OnEnter(AppState::Game), setup_ui)
             .add_systems(
                 Update,
-                (update_displays, update_character_thoughts, handle_events)
+                (
+                    update_displays,
+                    update_character_thoughts,
+                    handle_events,
+                    handle_button_interactions,
+                    update_end_turn_button_visibility,
+                    handle_end_turn_button,
+                )
                     .run_if(in_state(AppState::Game)),
             );
     }
@@ -34,6 +42,9 @@ impl UpdateThoughtsEvent {
     }
 }
 
+#[derive(Event)]
+pub struct EndTurnEvent;
+
 // Consolidated UI colors
 pub struct UIColors;
 
@@ -43,6 +54,10 @@ impl UIColors {
     pub const TEXT_DIM: Color = Color::srgb(0.6, 0.6, 0.6);
     pub const THOUGHTS_TEXT: Color = Color::srgb(0.95, 0.9, 1.0);
     pub const ACCENT: Color = Color::srgb(0.4, 0.7, 1.0);
+    pub const BUTTON_NORMAL: Color = Color::srgb(0.4, 0.7, 1.0);
+    pub const BUTTON_HOVERED: Color = Color::srgb(0.5, 0.8, 1.0);
+    pub const BUTTON_PRESSED: Color = Color::srgb(0.3, 0.6, 0.9);
+    pub const BUTTON_DISABLED: Color = Color::srgb(0.3, 0.3, 0.3);
 
     const RESOURCE_COLORS: [(Color, Color); 4] = [
         (Color::srgb(0.3, 0.6, 0.9), Color::srgb(0.6, 0.3, 0.9)), // Sleep
@@ -203,6 +218,9 @@ pub struct ResourceValueText {
     pub resource_type: ResourceType,
 }
 
+#[derive(Component)]
+pub struct EndTurnButton;
+
 fn setup_ui(mut commands: Commands, asset_server: Res<AssetServer>) {
     spawn_left_panel(&mut commands);
     spawn_thoughts_panel(&mut commands, &asset_server);
@@ -217,11 +235,13 @@ fn spawn_left_panel(commands: &mut Commands) {
                 height: Val::Percent(100.0),
                 flex_direction: FlexDirection::Column,
                 position_type: PositionType::Absolute,
+                justify_content: JustifyContent::SpaceBetween,
                 ..default()
             },
             Name::new("Left Panel"),
         ))
         .with_children(|parent| {
+            // Main content panel
             parent
                 .spawn((
                     Node {
@@ -230,6 +250,7 @@ fn spawn_left_panel(commands: &mut Commands) {
                         padding: UiRect::all(Val::Px(16.0)),
                         margin: UiRect::all(Val::Px(8.0)),
                         border: UiRect::all(Val::Px(1.0)),
+                        flex_grow: 1.0,
                         ..default()
                     },
                     BorderRadius::new(Val::Px(5.), Val::Px(5.), Val::Px(5.), Val::Px(5.)),
@@ -292,7 +313,7 @@ fn spawn_left_panel(commands: &mut Commands) {
                             Node {
                                 flex_direction: FlexDirection::Column,
                                 margin: UiRect::top(Val::Px(16.0)),
-
+                                flex_grow: 1.0,
                                 ..default()
                             },
                             StatusEffectsPanel,
@@ -314,8 +335,50 @@ fn spawn_left_panel(commands: &mut Commands) {
                                 },
                             ));
                         });
+
+                    // End Turn Button - Initially hidden
+                    panel
+                        .spawn((
+                            Button,
+                            Node {
+                                width: Val::Percent(100.0),
+                                height: Val::Px(50.0),
+                                justify_content: JustifyContent::Center,
+                                align_items: AlignItems::Center,
+                                border: UiRect::all(Val::Px(2.0)),
+                                ..default()
+                            },
+                            BackgroundColor(UIColors::BUTTON_NORMAL),
+                            BorderColor(UIColors::BUTTON_NORMAL),
+                            BorderRadius::new(Val::Px(8.), Val::Px(8.), Val::Px(8.), Val::Px(8.)),
+                            Visibility::Hidden, // Start hidden
+                            EndTurnButton,
+                        ))
+                        .with_children(|button| {
+                            button.spawn((
+                                Text::new("End Turn"),
+                                TextFont {
+                                    font_size: 16.0,
+                                    ..default()
+                                },
+                                TextColor(Color::WHITE),
+                            ));
+                        });
                 });
         });
+}
+
+fn handle_end_turn_button(
+    mut end_turn_events: EventReader<EndTurnEvent>,
+    mut turn_over_events: EventWriter<TurnOverEvent>,
+    phase_state: Res<GamePhaseState>,
+) {
+    for _event in end_turn_events.read() {
+        if !phase_state.cutscene_active {
+            info!("End Turn button pressed - processing turn over");
+            turn_over_events.write(TurnOverEvent);
+        }
+    }
 }
 
 fn spawn_thoughts_panel(commands: &mut Commands, asset_server: &Res<AssetServer>) {
@@ -345,9 +408,6 @@ fn spawn_thoughts_panel(commands: &mut Commands, asset_server: &Res<AssetServer>
                     border: UiRect::all(Val::Px(1.0)),
                     ..default()
                 })
-                // .insert(BorderRadius::all(Val::Px(60.0))) // Circular border
-                // .insert(BorderColor(UIColors::ACCENT.with_alpha(0.3)))
-                // .insert(BackgroundColor(UIColors::BACKGROUND.with_alpha(0.5)))
                 .with_children(|avatar_container| {
                     avatar_container.spawn((
                         ImageNode::new(asset_server.load("avatars/avatar_anxious.png")),
@@ -356,7 +416,6 @@ fn spawn_thoughts_panel(commands: &mut Commands, asset_server: &Res<AssetServer>
                             height: Val::Percent(100.0),
                             ..default()
                         },
-                        // BorderRadius::all(Val::Px(58.0)), // Slightly smaller radius for the image
                         AvatarImage,
                     ));
                 });
@@ -386,7 +445,7 @@ fn spawn_thoughts_panel(commands: &mut Commands, asset_server: &Res<AssetServer>
                     // Thoughts text container
                     thoughts_section
                         .spawn(Node {
-                            width: Val::Px(600.0),
+                            width: Val::Px(550.0),
                             min_height: Val::Px(80.0),
                             max_height: Val::Px(130.0),
                             justify_content: JustifyContent::Start,
@@ -394,14 +453,11 @@ fn spawn_thoughts_panel(commands: &mut Commands, asset_server: &Res<AssetServer>
                             border: UiRect::all(Val::Px(1.0)),
                             ..default()
                         })
-                        // .insert(BorderRadius::all(Val::Px(8.0)))
-                        // .insert(BackgroundColor(UIColors::BACKGROUND.with_alpha(0.7)))
-                        // .insert(BorderColor(UIColors::ACCENT.with_alpha(0.2)))
                         .with_children(|panel| {
                             panel.spawn((
                                 Text::new("A new day to survive..."),
                                 TextFont {
-                                    font_size: 14.0,
+                                    font_size: 13.0,
                                     ..default()
                                 },
                                 TextColor(UIColors::THOUGHTS_TEXT),
@@ -411,6 +467,7 @@ fn spawn_thoughts_panel(commands: &mut Commands, asset_server: &Res<AssetServer>
                 });
         });
 }
+
 fn spawn_text_section<T: Component>(
     parent: &mut ChildSpawnerCommands,
     text: &str,
@@ -500,7 +557,26 @@ fn spawn_resource_bar(parent: &mut ChildSpawnerCommands, label: &str, resource_t
         });
 }
 
-// Consolidated update systems
+// NEW SYSTEM: Update End Turn Button Visibility
+fn update_end_turn_button_visibility(
+    mut button_query: Query<&mut Visibility, With<EndTurnButton>>,
+    phase_state: Res<GamePhaseState>,
+) {
+    // Only run when phase state changes
+    if phase_state.is_changed() {
+        for mut visibility in button_query.iter_mut() {
+            *visibility = if matches!(phase_state.current_phase, GamePhase::TurnOver)
+                && !phase_state.cutscene_active
+            {
+                Visibility::Inherited
+            } else {
+                Visibility::Hidden
+            };
+        }
+    }
+}
+
+// Consolidated update systems (removed button state logic since we're using visibility now)
 fn update_displays(
     mut commands: Commands,
     mut text_queries: ParamSet<(
@@ -509,7 +585,7 @@ fn update_displays(
         Query<&mut Text, (With<TimeDisplay>, Without<DayDisplay>)>,
         Query<&mut Text, (With<DayDisplay>, Without<TimeDisplay>)>,
         Query<(&mut Text, &mut TextColor), With<MoodDisplay>>,
-        Query<(&mut Text, &mut TextColor), With<CrisisDisplay>>,
+        Query<(&mut Text, &mut TextColor), (With<CrisisDisplay>, Without<MoodDisplay>)>,
         Query<(&mut Text, &ResourceValueText)>,
     )>,
     mut fill_query: Query<
@@ -617,6 +693,41 @@ fn update_displays(
     }
 }
 
+fn handle_button_interactions(
+    mut interaction_query: Query<
+        (&Interaction, &mut BackgroundColor, &mut BorderColor),
+        (Changed<Interaction>, With<EndTurnButton>),
+    >,
+    mut end_turn_events: EventWriter<EndTurnEvent>,
+    phase_state: Res<GamePhaseState>,
+) {
+    for (interaction, mut background_color, mut border_color) in &mut interaction_query {
+        // Only handle interactions if button is visible (TurnOver phase and not in cutscene)
+        let button_active = matches!(phase_state.current_phase, GamePhase::TurnOver)
+            && !phase_state.cutscene_active;
+
+        if !button_active {
+            continue;
+        }
+
+        match *interaction {
+            Interaction::Pressed => {
+                background_color.0 = UIColors::BUTTON_PRESSED;
+                border_color.0 = UIColors::BUTTON_PRESSED;
+                end_turn_events.send(EndTurnEvent);
+            }
+            Interaction::Hovered => {
+                background_color.0 = UIColors::BUTTON_HOVERED;
+                border_color.0 = UIColors::BUTTON_HOVERED;
+            }
+            Interaction::None => {
+                background_color.0 = UIColors::BUTTON_NORMAL;
+                border_color.0 = UIColors::BUTTON_NORMAL;
+            }
+        }
+    }
+}
+
 fn update_status_effects_display(
     commands: &mut Commands,
     status_effects_panel_query: &Query<(Entity, &Children), With<StatusEffectsPanel>>,
@@ -629,7 +740,7 @@ fn update_status_effects_display(
     }
 
     // Find the status effects panel
-    if let Ok((panel_entity, children)) = status_effects_panel_query.get_single() {
+    if let Ok((panel_entity, children)) = status_effects_panel_query.single() {
         // Find the panel container (skip the header)
         for child in children.iter() {
             commands.entity(child).with_children(|panel| {

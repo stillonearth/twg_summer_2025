@@ -3,79 +3,96 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>MTG-Style Card Game</title>
-        <script src="./html2canvas.js"></script>
+        <title>Psychosis Spectrum Cards</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
         <style>
             body {
-                background: linear-gradient(135deg, #1a1a2e, #16213e);
+                background: linear-gradient(135deg, #0a0a0a, #1a1a2e, #16213e);
                 font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
                 margin: 0;
                 padding: 20px;
                 min-height: 100vh;
+                color: #e0e0e0;
             }
 
             .card {
-                width: 280px;
-                height: 450px;
-                border-radius: 12px;
+                width: 300px;
+                height: 480px;
+                border-radius: 15px;
                 box-shadow:
-                    0 8px 25px rgba(0, 0, 0, 0.6),
-                    0 0 0 2px #d4af37;
+                    0 10px 30px rgba(0, 0, 0, 0.8),
+                    0 0 0 2px #333,
+                    inset 0 1px 0 rgba(255, 255, 255, 0.1);
                 margin: 15px;
                 display: inline-block;
-                background: linear-gradient(145deg, #f8f6f0, #e8e6e0);
+                background: linear-gradient(145deg, #1a1a1a, #2d2d2d);
                 position: relative;
                 overflow: hidden;
                 transition:
                     transform 0.3s ease,
                     box-shadow 0.3s ease;
+                border: 1px solid #444;
             }
 
             .card:hover {
-                transform: translateY(-5px) scale(1.02);
+                transform: translateY(-8px) scale(1.03);
                 box-shadow:
-                    0 12px 35px rgba(0, 0, 0, 0.8),
-                    0 0 0 3px #ffd700;
+                    0 15px 40px rgba(0, 0, 0, 0.9),
+                    0 0 0 3px #555,
+                    0 0 20px rgba(100, 100, 255, 0.3);
             }
 
             .card-header {
-                background: linear-gradient(135deg, #2c3e50, #34495e);
-                border-radius: 12px 12px 0 0;
-                padding: 8px 12px;
+                background: linear-gradient(135deg, #1a1a1a, #333);
+                border-radius: 15px 15px 0 0;
+                padding: 12px 15px;
                 position: relative;
-                border-bottom: 2px solid #d4af37;
+                border-bottom: 2px solid #444;
+            }
+
+            .card-name {
+                color: #e0e0e0;
+                font-size: 18px;
+                font-weight: bold;
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+                margin: 0 0 5px 0;
+                text-align: center;
             }
 
             .card-title {
-                color: #fff;
-                font-size: 16px;
-                font-weight: bold;
+                color: #b0b0b0;
+                font-size: 14px;
+                font-weight: normal;
+                font-style: italic;
                 text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
                 margin: 0;
                 text-align: center;
-                padding-right: 50px;
             }
 
             .card-type {
                 position: absolute;
-                top: 5px;
-                right: 8px;
-                background: rgba(255, 215, 0, 0.9);
-                color: #2c3e50;
-                padding: 2px 6px;
-                border-radius: 4px;
+                top: 8px;
+                right: 10px;
+                background: rgba(100, 100, 255, 0.8);
+                color: #fff;
+                padding: 3px 8px;
+                border-radius: 6px;
                 font-size: 10px;
                 font-weight: bold;
                 text-transform: uppercase;
+                letter-spacing: 0.5px;
             }
 
             .card-image-container {
                 width: 100%;
-                height: 200px;
+                height: 220px;
                 position: relative;
-                background: linear-gradient(45deg, #667eea, #764ba2);
-                border-bottom: 2px solid #d4af37;
+                background: linear-gradient(45deg, #2a2a2a, #3a3a3a);
+                border-bottom: 2px solid #444;
                 overflow: hidden;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
 
             .card-image {
@@ -83,183 +100,106 @@
                 height: 100%;
                 object-fit: cover;
                 transition: transform 0.3s ease;
+                opacity: 0.9;
             }
 
             .card:hover .card-image {
                 transform: scale(1.05);
+                opacity: 1;
             }
 
-            .costs-effects-section {
-                background: linear-gradient(135deg, #2c3e50, #34495e);
-                padding: 4px 6px;
-                border-bottom: 1px solid #d4af37;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-
-            .costs-column {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .effects-column {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .divider {
-                width: 1px;
-                height: 40px;
-                background: linear-gradient(
-                    to bottom,
-                    transparent,
-                    #d4af37,
-                    transparent
-                );
-                opacity: 0.6;
-            }
-
-            .costs-header,
-            .effects-header {
-                color: #fff;
-                font-size: 9px;
-                font-weight: bold;
-                margin-bottom: 2px;
+            .placeholder-image {
+                color: #666;
+                font-size: 48px;
                 text-align: center;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100%;
+                background: linear-gradient(45deg, #1a1a1a, #2a2a2a);
+            }
+
+            .placeholder-text {
+                font-size: 12px;
+                margin-top: 10px;
+                color: #555;
+            }
+
+            .conditions-section {
+                background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+                padding: 8px 12px;
+                border-bottom: 1px solid #444;
+                font-size: 10px;
+            }
+
+            .conditions-header {
+                color: #888;
+                font-weight: bold;
+                margin-bottom: 4px;
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
             }
 
-            .costs-header {
-                color: #ff9999;
+            .condition-item {
+                display: inline-block;
+                background: rgba(255, 100, 100, 0.2);
+                border: 1px solid #666;
+                border-radius: 4px;
+                padding: 2px 6px;
+                margin: 1px;
+                color: #ccc;
+                font-size: 9px;
             }
 
-            .effects-header {
-                color: #99ccff;
-            }
-
-            .costs-grid,
-            .effects-grid {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                flex-wrap: wrap;
-                gap: 2px;
-            }
-
-            .cost-item {
-                background: rgba(255, 153, 153, 0.2);
-                border: 1px solid #ff9999;
-                border-radius: 3px;
-                padding: 1px 3px;
-                color: #fff;
-                font-size: 8px;
-                font-weight: bold;
-                text-align: center;
-                min-width: 28px;
-                backdrop-filter: blur(3px);
-            }
-
-            .effect-item {
-                background: rgba(153, 204, 255, 0.2);
-                border: 1px solid #99ccff;
-                border-radius: 3px;
-                padding: 1px 3px;
-                color: #fff;
-                font-size: 8px;
-                font-weight: bold;
-                text-align: center;
-                min-width: 28px;
-                backdrop-filter: blur(3px);
-            }
-
-            .resource-sleep {
-                background: rgba(75, 0, 130, 0.3);
-                border-color: #4b0082;
-            }
-            .resource-health {
-                background: rgba(255, 99, 132, 0.3);
-                border-color: #ff6384;
-            }
-            .resource-mental {
-                background: rgba(54, 162, 235, 0.3);
-                border-color: #36a2eb;
-            }
-            .resource-food {
-                background: rgba(255, 165, 0, 0.3);
-                border-color: #ffa500;
-            }
-            .resource-time {
-                background: rgba(128, 128, 128, 0.3);
-                border-color: #808080;
-            }
-
-            .resource-icon {
-                font-size: 8px;
-                margin-right: 1px;
-            }
-
-            .card-effect {
-                padding: 8px;
-                font-size: 11px;
-                line-height: 1.3;
+            .card-setup {
+                padding: 12px;
+                font-size: 12px;
+                line-height: 1.4;
                 text-align: justify;
-                color: #2c3e50;
-                background: rgba(255, 255, 255, 0.8);
-                min-height: 45px;
-                border-bottom: 1px solid #d4af37;
+                color: #d0d0d0;
+                background: rgba(0, 0, 0, 0.3);
+                min-height: 60px;
+                border-bottom: 1px solid #444;
             }
 
-            .status-effects {
-                padding: 6px 8px;
+            .trigger-symptoms {
+                padding: 8px 12px;
                 font-size: 10px;
-                color: #2c3e50;
-                background: rgba(255, 235, 59, 0.2);
-                border-bottom: 1px solid #d4af37;
+                color: #ccc;
+                background: rgba(150, 50, 50, 0.2);
+                border-bottom: 1px solid #444;
                 min-height: 25px;
             }
 
-            .status-effects-header {
+            .triggers-header {
                 font-weight: bold;
-                margin-bottom: 3px;
+                margin-bottom: 4px;
                 text-transform: uppercase;
                 font-size: 9px;
+                color: #ff9999;
             }
 
-            .status-effect {
+            .trigger-symptom {
                 display: inline-block;
-                background: rgba(255, 193, 7, 0.3);
-                border: 1px solid #ffc107;
+                background: rgba(255, 100, 100, 0.3);
+                border: 1px solid #ff6666;
                 border-radius: 3px;
-                padding: 1px 4px;
+                padding: 2px 6px;
                 margin: 1px;
                 font-size: 9px;
+                color: #ffcccc;
             }
 
-            .additional-costs {
-                padding: 3px 6px;
-                font-size: 8px;
-                color: #8b0000;
-                background: rgba(255, 0, 0, 0.1);
-                border-bottom: 1px solid #d4af37;
+            .scenario-id {
+                padding: 6px 12px;
+                font-size: 10px;
                 font-style: italic;
+                color: #777;
                 text-align: center;
-            }
-
-            .card-flavor {
-                padding: 6px 8px;
-                font-size: 9px;
-                font-style: italic;
-                color: #6c757d;
-                text-align: center;
-                background: rgba(248, 249, 250, 0.9);
-                border-radius: 0 0 12px 12px;
-                min-height: 30px;
+                background: rgba(0, 0, 0, 0.4);
+                border-radius: 0 0 15px 15px;
+                min-height: 20px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -272,8 +212,8 @@
                 left: 0;
                 right: 0;
                 bottom: 0;
-                border-radius: 12px;
-                background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
+                border-radius: 15px;
+                background: linear-gradient(45deg, #444, #666, #444);
                 z-index: -1;
                 filter: blur(8px);
                 opacity: 0;
@@ -281,17 +221,18 @@
             }
 
             .card:hover .card-border-glow {
-                opacity: 0.7;
+                opacity: 0.5;
             }
 
             .loading {
                 padding: 40px;
                 text-align: center;
                 font-size: 20px;
-                color: #fff;
-                background: rgba(0, 0, 0, 0.5);
+                color: #e0e0e0;
+                background: rgba(0, 0, 0, 0.7);
                 border-radius: 10px;
                 margin: 20px;
+                border: 1px solid #444;
             }
 
             .error {
@@ -326,544 +267,258 @@
             }
 
             .card {
-                animation: cardAppear 0.6s ease-out forwards;
+                animation: cardAppear 0.8s ease-out forwards;
+            }
+
+            .render-button {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 24px;
+                background: linear-gradient(135deg, #444, #666);
+                color: #e0e0e0;
+                border: 1px solid #666;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: bold;
+                z-index: 1000;
+                transition: all 0.3s ease;
+            }
+
+            .render-button:hover {
+                background: linear-gradient(135deg, #555, #777);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            }
+
+            .card-id {
+                position: absolute;
+                top: 8px;
+                left: 10px;
+                background: rgba(0, 0, 0, 0.6);
+                color: #999;
+                padding: 2px 6px;
+                border-radius: 4px;
+                font-size: 9px;
+                font-weight: bold;
             }
         </style>
     </head>
     <body>
-        <div id="loading" class="loading">🎴 Loading magical cards...</div>
+        <div id="loading" class="loading">
+            🃏 Loading psychosis spectrum cards...
+        </div>
         <div id="error" class="error" style="display: none"></div>
 
         <div class="cards-container" id="cardsContainer"></div>
 
-        <div class="card" id="cardTemplate" style="display: none">
-            <div class="card-border-glow"></div>
-            <div class="card-header">
-                <h3 class="card-title">{{name}}</h3>
-                <div class="card-type">{{card_type}}</div>
-            </div>
-
-            <div class="card-image-container">
-                <img class="card-image" alt="Card artwork" />
-            </div>
-
-            <div class="costs-effects-section">
-                <div class="costs-column">
-                    <div class="costs-header">Costs</div>
-                    <div class="costs-grid" id="costsGrid">
-                        <!-- Costs will be populated here -->
-                    </div>
-                </div>
-                <div class="divider"></div>
-                <div class="effects-column">
-                    <div class="effects-header">Effects</div>
-                    <div class="effects-grid" id="effectsGrid">
-                        <!-- Effects will be populated here -->
-                    </div>
-                </div>
-            </div>
-
-            <div
-                class="additional-costs"
-                id="additionalCosts"
-                style="display: none"
-            >
-                <!-- Additional costs will be populated here -->
-            </div>
-
-            <div
-                class="status-effects"
-                id="statusEffects"
-                style="display: none"
-            >
-                <div id="statusEffectsList">
-                    <!-- Status effects will be populated here -->
-                </div>
-            </div>
-
-            <div class="card-effect">
-                <strong>Description:</strong> {{effect}}
-            </div>
-
-            <div class="card-flavor">"{{flavorText}}"</div>
-        </div>
-
         <script>
             let cards = [];
 
-            // Enhanced sample card data with new structure
-            const sampleCards = [
-                {
-                    name: "Mystic Forest Feast",
-                    card_type: "Action",
-                    flavor_text:
-                        "The forest provides for those who know where to look.",
-                    effect: "Gather mystical berries from the enchanted forest. Risk getting sick from unknown fruits.",
-                    costs: {
-                        sleep_cost: 0,
-                        health_cost: 15,
-                        mental_cost: 10,
-                        food_cost: 0,
-                        time_cost: 1.0,
-                        additional_costs: ["LockResource(Food, 3)"],
-                    },
-                    effects: {
-                        sleep: 0,
-                        health: -15,
-                        mental: -10,
-                        food: 60,
-                    },
-                    status_effects: [
-                        {
-                            effect: "Sick",
-                            duration: 2,
-                            intensity: 1.0,
-                        },
-                    ],
-                    prompt: "A mystical forest with glowing berries",
-                },
-                {
-                    name: "Lightning Strike",
-                    card_type: "Spell",
-                    flavor_text:
-                        "Pure energy courses through your mind, devastating but draining.",
-                    effect: "Channel raw lightning energy to devastate enemies, but at great personal cost.",
-                    costs: {
-                        sleep_cost: 20,
-                        health_cost: 30,
-                        mental_cost: 0,
-                        food_cost: 10,
-                        time_cost: 0.5,
-                    },
-                    effects: {
-                        sleep: -20,
-                        health: -30,
-                        mental: 50,
-                        food: -10,
-                    },
-                    status_effects: [
-                        {
-                            effect: "Energized",
-                            duration: 3,
-                            intensity: 2.0,
-                        },
-                        {
-                            effect: "Exhausted",
-                            duration: 1,
-                            intensity: 1.5,
-                        },
-                    ],
-                    prompt: "A brilliant lightning bolt crackling with electric energy",
-                },
-                {
-                    name: "Healing Meditation",
-                    card_type: "Ritual",
-                    flavor_text: "Inner peace brings physical restoration.",
-                    effect: "Deep meditation restores both body and mind through focused breathing.",
-                    costs: {
-                        sleep_cost: 0,
-                        health_cost: 0,
-                        mental_cost: 25,
-                        food_cost: 5,
-                        time_cost: 2.0,
-                        additional_costs: ["RequireLocation(Quiet Place)"],
-                    },
-                    effects: {
-                        sleep: 10,
-                        health: 40,
-                        mental: -25,
-                        food: -5,
-                    },
-                    status_effects: [
-                        {
-                            effect: "Peaceful",
-                            duration: 4,
-                            intensity: 1.0,
-                        },
-                    ],
-                    prompt: "A serene meditation scene with glowing aura",
-                },
-            ];
-
-            // Function to normalize card data and fill missing fields
-            function normalizeCardData(card, index) {
-                return {
-                    name:
-                        card.name || card.title || `Unknown Card ${index + 1}`,
-                    card_type: card.card_type || card.type || "Unknown",
-                    flavor_text:
-                        card.flavor_text ||
-                        card.flavorText ||
-                        card.description ||
-                        "A mysterious card with unknown origins.",
-                    effect:
-                        card.effect ||
-                        card.ability ||
-                        card.power ||
-                        generateDefaultEffect(card),
-                    costs:
-                        card.costs ||
-                        generateDefaultCosts(card.card_type || card.type),
-                    effects:
-                        card.effects ||
-                        card.resource_effects ||
-                        generateDefaultEffects(card.card_type || card.type),
-                    status_effects: card.status_effects || [],
-                    prompt:
-                        card.prompt ||
-                        card.description ||
-                        `A ${card.card_type || "mysterious"} card`,
-                    // Additional fields
-                    cost: card.cost || card.mana_cost || 0,
-                    rarity: card.rarity || "Common",
-                    artist: card.artist || "Unknown Artist",
-                };
-            }
-
-            // Generate default effect based on card type
-            function generateDefaultEffect(card) {
-                const cardType = (
-                    card.card_type ||
-                    card.type ||
-                    ""
-                ).toLowerCase();
-                switch (cardType) {
-                    case "creature":
-                        return "A creature that can attack and defend.";
-                    case "spell":
-                        return "Cast this spell for an immediate effect.";
-                    case "artifact":
-                        return "An artifact with ongoing benefits.";
-                    case "action":
-                        return "Perform this action to gain resources or effects.";
-                    case "ritual":
-                        return "A powerful ritual with lasting effects.";
-                    default:
-                        return "This card has a mysterious power waiting to be discovered.";
-                }
-            }
-
-            // Generate default costs
-            function generateDefaultCosts(cardType) {
-                const type = (cardType || "").toLowerCase();
-                switch (type) {
-                    case "creature":
-                        return {
-                            health_cost: 10,
-                            mental_cost: 5,
-                            time_cost: 1.0,
-                        };
-                    case "spell":
-                        return { mental_cost: 15, time_cost: 0.5 };
-                    case "action":
-                        return { time_cost: 1.0, mental_cost: 10 };
-                    case "ritual":
-                        return { mental_cost: 20, time_cost: 2.0 };
-                    default:
-                        return { mental_cost: 5, time_cost: 0.5 };
-                }
-            }
-
-            // Generate default effects
-            function generateDefaultEffects(cardType) {
-                const type = (cardType || "").toLowerCase();
-                switch (type) {
-                    case "creature":
-                        return { health: 10, mental: 5 };
-                    case "spell":
-                        return { mental: 15 };
-                    case "action":
-                        return { food: 20 };
-                    case "ritual":
-                        return { health: 25, mental: 10 };
-                    default:
-                        return { mental: 5 };
-                }
-            }
-
-            // Function to load cards from JSON file or use sample data
+            // Function to load cards from JSON file
             async function loadCards() {
                 try {
-                    const response = await fetch("./cards.json");
+                    const response = await fetch("./schizophrenic-cards.json");
                     if (!response.ok) {
-                        console.log("No cards.json found, using sample data");
-                        cards = sampleCards.map(normalizeCardData);
-                    } else {
-                        const data = await response.json();
-                        cards = data.map(normalizeCardData);
-                        console.log("Loaded cards:", cards);
+                        throw new Error(
+                            `HTTP error! status: ${response.status}`,
+                        );
                     }
+                    const data = await response.json();
+                    cards = Array.isArray(data) ? data : [];
+                    console.log("Loaded cards:", cards);
                     document.getElementById("loading").style.display = "none";
                     initializeCards();
                 } catch (error) {
-                    console.log(
-                        "Error loading cards, using sample data:",
-                        error,
-                    );
-                    cards = sampleCards.map(normalizeCardData);
+                    console.error("Error loading cards:", error);
                     document.getElementById("loading").style.display = "none";
-                    initializeCards();
+                    const errorElement = document.getElementById("error");
+                    errorElement.style.display = "block";
+                    errorElement.textContent = `Failed to load cards.json: ${error.message}`;
                 }
             }
 
-            // Function to create cost elements
-            function createCostElements(costs) {
-                const costsGrid = document.createElement("div");
-                costsGrid.className = "costs-grid";
+            // Function to create condition elements
+            function createConditionElements(conditions) {
+                const conditionsContainer = document.createElement("div");
 
-                if (!costs || typeof costs !== "object") {
-                    const noCost = document.createElement("div");
-                    noCost.className = "cost-item";
-                    noCost.innerHTML =
-                        '<span class="resource-icon">⚡</span>Free';
-                    costsGrid.appendChild(noCost);
-                    return costsGrid;
+                if (!conditions || typeof conditions !== "object") {
+                    return conditionsContainer;
                 }
 
-                const costTypes = {
-                    sleep_cost: { icon: "😴", class: "resource-sleep" },
-                    health_cost: { icon: "❤️", class: "resource-health" },
-                    mental_cost: { icon: "🧠", class: "resource-mental" },
-                    food_cost: { icon: "🍎", class: "resource-food" },
-                    time_cost: { icon: "⏰", class: "resource-time" },
-                };
+                // Filter out trigger_symptoms as we'll display them separately
+                const filteredConditions = Object.entries(conditions).filter(
+                    ([key]) => key !== "trigger_symptoms",
+                );
 
-                let hasCosts = false;
-                for (const [type, value] of Object.entries(costs)) {
-                    if (
-                        type !== "additional_costs" &&
-                        value !== 0 &&
-                        value !== null &&
-                        value !== undefined
-                    ) {
-                        hasCosts = true;
-                        const costItem = document.createElement("div");
-                        costItem.className = `cost-item ${costTypes[type]?.class || ""}`;
-
-                        const icon = costTypes[type]?.icon || "⚡";
-                        costItem.innerHTML = `<span class="resource-icon">${icon}</span>${value}`;
-
-                        costsGrid.appendChild(costItem);
-                    }
-                }
-
-                if (!hasCosts) {
-                    const noCost = document.createElement("div");
-                    noCost.className = "cost-item";
-                    noCost.innerHTML =
-                        '<span class="resource-icon">⚡</span>Free';
-                    costsGrid.appendChild(noCost);
-                }
-
-                return costsGrid;
-            }
-
-            // Function to create effect elements
-            function createEffectElements(effects) {
-                const effectsGrid = document.createElement("div");
-                effectsGrid.className = "effects-grid";
-
-                if (!effects || typeof effects !== "object") {
-                    const noEffect = document.createElement("div");
-                    noEffect.className = "effect-item";
-                    noEffect.innerHTML =
-                        '<span class="resource-icon">⚡</span>None';
-                    effectsGrid.appendChild(noEffect);
-                    return effectsGrid;
-                }
-
-                const effectTypes = {
-                    sleep: { icon: "😴", class: "resource-sleep" },
-                    health: { icon: "❤️", class: "resource-health" },
-                    mental: { icon: "🧠", class: "resource-mental" },
-                    food: { icon: "🍎", class: "resource-food" },
-                };
-
-                let hasEffects = false;
-                for (const [type, value] of Object.entries(effects)) {
-                    if (value !== 0 && value !== null && value !== undefined) {
-                        hasEffects = true;
-                        const effectItem = document.createElement("div");
-                        effectItem.className = `effect-item ${effectTypes[type]?.class || ""}`;
-
-                        const icon = effectTypes[type]?.icon || "⚡";
-                        const sign = value > 0 ? "+" : "";
-                        effectItem.innerHTML = `<span class="resource-icon">${icon}</span>${sign}${value}`;
-
-                        effectsGrid.appendChild(effectItem);
-                    }
-                }
-
-                if (!hasEffects) {
-                    const noEffect = document.createElement("div");
-                    noEffect.className = "effect-item";
-                    noEffect.innerHTML =
-                        '<span class="resource-icon">⚡</span>None';
-                    effectsGrid.appendChild(noEffect);
-                }
-
-                return effectsGrid;
-            }
-
-            // Function to create status effects
-            function createStatusEffects(statusEffects) {
-                if (
-                    !statusEffects ||
-                    !Array.isArray(statusEffects) ||
-                    statusEffects.length === 0
-                ) {
-                    return null;
-                }
-
-                const statusContainer = document.createElement("div");
-                statusEffects.forEach((status) => {
-                    const statusDiv = document.createElement("div");
-                    statusDiv.className = "status-effect";
-                    const durationText = status.duration
-                        ? ` (${status.duration}t)`
-                        : "";
-                    const intensityText =
-                        status.intensity && status.intensity !== 1.0
-                            ? ` x${status.intensity}`
-                            : "";
-                    statusDiv.textContent = `${status.effect}${durationText}${intensityText}`;
-                    statusContainer.appendChild(statusDiv);
+                filteredConditions.forEach(([key, value]) => {
+                    const conditionItem = document.createElement("div");
+                    conditionItem.className = "condition-item";
+                    conditionItem.textContent = `${key.replace(/_/g, " ")}: ${value}`;
+                    conditionsContainer.appendChild(conditionItem);
                 });
 
-                return statusContainer;
+                return conditionsContainer;
             }
 
-            // Function to create additional costs display
-            function createAdditionalCosts(costs) {
+            // Function to create trigger symptom elements
+            function createTriggerElements(triggerSymptoms) {
+                const triggerContainer = document.createElement("div");
+
                 if (
-                    !costs ||
-                    !costs.additional_costs ||
-                    !Array.isArray(costs.additional_costs) ||
-                    costs.additional_costs.length === 0
+                    !triggerSymptoms ||
+                    !Array.isArray(triggerSymptoms) ||
+                    triggerSymptoms.length === 0
                 ) {
                     return null;
                 }
 
-                const additionalDiv = document.createElement("div");
-                additionalDiv.textContent = `Special: ${costs.additional_costs.join(", ")}`;
-                return additionalDiv;
+                triggerSymptoms.forEach((symptom) => {
+                    const triggerDiv = document.createElement("div");
+                    triggerDiv.className = "trigger-symptom";
+                    triggerDiv.textContent = symptom.replace(/_/g, " ");
+                    triggerContainer.appendChild(triggerDiv);
+                });
+
+                return triggerContainer;
+            }
+
+            // Function to get placeholder icon based on scenario
+            function getPlaceholderIcon(scenarioId) {
+                const iconMap = {
+                    auditory_disturbance: "🔊",
+                    visual_disturbance: "👁️",
+                    paranoid_thoughts: "🧠",
+                    sensory_overload: "⚡",
+                    dissociation_episode: "🌀",
+                    thought_disorganization: "🧩",
+                    surveillance_delusion: "👀",
+                    affective_flattening: "😶",
+                    speech_disorganization: "💬",
+                    movement_disruption: "🚫",
+                    self_dissolution: "🪞",
+                    delusional_thinking: "🕸️",
+                    imperative_hallucinations: "📢",
+                    temporal_confusion: "⏰",
+                    telepathic_delusion: "🧠",
+                    body_sensations: "✋",
+                    inflated_importance: "👑",
+                    personal_references: "👁️‍🗨️",
+                    foreign_thoughts: "💭",
+                    reflection_confusion: "🪞",
+                    phantom_smells: "👃",
+                    stolen_thoughts: "🔓",
+                    persecution_complex: "🏃",
+                    repetitive_speech: "🔄",
+                    self_detachment: "👻",
+                    phantom_tastes: "👅",
+                    communication_withdrawal: "🤐",
+                    constant_alertness: "🚨",
+                    unusual_actions: "🤹",
+                    information_overload: "🌊",
+                };
+                return iconMap[scenarioId] || "🎴";
             }
 
             // Function to create a card element
-            function createCard(card, index) {
-                const template = document.getElementById("cardTemplate");
-                const clone = template.cloneNode(true);
+            function createCard(cardData, index) {
+                const cardElement = document.createElement("div");
+                cardElement.className = "card";
+                cardElement.id = `card-${index}`;
+                cardElement.style.animationDelay = `${index * 0.1}s`;
 
-                clone.style.display = "block";
-                clone.id = `card-${index}`;
+                // Create card structure
+                cardElement.innerHTML = `
+                    <div class="card-border-glow"></div>
+                    <div class="card-id">#${cardData.id}</div>
+                    <div class="card-header">
+                        <h3 class="card-name">${cardData.card_name || "Unknown Card"}</h3>
+                        <div class="card-title">${cardData.title || ""}</div>
+                        <div class="card-type">${cardData.card_type || "spectrum"}</div>
+                    </div>
 
-                // Set card content
-                clone.querySelector(".card-title").textContent = card.name;
-                clone.querySelector(".card-type").textContent = card.card_type;
-                clone.querySelector(".card-flavor").textContent =
-                    `"${card.flavor_text}"`;
+                    <div class="card-image-container">
+                        <div class="placeholder-image">
+                            <div>${getPlaceholderIcon(cardData.scenario_id)}</div>
+                            <div class="placeholder-text">Generated Image</div>
+                        </div>
+                    </div>
 
-                // Update effect text
-                const effectElement = clone.querySelector(".card-effect");
-                effectElement.innerHTML = `<strong>Description:</strong> ${card.effect}`;
+                    <div class="conditions-section">
+                        <div class="conditions-header">Conditions</div>
+                        <div class="conditions-list"></div>
+                    </div>
 
-                // Set card image
-                const imageElement = clone.querySelector(".card-image");
-                let imageFile = `processed_images/card-picture-${index}.png`;
-                imageElement.src = imageFile;
-                imageElement.alt = `Artwork for ${card.name}`;
+                    <div class="trigger-symptoms" style="display: none;">
+                        <div class="triggers-header">Trigger Symptoms</div>
+                        <div class="trigger-list"></div>
+                    </div>
+                `;
 
-                imageElement.onerror = function () {
-                    const cardType = card.card_type.toLowerCase();
-                    let bgColor = "#667eea";
-                    let icon = "🎴";
+                // Add conditions
+                const conditionsListElement =
+                    cardElement.querySelector(".conditions-list");
+                const conditionsElements = createConditionElements(
+                    cardData.conditions,
+                );
+                conditionsListElement.appendChild(conditionsElements);
 
-                    switch (cardType) {
-                        case "creature":
-                            bgColor = "#28a745";
-                            icon = "🐉";
-                            break;
-                        case "spell":
-                            bgColor = "#dc3545";
-                            icon = "✨";
-                            break;
-                        case "artifact":
-                            bgColor = "#ffc107";
-                            icon = "⚡";
-                            break;
-                        case "action":
-                            bgColor = "#17a2b8";
-                            icon = "🎯";
-                            break;
-                        case "ritual":
-                            bgColor = "#6f42c1";
-                            icon = "🔮";
-                            break;
+                // Add trigger symptoms if they exist
+                if (
+                    cardData.conditions &&
+                    cardData.conditions.trigger_symptoms
+                ) {
+                    const triggerElement =
+                        cardElement.querySelector(".trigger-symptoms");
+                    const triggerListElement =
+                        cardElement.querySelector(".trigger-list");
+                    const triggerElements = createTriggerElements(
+                        cardData.conditions.trigger_symptoms,
+                    );
+
+                    if (triggerElements) {
+                        triggerListElement.appendChild(triggerElements);
+                        triggerElement.style.display = "block";
                     }
-
-                    this.src = `data:image/svg+xml;base64,${btoa(`
-                        <svg width="280" height="120" viewBox="0 0 280 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <rect width="280" height="120" fill="${bgColor}"/>
-                            <text x="140" y="50" text-anchor="middle" fill="white" font-size="30" font-family="sans-serif">${icon}</text>
-                            <text x="140" y="75" text-anchor="middle" fill="white" font-size="12" font-family="sans-serif">${card.name}</text>
-                            <text x="140" y="95" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10" font-family="sans-serif">${card.card_type}</text>
-                        </svg>
-                    `)}`;
-                };
-
-                // Create and replace costs
-                const costsContainer = clone.querySelector(
-                    ".costs-column .costs-grid",
-                );
-                const newCostsGrid = createCostElements(card.costs);
-                costsContainer.parentNode.replaceChild(
-                    newCostsGrid,
-                    costsContainer,
-                );
-
-                // Handle additional costs
-                const additionalCostsElement =
-                    clone.querySelector("#additionalCosts");
-
-                // Create and replace effects
-                const effectsContainer = clone.querySelector(
-                    ".effects-column .effects-grid",
-                );
-                const newEffectsGrid = createEffectElements(card.effects);
-                effectsContainer.parentNode.replaceChild(
-                    newEffectsGrid,
-                    effectsContainer,
-                );
-
-                // Handle status effects
-                const statusEffectsElement =
-                    clone.querySelector("#statusEffects");
-                const statusEffects = createStatusEffects(card.status_effects);
-                if (statusEffects) {
-                    const statusList =
-                        statusEffectsElement.querySelector(
-                            "#statusEffectsList",
-                        );
-                    statusList.appendChild(statusEffects);
-                    statusEffectsElement.style.display = "block";
                 }
 
-                return clone;
+                // Try to load actual image
+                const imageContainer = cardElement.querySelector(
+                    ".card-image-container",
+                );
+                const img = document.createElement("img");
+                img.className = "card-image";
+                img.src = `schizo-images/card-picture-${index}.png`;
+                img.alt = `Artwork for ${cardData.card_name}`;
+
+                img.onload = function () {
+                    imageContainer.innerHTML = "";
+                    imageContainer.appendChild(img);
+                };
+
+                img.onerror = function () {
+                    // Keep placeholder if image fails to load
+                    console.log(
+                        `Image not found for card ${index}, keeping placeholder`,
+                    );
+                };
+
+                return cardElement;
             }
 
+            // Function to render cards as images
             function renderCards() {
                 console.log("Rendering cards to images...");
                 document
                     .querySelectorAll(".card")
                     .forEach((cardElement, index) => {
-                        if (cardElement.id === "cardTemplate") return;
-
                         html2canvas(cardElement, {
-                            width: 280,
-                            height: 450,
+                            width: 300,
+                            height: 480,
                             scale: 2,
                             useCORS: true,
                             allowTaint: true,
+                            backgroundColor: null,
                         })
                             .then((canvas) => {
                                 const imgData = canvas.toDataURL("image/png");
@@ -873,7 +528,9 @@
                                 document.body.appendChild(link);
                                 link.click();
                                 document.body.removeChild(link);
-                                console.log(`Rendered card ${index}`);
+                                console.log(
+                                    `Rendered card ${index}: ${cards[index].card_name}`,
+                                );
                             })
                             .catch((error) => {
                                 console.error(
@@ -887,34 +544,30 @@
             // Initialize cards after loading from JSON
             function initializeCards() {
                 const container = document.getElementById("cardsContainer");
-                const existingCards = container.querySelectorAll(".card");
-                existingCards.forEach((card) => card.remove());
 
+                if (!cards || cards.length === 0) {
+                    container.innerHTML =
+                        '<div class="error">No cards found in cards.json</div>';
+                    return;
+                }
+
+                // Clear existing cards
+                container.innerHTML = "";
+
+                // Create cards
                 cards.forEach((cardData, index) => {
                     const cardElement = createCard(cardData, index);
-                    cardElement.style.animationDelay = `${index * 0.1}s`;
                     container.appendChild(cardElement);
                 });
 
                 console.log(`Loaded ${cards.length} cards`);
 
+                // Add render button
                 if (!document.getElementById("renderButton")) {
                     const renderButton = document.createElement("button");
                     renderButton.id = "renderButton";
+                    renderButton.className = "render-button";
                     renderButton.textContent = "Download All Cards as Images";
-                    renderButton.style.cssText = `
-                        position: fixed;
-                        top: 20px;
-                        right: 20px;
-                        padding: 10px 20px;
-                        background: #d4af37;
-                        color: #2c3e50;
-                        border: none;
-                        border-radius: 5px;
-                        cursor: pointer;
-                        font-weight: bold;
-                        z-index: 1000;
-                    `;
                     renderButton.onclick = renderCards;
                     document.body.appendChild(renderButton);
                 }
@@ -922,9 +575,6 @@
 
             // Load cards when page loads
             window.addEventListener("DOMContentLoaded", loadCards);
-
-            // Auto-render after 5 seconds (optional)
-            setTimeout(renderCards, 5000);
         </script>
     </body>
 </html>

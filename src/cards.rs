@@ -117,7 +117,7 @@ fn setup(
             player: 1,
         },
         Name::new("Play Area 1".to_string()),
-        // Visibility::Hidden,
+        Visibility::Hidden,
     ));
 
     commands.spawn((
@@ -128,8 +128,8 @@ fn setup(
             marker: 2,
             player: 1,
         },
-        Name::new("Play Area 1".to_string()),
-        // Visibility::Hidden,
+        Name::new("Play Area 2".to_string()),
+        Visibility::Hidden,
     ));
 }
 
