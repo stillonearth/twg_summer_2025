@@ -229,13 +229,9 @@ pub fn handle_player_destination_reached(
                 .iter()
                 .find(|(_, card)| card.data.id() == selected_card_id)
         {
-            println!("{:?}", card.1.data.clone());
-
             ew_action_completed.write(ActionCompletedEvent {
                 card_played: card.1.data.clone(),
             });
-        } else {
-            println!("error here");
         }
     }
 }

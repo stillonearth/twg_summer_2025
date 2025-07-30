@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use bevy_defer::{AsyncCommandsExtension, AsyncWorld};
+use bevy_la_mesa::events::PlaceCardOnTable;
 use bevy_la_mesa::{Card, Hand};
 use bevy_novel::{events::EventStartScenario, rpy_asset_loader::Rpy};
 use rand::{Rng, rng};
@@ -889,6 +890,7 @@ fn handle_adversary_card_selection_phase(
     mut phase_changed_events: EventReader<PhaseChangedEvent>,
     mut adversary_card_selected_events: EventWriter<AdversaryCardSelectedEvent>,
     mut phase_state: ResMut<GamePhaseState>,
+    mut ew_place_card_on_table: EventWriter<PlaceCardOnTable>,
     q_cards: Query<(Entity, &Card<GameCard>, &Hand)>,
 ) {
     for event in phase_changed_events.read() {
@@ -911,11 +913,17 @@ fn handle_adversary_card_selection_phase(
             // Select a random card from adversary's hand
             let mut rng = rand::thread_rng();
             let random_index: usize = rng.gen_range(0..adversary_cards.len());
-            let (_, selected_card, _) = &adversary_cards[random_index];
+            let (entity, selected_card, _) = &adversary_cards[random_index];
 
             // Extract the schizophrenic card data
             if let Some(schizo_card) = selected_card.data.to_schizophrenic_card() {
                 info!("Adversary selected card: {}", schizo_card.card_name);
+
+                ew_place_card_on_table.send(PlaceCardOnTable {
+                    card_entity: entity,
+                    marker: 1,
+                    player: 2,
+                });
 
                 adversary_card_selected_events.write(AdversaryCardSelectedEvent {
                     card: schizo_card.clone(),
