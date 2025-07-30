@@ -4,7 +4,6 @@ use bevy::color::palettes::css::*;
 use bevy::prelude::*;
 use bevy_defer::AsyncCommandsExtension;
 use bevy_defer::AsyncWorld;
-use bevy_la_mesa::events::CardHoverable;
 use bevy_la_mesa::events::{CardPress, DeckShuffle, DrawToHand, PlaceCardOnTable, RenderDeck};
 use bevy_la_mesa::CardMetadata;
 use bevy_la_mesa::{Card, CardOnTable, Hand, PlayArea};
@@ -66,9 +65,7 @@ pub fn handle_drag_cards_in_hand_down(
                     },
                 );
 
-                commands
-                    .entity(entity)
-                    .insert((Animator::new(tween), CardHoverable(false)));
+                commands.entity(entity).insert((Animator::new(tween)));
             }
         }
     }

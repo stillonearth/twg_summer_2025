@@ -1,5 +1,3 @@
-#![feature(let_chains)]
-
 use std::f32::consts::FRAC_PI_2;
 
 use avian2d::prelude::*;

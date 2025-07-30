@@ -519,11 +519,11 @@ fn update_displays(
         for mut image in avatar_query.iter_mut() {
             let avatar_path = match game_state.current_mood {
                 Mood::Depressed => "avatars/avatar_depressed.png",
-                Mood::Anxious => "avatars/avatar_depressed.png",
-                Mood::Tired => "avatars/avatar_depressed.png",
-                Mood::Neutral => "avatars/avatar_depressed.png",
-                Mood::Content => "avatars/avatar_depressed.png",
-                Mood::Manic => "avatars/avatar_depressed.png",
+                Mood::Anxious => "avatars/avatar_anxious.png",
+                Mood::Tired => "avatars/avatar_tired.png",
+                Mood::Neutral => "avatars/avatar_neutral.png",
+                Mood::Content => "avatars/avatar_content.png",
+                Mood::Manic => "avatars/avatar_manic.png",
             };
             *image = ImageNode::new(asset_server.load(avatar_path));
         }
