@@ -3,6 +3,7 @@ use bevy_novel::{NovelText, events::EventNovelEnd, rpy_asset_loader::Rpy};
 
 use crate::{
     AppState,
+    endgame::EndGameEvent,
     logic::{CutsceneEndEvent, CutsceneStartEvent},
 };
 
@@ -14,7 +15,8 @@ impl Plugin for CutscenePlugin {
         app.add_systems(OnEnter(AppState::Game), load_scenario)
             .add_systems(
                 Update,
-                (start_visual_novel, handle_novel_end).run_if(in_state(AppState::Game)),
+                (start_visual_novel, handle_novel_end, handle_game_over)
+                    .run_if(in_state(AppState::Game)),
             );
     }
 }
@@ -81,5 +83,11 @@ pub fn handle_novel_end(
 ) {
     for _ in er_novel_end.read() {
         ew_cutscene_end.write(CutsceneEndEvent {});
+    }
+}
+
+pub fn handle_game_over(mut er_game_over: EventReader<EndGameEvent>) {
+    for e in er_game_over.read() {
+        println!("endgame scenario: {}", e.scenario_id);
     }
 }

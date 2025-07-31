@@ -1,4 +1,4 @@
-use std::f32::consts::FRAC_PI_2;
+use std::{f32::consts::FRAC_PI_2, time::Duration};
 
 use avian2d::prelude::*;
 use bevy::{input::common_conditions::input_toggle_active, prelude::*};
@@ -7,18 +7,19 @@ use bevy_defer::AsyncPlugin;
 use bevy_ecs_tiled::prelude::*;
 use bevy_hui::HuiPlugin;
 use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
-use bevy_kira_audio::AudioPlugin;
+use bevy_kira_audio::{Audio, AudioControl, AudioEasing, AudioPlugin, AudioTween};
 use bevy_la_mesa::{LaMesaPlugin, LaMesaPluginSettings};
 use bevy_llm::LLMPlugin;
 use bevy_novel::{NovelBackground, NovelImage, NovelPlugin, NovelText};
 
 use crate::{
     cards::{
-        ActivityCard, ActivityCards, ActivityCardsHandle, CardSystemPlugin, GameCard,
-        SchizophrenicCards, SchizophrenicCardsHandle,
+        ActivityCards, ActivityCardsHandle, CardSystemPlugin, GameCard, SchizophrenicCards,
+        SchizophrenicCardsHandle,
     },
     cutscene::CutscenePlugin,
     cutscene_menu::GameMenuPlugin,
+    endgame::{EndGamePlugin, EndGameScenarios, EndGameScenariosHandle},
     logic::{CutsceneEndEvent, CutsceneStartEvent, GameLogicPlugin},
     main_menu::MainMenuPlugin,
     player::PlayerPlugin,
@@ -29,6 +30,7 @@ use crate::{
 mod cards;
 mod cutscene;
 mod cutscene_menu;
+mod endgame;
 mod game_objects;
 mod logic;
 mod main_menu;
@@ -75,6 +77,9 @@ fn startup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let schizphrenic_cards_handle =
         SchizophrenicCardsHandle(asset_server.load("schizophrenic-cards.json"));
     commands.insert_resource(schizphrenic_cards_handle);
+
+    let endgame_scenarios_handle = EndGameScenariosHandle(asset_server.load("endgame.json"));
+    commands.insert_resource(endgame_scenarios_handle);
 }
 
 fn startup_game(
@@ -178,6 +183,7 @@ fn main() {
         .add_plugins((
             JsonAssetPlugin::<ActivityCards>::new(&["json"]),
             JsonAssetPlugin::<SchizophrenicCards>::new(&["json"]),
+            JsonAssetPlugin::<EndGameScenarios>::new(&["json"]),
             CharacterThoughtsPlugin,
             AudioPlugin,
             CutscenePlugin,
@@ -187,6 +193,7 @@ fn main() {
             PlayerPlugin,
             GameMenuPlugin,
             MainMenuPlugin,
+            EndGamePlugin,
         ))
         .add_systems(Startup, startup)
         .add_systems(OnEnter(AppState::Game), startup_game)

@@ -6,6 +6,7 @@ use bevy::prelude::*;
 use bevy_defer::AsyncCommandsExtension;
 use bevy_defer::AsyncWorld;
 use bevy_la_mesa::CardMetadata;
+use bevy_la_mesa::events::CardHoverable;
 use bevy_la_mesa::events::{CardPress, DeckShuffle, DrawToHand, PlaceCardOnTable, RenderDeck};
 use bevy_la_mesa::{Card, CardOnTable, Hand, PlayArea};
 use bevy_la_mesa::{DeckArea, HandArea};
@@ -78,7 +79,10 @@ pub fn handle_drag_cards_in_hand_down(
                     },
                 );
 
-                commands.entity(entity).insert((Animator::new(tween)));
+                commands
+                    .entity(entity)
+                    .insert(Animator::new(tween))
+                    .insert(CardHoverable(false));
             }
         }
     }
@@ -102,7 +106,10 @@ pub fn handle_drag_cards_in_hand_up(
                     },
                 );
 
-                commands.entity(entity).insert((Animator::new(tween)));
+                commands
+                    .entity(entity)
+                    .insert(Animator::new(tween))
+                    .insert(CardHoverable(false));
             }
         }
     }
@@ -124,7 +131,7 @@ fn setup(
     // Deck area
     commands.spawn((
         Name::new("Deck 1 -- Play Cards"),
-        Transform::from_translation(Vec3::new(14.0, 0.0, 8.0))
+        Transform::from_translation(Vec3::new(7.8, 0.0, 8.0))
             .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
         DeckArea { marker: 1 },
         Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
@@ -134,7 +141,7 @@ fn setup(
 
     commands.spawn((
         Name::new("Deck 2 -- Play Cards"),
-        Transform::from_translation(Vec3::new(14.0, 0.0, -8.0))
+        Transform::from_translation(Vec3::new(3.3, 0.0, 8.0))
             .with_rotation(Quat::from_rotation_y(std::f32::consts::PI / 2.0)),
         DeckArea { marker: 2 },
         Mesh3d(meshes.add(Plane3d::default().mesh().size(2.5, 3.5).subdivisions(10))),
