@@ -920,7 +920,7 @@ fn handle_adversary_card_selection_phase(
                 info!("Adversary selected card: {}", schizo_card.card_name);
 
                 ew_place_card_on_table.send(PlaceCardOnTable {
-                    card_entity: entity,
+                    card_entity: *entity,
                     marker: 1,
                     player: 2,
                 });

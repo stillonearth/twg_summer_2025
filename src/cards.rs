@@ -344,7 +344,7 @@ fn handle_adversary_card_draw_phase(
             // Send draw event for adversary (player 2)
             AsyncWorld.send_event(DrawToHand {
                 deck_entity,
-                num_cards: cards_to_draw,
+                num_cards: cards_to_draw + 1,
                 player: 2,
             })?;
 
@@ -560,71 +560,7 @@ pub struct StatusEffectApplication {
 // Conditions specific to spectrum cards
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct SpectrumConditions {
-    pub trigger_symptoms: Vec<TriggerSymptom>,
-}
-
-// Trigger symptoms enum
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
-#[serde(rename_all = "snake_case")]
-pub enum TriggerSymptom {
-    AuditoryHallucinations,
-    Paranoia,
-    VisualHallucinations,
-    ParanoidDelusions,
-    SocialWithdrawal,
-    SensoryProcessingIssues,
-    Anxiety,
-    Dissociation,
-    Derealization,
-    DisorganizedThinking,
-    CognitiveFragmentation,
-    SurveillanceAnxiety,
-    FlatAffect,
-    EmotionalWithdrawal,
-    DisorganizedSpeech,
-    CommunicationBreakdown,
-    CatatonicSymptoms,
-    MotorDisruption,
-    IdentityDisturbance,
-    SelfFragmentation,
-    DelusionalThinking,
-    ConspiracyBeliefs,
-    CommandHallucinations,
-    LossOfControl,
-    TemporalDisorientation,
-    TimeConfusion,
-    TelepathicDelusions,
-    BoundaryConfusion,
-    TactileHallucinations,
-    BodyDisturbance,
-    GrandioseDelusions,
-    InflatedSelfImportance,
-    IdeasOfReference,
-    SelfReferentialThinking,
-    ThoughtInsertion,
-    ForeignThoughts,
-    VisualDistortions,
-    SelfRecognitionIssues,
-    OlfactoryHallucinations,
-    SmellDisturbance,
-    ThoughtWithdrawal,
-    CognitiveTheft,
-    PersecutoryDelusions,
-    ParanoidFear,
-    Echolalia,
-    RepetitiveSpeech,
-    Depersonalization,
-    SelfDetachment,
-    GustatoryHallucinations,
-    TasteDisturbance,
-    Alogia,
-    SpeechPoverty,
-    Hypervigilance,
-    ParanoidAlertness,
-    BizarreBehavior,
-    UnusualCompulsions,
-    CognitiveOverload,
-    InformationFlooding,
+    pub trigger_symptoms: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Default)]
