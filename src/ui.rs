@@ -59,6 +59,11 @@ impl UIColors {
     pub const BUTTON_PRESSED: Color = Color::srgb(0.3, 0.6, 0.9);
     pub const BUTTON_DISABLED: Color = Color::srgb(0.3, 0.3, 0.3);
 
+    // Symptom colors for visual distinction
+    pub const SYMPTOM_BACKGROUND: Color = Color::srgba(0.8, 0.3, 0.3, 0.2);
+    pub const SYMPTOM_BORDER: Color = Color::srgb(0.9, 0.4, 0.4);
+    pub const SYMPTOM_TEXT: Color = Color::srgb(0.95, 0.6, 0.6);
+
     const RESOURCE_COLORS: [(Color, Color); 4] = [
         (Color::srgb(0.3, 0.6, 0.9), Color::srgb(0.6, 0.3, 0.9)), // Sleep
         (Color::srgb(0.4, 0.8, 0.4), Color::srgb(0.8, 0.3, 0.3)), // Health
@@ -200,6 +205,13 @@ pub struct StatusEffectsPanel;
 #[derive(Component)]
 pub struct StatusEffectItem;
 
+// New component for symptoms display
+#[derive(Component)]
+pub struct SymptomsPanel;
+
+#[derive(Component)]
+pub struct SymptomItem;
+
 #[derive(Component, Default)]
 pub struct CharacterThoughts {
     pub clear_timer: Option<Timer>,
@@ -309,6 +321,36 @@ fn spawn_left_panel(commands: &mut Commands) {
                     // Time displays
                     spawn_text_section(panel, "10:00", 20.0, UIColors::TEXT, Some(TimeDisplay));
                     spawn_text_section(panel, "Day 1", 14.0, UIColors::TEXT_DIM, Some(DayDisplay));
+
+                    // Active Symptoms Section (NEW)
+                    panel
+                        .spawn((
+                            Node {
+                                flex_direction: FlexDirection::Column,
+                                margin: UiRect::top(Val::Px(16.0)),
+                                padding: UiRect::bottom(Val::Px(16.0)),
+
+                                ..default()
+                            },
+                            SymptomsPanel,
+                        ))
+                        .with_children(|symptoms_panel| {
+                            // Symptoms header
+                            symptoms_panel.spawn((
+                                Text::new("Active Symptoms"),
+                                TextFont {
+                                    font_size: 14.0,
+                                    ..default()
+                                },
+                                TextColor(UIColors::SYMPTOM_TEXT),
+                                Node {
+                                    margin: UiRect::bottom(Val::Px(16.0)),
+
+                                    display: Display::Grid,
+                                    ..default()
+                                },
+                            ));
+                        });
 
                     // Status Effects Section
                     panel
@@ -560,12 +602,10 @@ fn spawn_resource_bar(parent: &mut ChildSpawnerCommands, label: &str, resource_t
         });
 }
 
-// NEW SYSTEM: Update End Turn Button Visibility
 fn update_end_turn_button_visibility(
     mut button_query: Query<&mut Visibility, With<EndTurnButton>>,
     phase_state: Res<GamePhaseState>,
 ) {
-    // Only run when phase state changes
     if phase_state.is_changed() {
         for mut visibility in button_query.iter_mut() {
             *visibility = if matches!(phase_state.current_phase, GamePhase::TurnOver)
@@ -598,6 +638,9 @@ fn update_displays(
     bar_query: Query<(&ResourceBar, &Children)>,
     status_effects_panel_query: Query<(Entity, &Children), With<StatusEffectsPanel>>,
     status_effect_items_query: Query<Entity, With<StatusEffectItem>>,
+    // NEW: Symptoms panel queries
+    symptoms_panel_query: Query<(Entity, &Children), With<SymptomsPanel>>,
+    symptom_items_query: Query<Entity, With<SymptomItem>>,
     phase_state: Res<GamePhaseState>,
     game_state: Res<GameState>,
     asset_server: Res<AssetServer>,
@@ -683,6 +726,14 @@ fn update_displays(
                 }
             }
         }
+
+        // NEW: Update symptoms display
+        update_symptoms_display(
+            &mut commands,
+            &symptoms_panel_query,
+            &symptom_items_query,
+            &game_state,
+        );
     }
 
     // Update status effects display
@@ -731,6 +782,87 @@ fn handle_button_interactions(
     }
 }
 
+fn update_symptoms_display(
+    commands: &mut Commands,
+    symptoms_panel_query: &Query<(Entity, &Children), With<SymptomsPanel>>,
+    symptom_items_query: &Query<Entity, With<SymptomItem>>,
+    game_state: &GameState,
+) {
+    // Clear existing symptom items
+    for entity in symptom_items_query.iter() {
+        commands.entity(entity).despawn_recursive();
+    }
+
+    // Find the symptoms panel and add items directly to it (not to its children)
+    if let Ok((panel_entity, _)) = symptoms_panel_query.single() {
+        commands.entity(panel_entity).with_children(|panel| {
+            // Add active symptoms
+            if game_state.active_trigger_symptoms.is_empty() {
+                panel.spawn((
+                    Text::new("No active symptoms"),
+                    TextFont {
+                        font_size: 12.0,
+                        ..default()
+                    },
+                    TextColor(UIColors::TEXT_DIM),
+                    Node {
+                        margin: UiRect::top(Val::Px(4.0)),
+                        ..default()
+                    },
+                    SymptomItem,
+                ));
+            } else {
+                for symptom in &game_state.active_trigger_symptoms {
+                    spawn_symptom_item(panel, symptom);
+                }
+            }
+        });
+    }
+}
+
+fn spawn_symptom_item(parent: &mut ChildSpawnerCommands, symptom: &str) {
+    parent
+        .spawn((
+            Node {
+                flex_direction: FlexDirection::Row,
+                align_items: AlignItems::Center,
+                margin: UiRect::bottom(Val::Px(4.0)),
+                padding: UiRect::all(Val::Px(6.0)),
+                border: UiRect::all(Val::Px(1.0)),
+                ..default()
+            },
+            BorderRadius::new(Val::Px(3.), Val::Px(3.), Val::Px(3.), Val::Px(3.)),
+            BackgroundColor(UIColors::SYMPTOM_BACKGROUND),
+            BorderColor(UIColors::SYMPTOM_BORDER),
+            SymptomItem,
+        ))
+        .with_children(|item| {
+            // Warning icon (using text symbol)
+            item.spawn((
+                Text::new("⚠"),
+                TextFont {
+                    font_size: 14.0,
+                    ..default()
+                },
+                TextColor(UIColors::SYMPTOM_BORDER),
+                Node {
+                    margin: UiRect::right(Val::Px(6.0)),
+                    ..default()
+                },
+            ));
+
+            // Symptom name
+            item.spawn((
+                Text::new(symptom.clone()),
+                TextFont {
+                    font_size: 11.0,
+                    ..default()
+                },
+                TextColor(UIColors::SYMPTOM_TEXT),
+            ));
+        });
+}
+
 fn update_status_effects_display(
     commands: &mut Commands,
     status_effects_panel_query: &Query<(Entity, &Children), With<StatusEffectsPanel>>,
@@ -742,34 +874,30 @@ fn update_status_effects_display(
         commands.entity(entity).despawn_recursive();
     }
 
-    // Find the status effects panel
-    if let Ok((panel_entity, children)) = status_effects_panel_query.single() {
-        // Find the panel container (skip the header)
-        for child in children.iter() {
-            commands.entity(child).with_children(|panel| {
-                // Skip the header and add status effects
-                if game_state.status_effects.is_empty() {
-                    panel.spawn((
-                        Text::new("No active effects"),
-                        TextFont {
-                            font_size: 12.0,
-                            ..default()
-                        },
-                        TextColor(UIColors::TEXT_DIM),
-                        Node {
-                            margin: UiRect::bottom(Val::Px(4.0)),
-                            ..default()
-                        },
-                        StatusEffectItem,
-                    ));
-                } else {
-                    for status_effect in &game_state.status_effects {
-                        spawn_status_effect_item(panel, status_effect);
-                    }
+    // Find the status effects panel and add items directly to it (not to its children)
+    if let Ok((panel_entity, _)) = status_effects_panel_query.single() {
+        commands.entity(panel_entity).with_children(|panel| {
+            // Add status effects
+            if game_state.status_effects.is_empty() {
+                panel.spawn((
+                    Text::new("No active effects"),
+                    TextFont {
+                        font_size: 12.0,
+                        ..default()
+                    },
+                    TextColor(UIColors::TEXT_DIM),
+                    Node {
+                        margin: UiRect::top(Val::Px(4.0)),
+                        ..default()
+                    },
+                    StatusEffectItem,
+                ));
+            } else {
+                for status_effect in &game_state.status_effects {
+                    spawn_status_effect_item(panel, status_effect);
                 }
-            });
-            break; // Only add to the first child (the panel container)
-        }
+            }
+        });
     }
 }
 

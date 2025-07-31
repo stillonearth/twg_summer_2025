@@ -990,6 +990,8 @@ fn handle_adversary_card_selection(
     for event in adversary_card_selected_events.read() {
         info!("Adversary selected card: {}", event.card.title);
 
+        game_state.clear_trigger_symptoms();
+
         // Apply adversary card effects (including trigger symptoms)
         let status_events = game_state.apply_adversary_card_effects(&event.card);
         for status_event in status_events {
@@ -1437,9 +1439,6 @@ fn handle_turn_over(
         if phase_state.cutscene_active {
             continue;
         }
-
-        // Clear trigger symptoms from previous turn
-        game_state.clear_trigger_symptoms();
 
         // Discard cards from table
         for (entity, _) in q_cards.p0().iter() {
