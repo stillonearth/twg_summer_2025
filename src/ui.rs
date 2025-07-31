@@ -273,6 +273,35 @@ fn spawn_left_panel(commands: &mut Commands) {
                     BorderColor(UIColors::ACCENT.with_alpha(0.2)),
                 ))
                 .with_children(|panel| {
+                    // End Turn Button - Initially hidden
+                    panel
+                        .spawn((
+                            Button,
+                            Node {
+                                width: Val::Percent(100.0),
+                                height: Val::Px(50.0),
+                                margin: UiRect::bottom(Val::Px(16.0)),
+                                justify_content: JustifyContent::Center,
+                                align_items: AlignItems::Center,
+                                border: UiRect::all(Val::Px(2.0)),
+                                ..default()
+                            },
+                            BackgroundColor(UIColors::BUTTON_NORMAL),
+                            BorderColor(UIColors::BUTTON_NORMAL),
+                            Visibility::Hidden,
+                            EndTurnButton,
+                        ))
+                        .with_children(|button| {
+                            button.spawn((
+                                Text::new("End Turn"),
+                                TextFont {
+                                    font_size: 16.0,
+                                    ..default()
+                                },
+                                TextColor(Color::WHITE),
+                            ));
+                        });
+
                     spawn_text_section(
                         panel,
                         "Turn 1",
@@ -378,35 +407,6 @@ fn spawn_left_panel(commands: &mut Commands) {
                                     display: Display::Grid,
                                     ..default()
                                 },
-                            ));
-                        });
-
-                    // End Turn Button - Initially hidden
-                    panel
-                        .spawn((
-                            Button,
-                            Node {
-                                width: Val::Percent(100.0),
-                                height: Val::Px(50.0),
-                                justify_content: JustifyContent::Center,
-                                align_items: AlignItems::Center,
-                                border: UiRect::all(Val::Px(2.0)),
-                                ..default()
-                            },
-                            BackgroundColor(UIColors::BUTTON_NORMAL),
-                            BorderColor(UIColors::BUTTON_NORMAL),
-                            BorderRadius::new(Val::Px(8.), Val::Px(8.), Val::Px(8.), Val::Px(8.)),
-                            Visibility::Hidden, // Start hidden
-                            EndTurnButton,
-                        ))
-                        .with_children(|button| {
-                            button.spawn((
-                                Text::new("End Turn"),
-                                TextFont {
-                                    font_size: 16.0,
-                                    ..default()
-                                },
-                                TextColor(Color::WHITE),
                             ));
                         });
                 });

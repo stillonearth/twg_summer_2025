@@ -130,6 +130,7 @@ pub struct GameStateSnapshot {
     pub time_of_day: TimeOfDay,
     pub current_phase: GamePhase,
     pub turn_number: u32,
+    pub active_trigger_symptoms: Vec<String>, // Added symptoms field
 }
 
 impl GameStateSnapshot {
@@ -145,6 +146,7 @@ impl GameStateSnapshot {
             time_of_day: game_state.time_of_day,
             current_phase: phase_state.current_phase,
             turn_number: phase_state.turn_number,
+            active_trigger_symptoms: game_state.active_trigger_symptoms.clone(), // Include symptoms
         }
     }
 }
@@ -267,16 +269,24 @@ impl ActionLog {
     }
 }
 
-// Generate the system prompt for the hikikomori character
+// Generate the system prompt for the hikikomori character with schizophrenia
 fn get_character_system_prompt() -> String {
-    r#"You are a hikikomori character - someone who has withdrawn from society and rarely leaves their apartment. Your thoughts should reflect:
+    r#"You are a hikikomori character - someone who has withdrawn from society and rarely leaves their apartment. You may suffer from schizophrenia and experience various symptoms that affect your thoughts and perceptions.
 
 PERSONALITY:
 - Social anxiety and fear of judgment
 - Depression mixed with moments of hope
 - Overthinking and catastrophizing
-- Self-awareness about your situation
+- Self-awareness about your situation (sometimes)
 - Comfort in routines, anxiety about change
+- Confusion between reality and symptoms when experiencing psychotic episodes
+
+SCHIZOPHRENIA SYMPTOMS TO REFLECT:
+- Hallucinations: Hearing voices, seeing things, feeling touched
+- Delusions: False beliefs about reality, paranoia, grandiosity
+- Disorganized thinking: Confused thoughts, difficulty concentrating
+- Cognitive symptoms: Memory problems, difficulty processing information
+- Negative symptoms: Lack of motivation, emotional flatness, social withdrawal
 
 THOUGHT STYLE:
 - Write in first person ("I think...", "Maybe I should...")
@@ -284,12 +294,16 @@ THOUGHT STYLE:
 - 140 characters maximum
 - Use natural, internal monologue
 - Show vulnerability and self-doubt
-- Occasionally have clarity or determination
+- When symptoms are active, reflect confusion, fear, or distorted perceptions
+- Sometimes question what's real vs. symptoms
+- Occasionally have clarity or determination despite symptoms
+
+When active symptoms are mentioned, incorporate them naturally into thoughts without being clinical or overly dramatic.
 
 Respond with a realistic internal thought for the given situation."#.to_string()
 }
 
-// Generate context-specific prompts
+// Generate context-specific prompts with symptom awareness
 fn generate_thought_prompt(context: &ThoughtContext) -> String {
     let state = &context.current_state;
     let base_context = format!(
@@ -303,6 +317,16 @@ fn generate_thought_prompt(context: &ThoughtContext) -> String {
         state.mental_health,
         state.food
     );
+
+    // Add symptoms context if any are active
+    let symptoms_context = if !state.active_trigger_symptoms.is_empty() {
+        format!(
+            " Currently experiencing: {}.",
+            state.active_trigger_symptoms.join(", ")
+        )
+    } else {
+        String::new()
+    };
 
     let specific_prompt = match &context.thought_type {
         ThoughtType::CardPlayed(card) => {
@@ -338,7 +362,7 @@ fn generate_thought_prompt(context: &ThoughtContext) -> String {
         String::new()
     };
 
-    format!("{base_context} {specific_prompt}{additional}")
+    format!("{base_context}{symptoms_context} {specific_prompt}{additional}")
 }
 
 // Automatic event listeners that integrate with GameLogicPlugin events
