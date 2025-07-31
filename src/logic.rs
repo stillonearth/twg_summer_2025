@@ -138,16 +138,7 @@ pub enum AdversaryCardType {
 pub enum EnvironmentalChange {
     RemoveObject(String),
     AddObject(String),
-    LockResource(ResourceType, u32), // Resource type and duration
-    WeatherChange(WeatherType),
-}
-
-#[derive(Debug, Clone)]
-pub enum WeatherType {
-    Sunny,
-    Rainy,
-    Stormy,
-    Cloudy,
+    LockResource(ResourceType, u32),
 }
 
 // Rest of the existing events and structures remain the same...
@@ -366,9 +357,7 @@ pub struct GameState {
     pub negative_card_count: u32,
     pub shown_cutscenes: std::collections::HashSet<u32>,
 
-    // New adversary-related fields
-    pub current_weather: WeatherType,
-    pub adversary_action_history: Vec<AdversaryAction>,
+    pub active_trigger_symptoms: Vec<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -412,8 +401,7 @@ impl Default for GameState {
             ],
             negative_card_count: 0,
             shown_cutscenes: std::collections::HashSet::new(),
-            current_weather: WeatherType::Sunny,
-            adversary_action_history: Vec::new(),
+            active_trigger_symptoms: Vec::new(),
         }
     }
 }
@@ -570,6 +558,49 @@ impl GameState {
         }
 
         (blocking_conditions.is_empty(), blocking_conditions)
+    }
+
+    pub fn apply_adversary_card_effects(
+        &mut self,
+        card: &SchizophrenicCard,
+    ) -> Vec<StatusEffectAppliedEvent> {
+        let mut status_events = Vec::new();
+
+        // Clear previous trigger symptoms and add new ones
+        self.active_trigger_symptoms.clear();
+        self.active_trigger_symptoms
+            .extend(card.conditions.trigger_symptoms.clone());
+
+        info!(
+            "Applied trigger symptoms: {:?}",
+            self.active_trigger_symptoms
+        );
+
+        // You can add more adversary-specific effects here later
+        // For example, status effects, resource changes, etc.
+
+        status_events
+    }
+
+    /// Clear trigger symptoms (called at turn end)
+    pub fn clear_trigger_symptoms(&mut self) {
+        if !self.active_trigger_symptoms.is_empty() {
+            info!(
+                "Clearing trigger symptoms: {:?}",
+                self.active_trigger_symptoms
+            );
+            self.active_trigger_symptoms.clear();
+        }
+    }
+
+    /// Check if a specific trigger symptom is currently active
+    pub fn has_trigger_symptom(&self, symptom: &str) -> bool {
+        self.active_trigger_symptoms.contains(&symptom.to_string())
+    }
+
+    /// Get all active trigger symptoms
+    pub fn get_active_trigger_symptoms(&self) -> &Vec<String> {
+        &self.active_trigger_symptoms
     }
 
     pub fn filter_cards(&self, cards: &[GameCard]) -> Vec<GameCard> {
@@ -959,11 +990,11 @@ fn handle_adversary_card_selection(
     for event in adversary_card_selected_events.read() {
         info!("Adversary selected card: {}", event.card.title);
 
-        // Apply adversary card effects
-        // let status_events = game_state.apply_adversary_card_effects(&event.card);
-        // for status_event in status_events {
-        //     status_effect_events.write(status_event);
-        // }
+        // Apply adversary card effects (including trigger symptoms)
+        let status_events = game_state.apply_adversary_card_effects(&event.card);
+        for status_event in status_events {
+            status_effect_events.write(status_event);
+        }
 
         // Signal that adversary action is complete
         adversary_action_completed_events.write(AdversaryActionCompletedEvent {
@@ -1398,6 +1429,7 @@ fn handle_turn_over(
     mut turn_over_events: EventReader<TurnOverEvent>,
     mut phase_state: ResMut<GamePhaseState>,
     mut game_step_events: EventWriter<GameStepEvent>,
+    mut game_state: ResMut<GameState>, // Add this
     mut q_cards: ParamSet<(Query<(Entity, &Card<GameCard>)>,)>,
     mut ew_phase_change: EventWriter<PhaseChangedEvent>,
 ) {
@@ -1405,6 +1437,9 @@ fn handle_turn_over(
         if phase_state.cutscene_active {
             continue;
         }
+
+        // Clear trigger symptoms from previous turn
+        game_state.clear_trigger_symptoms();
 
         // Discard cards from table
         for (entity, _) in q_cards.p0().iter() {
