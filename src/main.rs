@@ -23,6 +23,7 @@ use crate::{
     logic::{CutsceneEndEvent, CutsceneStartEvent, GameLogicPlugin},
     main_menu::MainMenuPlugin,
     player::PlayerPlugin,
+    splashscreen::SplashscreenPlugin,
     thoughts::CharacterThoughtsPlugin,
     ui::GameUIPlugin,
 };
@@ -36,6 +37,7 @@ mod logic;
 mod main_menu;
 mod navigation;
 mod player;
+mod splashscreen;
 mod sprites;
 mod thoughts;
 mod ui;
@@ -43,6 +45,7 @@ mod ui;
 #[derive(Debug, Clone, Copy, Default, Eq, PartialEq, Hash, States)]
 enum AppState {
     #[default]
+    Splashscreen,
     MainMenu,
     Game,
 }
@@ -194,6 +197,7 @@ fn main() {
             GameMenuPlugin,
             MainMenuPlugin,
             EndGamePlugin,
+            SplashscreenPlugin,
         ))
         .add_systems(Startup, startup)
         .add_systems(OnEnter(AppState::Game), startup_game)
