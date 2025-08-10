@@ -1,0 +1,562 @@
+[
+  {
+    "id": 0,
+    "card_name": "Hearing Whispers",
+    "scenario_id": "auditory_disturbance",
+    "title": "Voices in the Quiet",
+    "card_type": "Schizophrenia Spectrum and Other Psychotic Disorders",
+    "conditions": {
+      "trigger_symptoms": ["auditory_hallucinations", "paranoia"]
+    },
+    "setup": "Character hears faint voices or sounds that others cannot hear, creating confusion about reality.",
+    "description": "Auditory hallucinations manifest as whispered voices that only the character can perceive. These voices may comment on actions, provide unwanted advice, or simply create a constant background of unintelligible murmuring that makes concentration difficult.",
+    "flavor_text": "\"Do you hear that? They're talking about us again... always talking.\"",
+    "image_prompt": "A person sitting alone in a dimly lit room, hands covering ears, with ethereal whispered text floating around them in translucent speech bubbles, muted blue and gray color palette, mysterious atmosphere"
+  },
+  {
+    "id": 1,
+    "card_name": "Shadow People",
+    "scenario_id": "visual_disturbance",
+    "title": "Peripheral Shadows",
+    "card_type": "Schizophrenia Spectrum and Other Psychotic Disorders",
+    "conditions": {
+      "trigger_symptoms": ["visual_hallucinations", "paranoia"]
+    },
+    "setup": "Character sees shadowy figures or movements in peripheral vision that may not be there.",
+    "description": "Dark, humanoid shapes appear at the edges of vision, vanishing when looked at directly. These shadow figures create persistent unease and hypervigilance, making the character constantly turn to check empty spaces.",
+    "flavor_text": "\"Something moved in the corner of my eye... but when I look, there's nothing there.\"",
+    "image_prompt": "Dark silhouettes lurking at the edges of a person's peripheral vision, with the figure in center looking nervously over their shoulder, high contrast black and gray shadows, unsettling composition"
+  },
+  {
+    "id": 2,
+    "card_name": "Thought Broadcasting",
+    "scenario_id": "paranoid_thoughts",
+    "title": "Exposed Mind",
+    "card_type": "Schizophrenia Spectrum and Other Psychotic Disorders",
+    "conditions": {
+      "trigger_symptoms": ["paranoid_delusions", "social_withdrawal"]
+    },
+    "setup": "Character believes others can hear their thoughts or that their mind is being read.",
+    "description": "The delusion that one's thoughts are being transmitted and heard by others, leading to extreme self-consciousness and social withdrawal. Every private thought feels exposed and vulnerable to judgment.",
+    "flavor_text": "\"They know what I'm thinking. I can see it in their eyes - they can hear everything.\"",
+    "image_prompt": "A person with transparent thought bubbles escaping from their head while others around them point and whisper, paranoid atmosphere, cool blue and purple tones, exposed and vulnerable feeling"
+  },
+  {
+    "id": 3,
+    "card_name": "Overwhelming Sounds",
+    "scenario_id": "sensory_overload",
+    "title": "Sensory Storm",
+    "card_type": "Neurodevelopmental Disorders",
+    "conditions": {
+      "trigger_symptoms": ["sensory_processing_issues", "anxiety"]
+    },
+    "setup": "Character experiences normal sounds as painfully loud and overwhelming.",
+    "description": "Auditory hypersensitivity causes everyday sounds to become unbearably intense. Conversations feel like shouting, footsteps thunder like earthquakes, and background noise creates a cacophony that makes functioning impossible.",
+    "flavor_text": "\"Make it stop... the world is too loud, too much, too everything.\"",
+    "image_prompt": "A person crouching with hands over ears in a chaotic environment with visible sound waves, lightning bolts, and overwhelming sensory elements radiating outward, bright harsh colors, sensory overload visualization"
+  },
+  {
+    "id": 4,
+    "card_name": "Reality Questioning",
+    "scenario_id": "dissociation_episode",
+    "title": "What Is Real?",
+    "card_type": "Dissociative Disorders",
+    "conditions": {
+      "trigger_symptoms": ["dissociation", "derealization"]
+    },
+    "setup": "Character questions whether their experiences and surroundings are real or imagined.",
+    "description": "A profound sense of unreality pervades perception, making everything feel dream-like or artificial. The boundary between what's real and what's imagined becomes increasingly blurred and uncertain.",
+    "flavor_text": "\"Is this really happening? Am I dreaming? Nothing feels solid anymore.\"",
+    "image_prompt": "A person reaching out to touch objects that appear translucent and dreamlike, with reality bending and warping around them, surreal colors shifting between real and unreal, questioning gesture"
+  },
+  {
+    "id": 5,
+    "card_name": "Fragmented Thoughts",
+    "scenario_id": "thought_disorganization",
+    "title": "Scattered Mind",
+    "card_type": "Schizophrenia Spectrum and Other Psychotic Disorders",
+    "conditions": {
+      "trigger_symptoms": ["disorganized_thinking", "cognitive_fragmentation"]
+    },
+    "setup": "Character struggles with disorganized thoughts that jump between topics without clear connection.",
+    "description": "Thoughts become disconnected and chaotic, jumping from topic to topic without logical progression. Conversations become difficult to follow as ideas fragment and lose coherence mid-sentence.",
+    "flavor_text": "\"I was talking about... wait, what was I... the blue car reminds me of Tuesday's rain...\"",
+    "image_prompt": "A person's head shown with scattered puzzle pieces floating around, broken mirrors reflecting different thoughts, chaotic mental fragments in bright conflicting colors, confused expression"
+  },
+  {
+    "id": 6,
+    "card_name": "Paranoid Watching",
+    "scenario_id": "surveillance_delusion",
+    "title": "Always Watched",
+    "card_type": "Schizophrenia Spectrum and Other Psychotic Disorders",
+    "conditions": {
+      "trigger_symptoms": ["paranoid_delusions", "surveillance_anxiety"]
+    },
+    "setup": "Character feels constantly monitored and watched by unknown entities or people.",
+    "description": "The persistent delusion of being under surveillance creates constant anxiety and hypervigilance. Every glance from a stranger, every camera, every reflection seems to confirm the conspiracy of observation.",
+    "flavor_text": "\"They're always watching... through the cameras, through the windows, through their eyes.\"",
+    "image_prompt": "A person looking over their shoulder with multiple eyes watching from shadows, security cameras, and windows, creating a surveillance network, dark paranoid atmosphere with piercing gazes"
+  },
+  {
+    "id": 7,
+    "card_name": "Emotional Numbness",
+    "scenario_id": "affective_flattening",
+    "title": "Feeling Nothing",
+    "card_type": "Schizophrenia Spectrum and Other Psychotic Disorders",
+    "conditions": {
+      "trigger_symptoms": ["flat_affect", "emotional_withdrawal"]
+    },
+    "setup": "Character experiences complete emotional numbness and inability to feel or express emotions.",
+    "description": "A profound absence of emotional experience leaves the character feeling hollow and disconnected. Joy, sadness, anger, and fear all become distant concepts rather than felt experiences.",
+    "flavor_text": "\"I should feel something... anything. But there's just... nothing.\"",
+    "image_prompt": "A person sitting motionless with a blank expression, surrounded by colorful emotional scenes that appear drained of color around them, grayscale figure in a world losing its vibrancy"
+  },
+  {
+    "id": 8,
+    "card_name": "Word Salad",
+    "scenario_id": "speech_disorganization",
+    "title": "Lost Language",
+    "card_type": "Schizophrenia Spectrum and Other Psychotic Disorders",
+    "conditions": {
+      "trigger_symptoms": ["disorganized_speech", "communication_breakdown"]
+    },
+    "setup": "Character struggles to communicate coherently, words becoming jumbled and meaning unclear.",
+    "description": "Speech becomes a chaotic mixture of unrelated words and phrases. Sentences start with one idea but end with completely different concepts, making communication nearly impossible.",
+    "flavor_text": "\"The purple elephant Tuesday washing machine thinks my grandmother's shoelaces are plotting revolution.\"",
+    "image_prompt": "A person speaking with scrambled letters and random words tumbling from their mouth in chaotic arrangement, mixed-up alphabet soup of communication, frustrated confused expression"
+  },
+  {
+    "id": 9,
+    "card_name": "Catatonic Freeze",
+    "scenario_id": "movement_disruption",
+    "title": "Frozen in Place",
+    "card_type": "Schizophrenia Spectrum and Other Psychotic Disorders",
+    "conditions": {
+      "trigger_symptoms": ["catatonic_symptoms", "motor_disruption"]
+    },
+    "setup": "Character becomes unable to move or respond, frozen in a catatonic state.",
+    "description": "Motor function becomes severely impaired, leaving the character immobile and unresponsive. They remain conscious but unable to initiate movement or respond to external stimuli.",
+    "flavor_text": "\"I want to move, to speak, to react... but my body won't obey.\"",
+    "image_prompt": "A person frozen mid-motion like a statue, with motion blur around them showing the world continuing to move while they remain perfectly still, trapped in their own body"
+  },
+  {
+    "id": 10,
+    "card_name": "Identity Confusion",
+    "scenario_id": "self_dissolution",
+    "title": "Who Am I?",
+    "card_type": "Dissociative Disorders",
+    "conditions": {
+      "trigger_symptoms": ["identity_disturbance", "self_fragmentation"]
+    },
+    "setup": "Character loses sense of personal identity and struggles to recognize themselves.",
+    "description": "The fundamental sense of self becomes fragmented and unclear. Personal history, preferences, and even physical appearance feel foreign and unrecognizable.",
+    "flavor_text": "\"I look in the mirror and see a stranger. Is this really me? Who am I supposed to be?\"",
+    "image_prompt": "A person looking into a cracked mirror that shows multiple different reflections of themselves, each reflection showing a different identity or version, fragmented self-image"
+  },
+  {
+    "id": 11,
+    "card_name": "Conspiracy Connections",
+    "scenario_id": "delusional_thinking",
+    "title": "Hidden Patterns",
+    "card_type": "Schizophrenia Spectrum and Other Psychotic Disorders",
+    "conditions": {
+      "trigger_symptoms": ["delusional_thinking", "conspiracy_beliefs"]
+    },
+    "setup": "Character sees meaningful connections and conspiracies in random events and coincidences.",
+    "description": "Random events become interconnected in elaborate conspiracy theories. Coincidences are seen as evidence of hidden plots, and everyday occurrences take on sinister significance.",
+    "flavor_text": "\"Don't you see? The red car, the bird, the number 23... they're all connected. It's all part of the plan.\"",
+    "image_prompt": "A person surrounded by photographs, newspaper clippings, and objects connected by red string in an elaborate conspiracy web, intense focused expression, detective-like obsession"
+  },
+  {
+    "id": 12,
+    "card_name": "Command Voices",
+    "scenario_id": "imperative_hallucinations",
+    "title": "Demanding Orders",
+    "card_type": "Schizophrenia Spectrum and Other Psychotic Disorders",
+    "conditions": {
+      "trigger_symptoms": ["command_hallucinations", "loss_of_control"]
+    },
+    "setup": "Character hears voices giving specific commands or instructions that feel compelling to follow.",
+    "description": "Auditory hallucinations take an imperative form, giving direct orders that feel impossible to resist. The voices demand specific actions with increasing urgency and authority.",
+    "flavor_text": "\"The voice is so clear, so commanding... I have to do what it says. I have no choice.\"",
+    "image_prompt": "A person with hands pressed to their head, large bold commanding text floating around them like 'DO THIS' and 'OBEY NOW', overwhelming authoritative presence, internal struggle visible"
+  },
+  {
+    "id": 13,
+    "card_name": "Time Distortion",
+    "scenario_id": "temporal_confusion",
+    "title": "Lost in Time",
+    "card_type": "Neurocognitive Disorders",
+    "conditions": {
+      "trigger_symptoms": ["temporal_disorientation", "time_confusion"]
+    },
+    "setup": "Character loses track of time completely, unable to distinguish between minutes, hours, or days.",
+    "description": "Temporal perception becomes severely distorted. Minutes feel like hours, days blur together, and the normal progression of time becomes meaningless and confusing.",
+    "flavor_text": "\"Was that yesterday or last week? How long have I been sitting here?\"",
+    "image_prompt": "A person surrounded by clocks showing different times, calendars with blurred dates, time flowing chaotically around them with temporal distortion effects, confused lost expression"
+  },
+  {
+    "id": 14,
+    "card_name": "Mind Reading Others",
+    "scenario_id": "telepathic_delusion",
+    "title": "Hearing Their Thoughts",
+    "card_type": "Schizophrenia Spectrum and Other Psychotic Disorders",
+    "conditions": {
+      "trigger_symptoms": ["telepathic_delusions", "boundary_confusion"]
+    },
+    "setup": "Character believes they can hear other people's thoughts or that minds are connected.",
+    "description": "The delusion of telepathic ability makes the character believe they can access others' thoughts. Internal assumptions about what others are thinking become perceived as actual telepathic communication.",
+    "flavor_text": "\"I can hear what they're really thinking... behind their fake smiles, I know the truth.\"",
+    "image_prompt": "A person with thought streams and mental connections flowing between them and others, psychic energy visualization, concentrated listening expression, mystical telepathic atmosphere"
+  },
+  {
+    "id": 15,
+    "card_name": "Somatic Hallucinations",
+    "scenario_id": "body_sensations",
+    "title": "False Physical Feelings",
+    "card_type": "Schizophrenia Spectrum and Other Psychotic Disorders",
+    "conditions": {
+      "trigger_symptoms": ["tactile_hallucinations", "body_disturbance"]
+    },
+    "setup": "Character feels physical sensations that aren't there - bugs crawling, burning, or touching.",
+    "description": "Tactile hallucinations create vivid physical sensations without external stimuli. The feeling of insects crawling on skin, burning sensations, or phantom touches become disturbingly real.",
+    "flavor_text": "\"Something's crawling under my skin... I can feel them moving, but there's nothing there.\"",
+    "image_prompt": "A person scratching at their skin with phantom insects and crawling sensations visualized on their body, uncomfortable distressed expression, false tactile experiences manifesting visually"
+  },
+  {
+    "id": 16,
+    "card_name": "Grandiose Delusions",
+    "scenario_id": "inflated_importance",
+    "title": "Special Mission",
+    "card_type": "Bipolar and Related Disorders",
+    "conditions": {
+      "trigger_symptoms": ["grandiose_delusions", "inflated_self_importance"]
+    },
+    "setup": "Character believes they have special powers, importance, or a divine mission to fulfill.",
+    "description": "Delusions of grandeur create an inflated sense of self-importance and special abilities. The character believes they are chosen for a special mission or possess extraordinary powers.",
+    "flavor_text": "\"I've been chosen. The universe has given me a sacred mission that only I can fulfill.\"",
+    "image_prompt": "A person standing confidently with divine light radiating around them, symbols of power and importance floating nearby, elevated commanding presence, grandiose self-perception"
+  },
+  {
+    "id": 17,
+    "card_name": "Referential Thinking",
+    "scenario_id": "personal_references",
+    "title": "Everything Relates to Me",
+    "card_type": "Schizophrenia Spectrum and Other Psychotic Disorders",
+    "conditions": {
+      "trigger_symptoms": ["ideas_of_reference", "self_referential_thinking"]
+    },
+    "setup": "Character believes random events, TV shows, or conversations are specifically about them.",
+    "description": "Normal events take on personal significance and meaning. Television programs, overheard conversations, and random occurrences all seem to contain hidden messages directed specifically at the individual.",
+    "flavor_text": "\"That news anchor is talking directly to me. The song on the radio - they're singing about my life.\"",
+    "image_prompt": "A person pointing at themselves while arrows from various media sources (TV, radio, newspapers) point back at them, everything converging on their personal experience, self-referential focus"
+  },
+  {
+    "id": 18,
+    "card_name": "Thought Insertion",
+    "scenario_id": "foreign_thoughts",
+    "title": "Not My Thoughts",
+    "card_type": "Schizophrenia Spectrum and Other Psychotic Disorders",
+    "conditions": {
+      "trigger_symptoms": ["thought_insertion", "foreign_thoughts"]
+    },
+    "setup": "Character believes thoughts that aren't their own are being inserted into their mind.",
+    "description": "Foreign thoughts appear in consciousness that feel distinctly different from one's own thinking. These intrusive thoughts are experienced as being implanted by external forces or entities.",
+    "flavor_text": "\"These aren't my thoughts... someone is putting ideas in my head that don't belong to me.\"",
+    "image_prompt": "A person with foreign thoughts being injected into their head like syringes, alien ideas floating into their mind, invasive mental intrusion, defensive posture against mental invasion"
+  },
+  {
+    "id": 19,
+    "card_name": "Mirror Distortion",
+    "scenario_id": "reflection_confusion",
+    "title": "Wrong Reflection",
+    "card_type": "Schizophrenia Spectrum and Other Psychotic Disorders",
+    "conditions": {
+      "trigger_symptoms": ["visual_distortions", "self_recognition_issues"]
+    },
+    "setup": "Character sees distorted or different reflections in mirrors that don't match their appearance.",
+    "description": "Mirrors show reflections that don't match the person's actual appearance. Features may appear distorted, aged, or completely different, creating profound confusion about self-image and identity.",
+    "flavor_text": "\"That's not me in the mirror... but it moves when I move. Who is that person?\"",
+    "image_prompt": "A person looking into a mirror that shows a completely different reflection - wrong face, wrong body, distorted features, shocking disconnect between self and reflection"
+  },
+  {
+    "id": 20,
+    "card_name": "Olfactory Hallucinations",
+    "scenario_id": "phantom_smells",
+    "title": "Strange Odors",
+    "card_type": "Schizophrenia Spectrum and Other Psychotic Disorders",
+    "conditions": {
+      "trigger_symptoms": ["olfactory_hallucinations", "smell_disturbance"]
+    },
+    "setup": "Character smells strong, unpleasant, or strange odors that others cannot detect.",
+    "description": "Phantom odors create powerful olfactory experiences without any actual source. These smells are often unpleasant, metallic, or chemical in nature and can be constant or intermittent.",
+    "flavor_text": "\"Can't you smell that? It's everywhere... that horrible burning chemical smell.\"",
+    "image_prompt": "A person reacting with disgust to phantom smells, holding their nose, with invisible odor waves and smell molecules floating around them, only they can perceive the offensive scents"
+  },
+  {
+    "id": 21,
+    "card_name": "Thought Withdrawal",
+    "scenario_id": "stolen_thoughts",
+    "title": "Thoughts Being Stolen",
+    "card_type": "Schizophrenia Spectrum and Other Psychotic Disorders",
+    "conditions": {
+      "trigger_symptoms": ["thought_withdrawal", "cognitive_theft"]
+    },
+    "setup": "Character believes their thoughts are being removed or stolen from their mind by external forces.",
+    "description": "The experience that one's thoughts are being extracted or removed from their mind by external agencies. This leaves the person feeling mentally empty and robbed of their cognitive processes.",
+    "flavor_text": "\"My thoughts... they're taking them away. I can feel my mind being emptied.\"",
+    "image_prompt": "A person with thoughts being visually sucked out of their head like smoke or energy, external forces stealing their mental content, empty confused expression, cognitive theft visualization"
+  },
+  {
+    "id": 22,
+    "card_name": "Persecutory Delusions",
+    "scenario_id": "persecution_complex",
+    "title": "They're After Me",
+    "card_type": "Schizophrenia Spectrum and Other Psychotic Disorders",
+    "conditions": {
+      "trigger_symptoms": ["persecutory_delusions", "paranoid_fear"]
+    },
+    "setup": "Character believes they are being actively persecuted, followed, or targeted for harm.",
+    "description": "The firm belief that one is being deliberately harmed, followed, or persecuted by individuals or organizations. This creates constant fear and hypervigilance about potential threats.",
+    "flavor_text": "\"They're following me everywhere. I know they want to hurt me... I have to stay hidden.\"",
+    "image_prompt": "A person running or hiding from menacing shadowy figures pursuing them, dark threatening atmosphere, being hunted visualization, paranoid fear and desperation"
+  },
+  {
+    "id": 23,
+    "card_name": "Echolalia Episodes",
+    "scenario_id": "repetitive_speech",
+    "title": "Repeating Words",
+    "card_type": "Neurodevelopmental Disorders",
+    "conditions": {
+      "trigger_symptoms": ["echolalia", "repetitive_speech"]
+    },
+    "setup": "Character compulsively repeats words, phrases, or sounds they hear without conscious control.",
+    "description": "Involuntary repetition of words, phrases, or sounds heard in the environment. This occurs without conscious intention and can interfere with normal communication patterns.",
+    "flavor_text": "\"Words words words... I can't stop repeating what I hear... repeating what I hear...\"",
+    "image_prompt": "A person with repeated words echoing around them in speech bubbles, same phrases multiplying and cascading, compulsive repetitive speech pattern visualization, frustrated expression"
+  },
+  {
+    "id": 24,
+    "card_name": "Depersonalization",
+    "scenario_id": "self_detachment",
+    "title": "Watching Myself",
+    "card_type": "Dissociative Disorders",
+    "conditions": {
+      "trigger_symptoms": ["depersonalization", "self_detachment"]
+    },
+    "setup": "Character feels detached from themselves, as if watching their life from outside their body.",
+    "description": "A persistent feeling of being detached from oneself, as if observing one's own thoughts, feelings, and actions from outside the body. Life feels like watching a movie of oneself.",
+    "flavor_text": "\"I'm watching myself live my life... like I'm floating above, seeing everything but not really there.\"",
+    "image_prompt": "A person watching themselves from above in an out-of-body experience, ghostly observer viewing their own life, disconnected floating perspective, detached ethereal atmosphere"
+  },
+  {
+    "id": 25,
+    "card_name": "Gustatory Hallucinations",
+    "scenario_id": "phantom_tastes",
+    "title": "False Flavors",
+    "card_type": "Schizophrenia Spectrum and Other Psychotic Disorders",
+    "conditions": {
+      "trigger_symptoms": ["gustatory_hallucinations", "taste_disturbance"]
+    },
+    "setup": "Character tastes strong, unpleasant, or metallic flavors when eating nothing or normal food.",
+    "description": "Phantom taste sensations occur without any food or drink present. These tastes are often metallic, bitter, or chemical in nature and can be persistent and disturbing.",
+    "flavor_text": "\"Everything tastes like metal and poison... even water has this horrible bitter taste.\"",
+    "image_prompt": "A person reacting with disgust to phantom tastes, tongue out, with bitter metallic taste sensations visualized around their mouth, false flavor experience, uncomfortable facial expression"
+  },
+  {
+    "id": 26,
+    "card_name": "Poverty of Speech",
+    "scenario_id": "communication_withdrawal",
+    "title": "Words Won't Come",
+    "card_type": "Schizophrenia Spectrum and Other Psychotic Disorders",
+    "conditions": {
+      "trigger_symptoms": ["alogia", "speech_poverty"]
+    },
+    "setup": "Character finds it extremely difficult to speak or form coherent responses to questions.",
+    "description": "Marked reduction in speech production and fluency. Responses become minimal, delayed, or completely absent, making communication increasingly difficult and sparse.",
+    "flavor_text": "\"I... I want to say... but the words... they won't...\"",
+    "image_prompt": "A person with empty speech bubbles above them, struggling to form words, mouth open but no words coming out, communication difficulty and silence visualization"
+  },
+  {
+    "id": 27,
+    "card_name": "Hypervigilance",
+    "scenario_id": "constant_alertness",
+    "title": "Always on Guard",
+    "card_type": "Trauma and Stressor-Related Disorders",
+    "conditions": {
+      "trigger_symptoms": ["hypervigilance", "paranoid_alertness"]
+    },
+    "setup": "Character remains in constant state of alertness, scanning for threats that may not exist.",
+    "description": "An enhanced state of sensory sensitivity and scanning for potential threats. The individual remains constantly alert and ready to react to perceived dangers in the environment.",
+    "flavor_text": "\"I have to stay alert... danger could come from anywhere at any moment.\"",
+    "image_prompt": "A person with wide alert eyes, scanning environment intensely, radar-like scanning beams from their head, hyper-aware defensive posture, constant threat assessment mode"
+  },
+  {
+    "id": 28,
+    "card_name": "Bizarre Behavior",
+    "scenario_id": "unusual_actions",
+    "title": "Strange Compulsions",
+    "card_type": "Schizophrenia Spectrum and Other Psychotic Disorders",
+    "conditions": {
+      "trigger_symptoms": ["bizarre_behavior", "unusual_compulsions"]
+    },
+    "setup": "Character engages in strange, repetitive, or seemingly meaningless behaviors without clear reason.",
+    "description": "Unusual and inappropriate behaviors that seem purposeless or bizarre to observers. These actions are performed without clear motivation and may be repetitive or ritualistic in nature.",
+    "flavor_text": "\"I have to touch every doorknob three times... I don't know why, but I have to.\"",
+    "image_prompt": "A person performing strange repetitive actions - touching objects repeatedly, odd ritualistic movements, bizarre compulsive behavior visualization, confused but compelled expression"
+  },
+  {
+    "id": 29,
+    "card_name": "Cognitive Flooding",
+    "scenario_id": "information_overload",
+    "title": "Too Much Information",
+    "card_type": "Neurodevelopmental Disorders",
+    "conditions": {
+      "trigger_symptoms": ["cognitive_overload", "information_flooding"]
+    },
+    "setup": "Character becomes overwhelmed by too much sensory and cognitive information processing at once.",
+    "description": "Mental systems become overwhelmed by excessive information input, leading to cognitive shutdown or extreme confusion. Processing multiple streams of information becomes impossible.",
+    "flavor_text": "\"Stop... too much... can't process... everything is flooding in at once...\"",
+    "image_prompt": "A person overwhelmed with information streams flooding their mind - text, images, sounds all converging chaotically, mental overload visualization, holding head in overwhelmed distress"
+  },
+  {
+    "id": 30,
+    "card_name": "Social Anxiety",
+    "scenario_id": "mild_social_fear",
+    "title": "Fear of Judgment",
+    "card_type": "Anxiety Disorders",
+    "conditions": {
+      "trigger_symptoms": ["social_anxiety", "performance_fear"]
+    },
+    "setup": "Character experiences intense fear and self-consciousness in social situations.",
+    "description": "Persistent fear of social situations where the person might be judged, embarrassed, or humiliated. Physical symptoms like blushing, sweating, and trembling often accompany the psychological distress.",
+    "flavor_text": "\"Everyone is looking at me... they can see how nervous I am... I need to get out of here.\"",
+    "image_prompt": "A person blushing and looking down nervously while others appear to be watching and judging, spotlight effect visualization, social scrutiny atmosphere, anxious body language"
+  },
+  {
+    "id": 31,
+    "card_name": "Racing Thoughts",
+    "scenario_id": "mild_mania",
+    "title": "Mind in Overdrive",
+    "card_type": "Bipolar and Related Disorders",
+    "conditions": {
+      "trigger_symptoms": ["racing_thoughts", "mental_acceleration"]
+    },
+    "setup": "Character's thoughts move rapidly from topic to topic, making concentration difficult.",
+    "description": "Thoughts move at an accelerated pace, jumping quickly from one idea to another. This mental acceleration makes it difficult to focus on any single topic for extended periods.",
+    "flavor_text": "\"My mind won't slow down... idea after idea, thought after thought, so fast I can't keep up...\"",
+    "image_prompt": "A person with rapid thought streams flowing quickly around their head, speed lines indicating mental velocity, energetic but scattered mental activity, fast-paced cognitive visualization"
+  },
+  {
+    "id": 32,
+    "card_name": "Mild Depression",
+    "scenario_id": "low_mood",
+    "title": "Heavy Heart",
+    "card_type": "Depressive Disorders",
+    "conditions": {
+      "trigger_symptoms": ["depressed_mood", "anhedonia"]
+    },
+    "setup": "Character experiences persistent sadness and loss of interest in previously enjoyable activities.",
+    "description": "A pervasive feeling of sadness, emptiness, or hopelessness that affects daily functioning. Activities that once brought joy now feel meaningless or require tremendous effort.",
+    "flavor_text": "\"Nothing seems worth doing anymore... everything feels gray and pointless.\"",
+    "image_prompt": "A person sitting alone with a heavy, sad expression, world around them appearing muted and colorless, weight of sadness visualized as dark clouds or heavy atmosphere"
+  },
+  {
+    "id": 33,
+    "card_name": "Intrusive Thoughts",
+    "scenario_id": "unwanted_thoughts",
+    "title": "Unwelcome Ideas",
+    "card_type": "Obsessive-Compulsive and Related Disorders",
+    "conditions": {
+      "trigger_symptoms": ["intrusive_thoughts", "mental_distress"]
+    },
+    "setup": "Character experiences unwanted, disturbing thoughts that feel foreign and distressing.",
+    "description": "Unwanted thoughts, images, or urges that intrude into consciousness and cause significant distress. These thoughts are experienced as ego-dystonic and contrary to the person's values.",
+    "flavor_text": "\"Why am I thinking this? I don't want these thoughts... they keep coming back no matter what I do.\"",
+    "image_prompt": "A person with dark, unwanted thought bubbles invading their mind against their will, pushing away disturbing mental intrusions, internal struggle against unwelcome ideas"
+  },
+  {
+    "id": 34,
+    "card_name": "Procrastination Paralysis",
+    "scenario_id": "executive_dysfunction",
+    "title": "Can't Start",
+    "card_type": "Attention-Deficit/Hyperactivity Disorder",
+    "conditions": {
+      "trigger_symptoms": ["executive_dysfunction", "task_avoidance"]
+    },
+    "setup": "Character knows what needs to be done but feels unable to begin or complete tasks.",
+    "description": "Executive function difficulties create a mental block against starting or completing tasks, even when the person is fully aware of what needs to be done and wants to do it.",
+    "flavor_text": "\"I know I need to do this... I want to do it... but I just can't make myself start.\"",
+    "image_prompt": "A person staring at a task or project, appearing frozen in indecision, with a mental wall or barrier between them and action, paralyzed by inability to begin"
+  },
+  {
+    "id": 35,
+    "card_name": "Perfectionist Anxiety",
+    "scenario_id": "performance_pressure",
+    "title": "Never Good Enough",
+    "card_type": "Anxiety Disorders",
+    "conditions": {
+      "trigger_symptoms": ["perfectionism", "performance_anxiety"]
+    },
+    "setup": "Character feels intense pressure to perform flawlessly and fears making any mistakes.",
+    "description": "An overwhelming need to perform perfectly in all endeavors, coupled with intense fear of making mistakes or falling short of impossibly high standards.",
+    "flavor_text": "\"It has to be perfect... if it's not absolutely perfect, then it's worthless.\"",
+    "image_prompt": "A person meticulously working on something with magnifying glass attention to detail, surrounded by crumpled papers of 'failed' attempts, perfectionist pressure visualization"
+  },
+  {
+    "id": 36,
+    "card_name": "Emotional Overwhelm",
+    "scenario_id": "emotional_dysregulation",
+    "title": "Too Much to Feel",
+    "card_type": "Personality Disorders",
+    "conditions": {
+      "trigger_symptoms": ["emotional_dysregulation", "overwhelming_feelings"]
+    },
+    "setup": "Character experiences emotions with such intensity that they become overwhelming and difficult to manage.",
+    "description": "Emotions are experienced with extreme intensity, making them feel overwhelming and difficult to regulate. Small triggers can lead to disproportionately strong emotional responses.",
+    "flavor_text": "\"I feel everything so intensely... it's like my emotions are turned up to maximum volume.\"",
+    "image_prompt": "A person drowning in a sea of colorful emotional waves, intense feelings visualized as overwhelming forces, struggling to stay afloat in emotional turbulence"
+  },
+  {
+    "id": 37,
+    "card_name": "Impostor Syndrome",
+    "scenario_id": "self_doubt",
+    "title": "Fake Success",
+    "card_type": "Other Conditions That May Be a Focus of Clinical Attention",
+    "conditions": {
+      "trigger_symptoms": ["impostor_feelings", "self_doubt"]
+    },
+    "setup": "Character believes their achievements are fraudulent and fears being exposed as incompetent.",
+    "description": "Persistent feelings of being a fraud despite evidence of competence and achievement. The person attributes success to luck rather than ability and fears discovery of their perceived inadequacy.",
+    "flavor_text": "\"I don't deserve this success... everyone will find out I'm just pretending to know what I'm doing.\"",
+    "image_prompt": "A person wearing a mask of confidence while looking insecure underneath, surrounded by achievements they don't feel they deserve, fraudulent self-perception visualization"
+  },
+  {
+    "id": 38,
+    "card_name": "Chronic Fatigue",
+    "scenario_id": "exhaustion_state",
+    "title": "Always Tired",
+    "card_type": "Somatic Symptom and Related Disorders",
+    "conditions": {
+      "trigger_symptoms": ["chronic_fatigue", "energy_depletion"]
+    },
+    "setup": "Character experiences persistent, overwhelming exhaustion that doesn't improve with rest.",
+    "description": "Profound, persistent fatigue that significantly impacts daily functioning and doesn't respond to typical rest and recovery methods. Simple tasks feel monumentally difficult.",
+    "flavor_text": "\"I'm so tired... not just sleepy, but exhausted in my bones, my mind, my very soul.\"",
+    "image_prompt": "A person appearing drained and exhausted, shoulders slumped, with energy meters showing empty, surrounded by tasks that feel impossibly heavy, chronic depletion visualization"
+  },
+  {
+    "id": 39,
+    "card_name": "Memory Fog",
+    "scenario_id": "cognitive_cloudiness",
+    "title": "Lost in the Haze",
+    "card_type": "Neurocognitive Disorders",
+    "conditions": {
+      "trigger_symptoms": ["memory_problems", "cognitive_fog"]
+    },
+    "setup": "Character struggles with memory problems and mental clarity, feeling like thinking through fog.",
+    "description": "Cognitive functions feel clouded and unclear. Memory, concentration, and mental processing all feel slowed and obscured, like trying to think through a thick fog.",
+    "flavor_text": "\"I can't remember what I was just doing... my thoughts feel so cloudy and unclear.\"",
+    "image_prompt": "A person with a foggy, clouded head trying to grasp at fading memories and thoughts, mental clarity obscured by cognitive mist, struggling to think clearly"
+  }
+]

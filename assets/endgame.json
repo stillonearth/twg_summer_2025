@@ -1,0 +1,175 @@
+[
+  {
+    "id": "psychiatric_hospitalization",
+    "title": "Psychiatric Hospitalization",
+    "trigger_conditions": {
+      "mental_health": "<=0",
+      "crisis_level": "Critical",
+      "status_effects_present": [
+        "auditory_hallucinations",
+        "paranoid_delusions",
+        "disorganized_thinking"
+      ],
+      "mood": "Depressed",
+      "consecutive_stable_days": "<=0",
+      "turn_number": ">=10"
+    },
+    "description": "After multiple crisis episodes and failed attempts at self-management, character is involuntarily committed to psychiatric care. The mental health deterioration became too severe for independent living.",
+    "image_prompt": "visual novel background, sterile hospital room with psychiatric ward atmosphere, medical equipment, security features, institutional lighting, loss of freedom visualization",
+    "ending_text": "The voices finally stopped, but so did everything else. In the quiet safety of the ward, you wonder if this was always inevitable, or if there was another path you missed along the way."
+  },
+  {
+    "id": "health_crisis_death",
+    "title": "Physical System Failure",
+    "trigger_conditions": {
+      "health": "<=0",
+      "mental_health": "<=15",
+      "crisis_level": "Critical",
+      "status_effects_present": [
+        "chronic_fatigue",
+        "energy_depletion",
+        "cognitive_fog"
+      ],
+      "mood": "Tired",
+      "turn_number": ">=15"
+    },
+    "description": "Neglecting basic health needs for too long finally catches up. The body can only take so much abuse before critical systems begin to fail.",
+    "image_prompt": "visual novel background, dark apartment showing signs of severe neglect, medical emergency atmosphere, scattered items suggesting inability to function, tragic health crisis environment",
+    "ending_text": "Your body finally gave up what your mind had abandoned long ago. In the end, the basic acts of survival became impossible burdens."
+  },
+  {
+    "id": "suicide_attempt",
+    "title": "The Final Decision",
+    "trigger_conditions": {
+      "mental_health": "<=2",
+      "health": "<=15",
+      "crisis_level": "Critical",
+      "status_effects_present": [
+        "depressed_mood",
+        "overwhelming_feelings",
+        "loss_of_control"
+      ],
+      "mood": "Depressed",
+      "consecutive_stable_days": "0",
+      "turn_number": ">=20"
+    },
+    "description": "The weight of existence became unbearable. Every day felt like drowning in an ocean of pain with no shore in sight. In a moment of absolute despair, the character makes the ultimate decision.",
+    "image_prompt": "visual novel background, somber location of character's choosing, symbolic elements of finality, emergency intervention attempts, tragic atmosphere with fading light",
+    "ending_text": "In your final moments, you remembered all the times someone said it would get better. You wished you could have believed them just a little longer."
+  },
+  {
+    "id": "romantic_recovery",
+    "title": "Love Finds a Way",
+    "trigger_conditions": {
+      "mental_health": ">=60",
+      "health": ">=50",
+      "sleep": ">=40",
+      "food": ">=40",
+      "consecutive_stable_days": ">=14",
+      "crisis_level": "None",
+      "mood": "Content"
+    },
+    "description": "Through gradual healing and maintaining basic self-care, character opens up to connection. A romantic relationship blossoms, providing support, motivation, and hope for the future.",
+    "image_prompt": "visual novel background, warm coffee shop or park where couple meets, soft romantic lighting, hopeful atmosphere with symbols of new beginnings and shared future",
+    "ending_text": "You never thought you deserved love, especially not like this. But here you are, planning a future you once couldn't imagine, with someone who loves every part of your journey."
+  },
+  {
+    "id": "monotonous_survival",
+    "title": "Just Getting By",
+    "trigger_conditions": {
+      "mental_health": "30-50",
+      "health": "40-60",
+      "sleep": "30-60",
+      "food": "30-60",
+      "crisis_level": "None",
+      "mood": "Neutral",
+      "consecutive_stable_days": ">=30",
+      "turn_number": ">=50"
+    },
+    "description": "Character achieves basic stability but never truly thrives. They maintain minimal functioning but lack passion, growth, or meaningful progress. Life becomes routine survival.",
+    "image_prompt": "visual novel background, bland apartment with basic necessities, repetitive daily schedule visible, neutral colors suggesting emotional flatness, survival mode atmosphere",
+    "ending_text": "You survived. That counts for something, doesn't it? The dreams you once had feel like someone else's memories now, but at least the pain has faded too."
+  },
+  {
+    "id": "hallucination_reality_break",
+    "title": "Lost in the Voices",
+    "trigger_conditions": {
+      "mental_health": "<=10",
+      "sleep": "<=15",
+      "crisis_level": "Critical",
+      "status_effects_present": [
+        "auditory_hallucinations",
+        "visual_hallucinations",
+        "paranoid_delusions"
+      ],
+      "mood": "Manic",
+      "turn_number": ">=25",
+      "active_trigger_symptoms": ["hearing_voices", "paranoid_delusions"]
+    },
+    "description": "In the depths of sleep deprivation and mental breakdown, character loses touch with reality completely. Whether the experiences are real or hallucination becomes irrelevant as they disappear into their own mind.",
+    "image_prompt": "visual novel background, apartment showing signs of someone living in altered reality, scattered evidence of delusions, otherworldly atmosphere with reality distortion effects",
+    "ending_text": "The voices became your only companions, the visions your only truth. Whether you found peace or madness in that inner world, no one will ever know."
+  },
+  {
+    "id": "career_success",
+    "title": "Professional Achievement",
+    "trigger_conditions": {
+      "mental_health": ">=70",
+      "health": ">=60",
+      "sleep": ">=50",
+      "food": ">=50",
+      "consecutive_stable_days": ">=21",
+      "crisis_level": "None",
+      "mood": "Content"
+    },
+    "description": "Through consistent self-care and utilizing available resources, character builds skills and achieves professional success. Work provides structure, purpose, and positive reinforcement.",
+    "image_prompt": "visual novel background, home office setup with computer showing professional success, achievement symbols, organized workspace representing discipline and growth",
+    "ending_text": "You stare at your latest professional achievement in disbelief. The person who used to struggle with basic tasks now excels at complex challenges. Recovery isn't just possible - it's happening."
+  },
+  {
+    "id": "creative_fulfillment",
+    "title": "Artistic Expression",
+    "trigger_conditions": {
+      "mental_health": ">=65",
+      "health": ">=55",
+      "sleep": ">=45",
+      "consecutive_stable_days": ">=28",
+      "crisis_level": "None",
+      "mood": "Content"
+    },
+    "description": "Character channels their experiences into creative expression using available tools. Art becomes both therapy and purpose, transforming pain into beauty and meaning.",
+    "image_prompt": "visual novel background, creative workspace with computer showing artistic projects, inspirational atmosphere with evidence of creative output and personal expression",
+    "ending_text": "Your art speaks to people who feel the same pain you once carried. In helping them heal through beauty, you discover your own wounds have become sources of strength."
+  },
+  {
+    "id": "social_reconnection",
+    "title": "Finding Community",
+    "trigger_conditions": {
+      "mental_health": ">=60",
+      "health": ">=55",
+      "sleep": ">=40",
+      "food": ">=45",
+      "consecutive_stable_days": ">=35",
+      "mood": "Content"
+    },
+    "description": "Character uses their phone to gradually rebuild social connections. Through careful relationship building and honest communication, they create a supportive community.",
+    "image_prompt": "visual novel background, living room with phone prominently featured, evidence of social connections like messages and calls, warm lighting suggesting human connection",
+    "ending_text": "Your phone rings and for the first time in years, you answer with genuine excitement. The support network you've built reminds you that healing happens in community, not isolation."
+  },
+  {
+    "id": "balanced_recovery",
+    "title": "Complete Wellness",
+    "trigger_conditions": {
+      "mental_health": ">=80",
+      "health": ">=80",
+      "sleep": ">=70",
+      "food": ">=70",
+      "consecutive_stable_days": ">=60",
+      "crisis_level": "None",
+      "mood": "Content"
+    },
+    "description": "Character achieves comprehensive wellness across all life areas. They maintain excellent physical and mental health while helping others who face similar challenges.",
+    "image_prompt": "visual novel background, beautifully organized living space showing mastery of life management, all objects well-maintained, atmosphere of complete wellness and life balance",
+    "ending_text": "Looking at your life now, you barely recognize the person you used to be. Every challenge became a lesson, every setback became strength. You didn't just survive - you learned to thrive."
+  }
+]

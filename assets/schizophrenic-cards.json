@@ -1,0 +1,422 @@
+[
+  {
+    "id": 0,
+    "card_name": "Hearing Whispers",
+    "scenario_id": "auditory_disturbance",
+    "title": "Voices in the Quiet",
+    "card_type": "spectrum",
+    "conditions": {
+      "reality_perception": "<=30",
+      "mental_state": "<=40",
+      "trigger_symptoms": ["auditory_hallucinations", "paranoia"]
+    },
+    "setup": "Character hears faint voices or sounds that others cannot hear, creating confusion about reality.",
+    "image_prompt": "visual novel background, quiet room with sound wave visualizations, whispered voices floating in air, confused atmosphere, muted colors with ethereal sound effects, auditory disturbance environment"
+  },
+  {
+    "id": 1,
+    "card_name": "Shadow People",
+    "scenario_id": "visual_disturbance",
+    "title": "Peripheral Shadows",
+    "card_type": "spectrum",
+    "conditions": {
+      "reality_perception": "<=25",
+      "sensory_sensitivity": ">=70",
+      "trigger_symptoms": ["visual_hallucinations", "paranoia"]
+    },
+    "setup": "Character sees shadowy figures or movements in peripheral vision that may not be there.",
+    "image_prompt": "visual novel background, room with dark shadows moving at edges of vision, peripheral darkness, unsettling atmosphere, gray and black color scheme, visual disturbance environment"
+  },
+  {
+    "id": 2,
+    "card_name": "Thought Broadcasting",
+    "scenario_id": "paranoid_thoughts",
+    "title": "Exposed Mind",
+    "card_type": "spectrum",
+    "conditions": {
+      "social_connection": "<=20",
+      "reality_perception": "<=35",
+      "trigger_symptoms": ["paranoid_delusions", "social_withdrawal"]
+    },
+    "setup": "Character believes others can hear their thoughts or that their mind is being read.",
+    "image_prompt": "visual novel background, room with thought bubbles escaping character's head, paranoid atmosphere, exposed feeling visualization, unsettling blues and purples, mind-reading anxiety environment"
+  },
+  {
+    "id": 3,
+    "card_name": "Overwhelming Sounds",
+    "scenario_id": "sensory_overload",
+    "title": "Sensory Storm",
+    "card_type": "spectrum",
+    "conditions": {
+      "sensory_sensitivity": ">=80",
+      "mental_state": "<=30",
+      "trigger_symptoms": ["sensory_processing_issues", "anxiety"]
+    },
+    "setup": "Character experiences normal sounds as painfully loud and overwhelming.",
+    "image_prompt": "visual novel background, room with overwhelming sound wave visualizations, intense audio chaos, sensory overload atmosphere, bright harsh colors, overwhelming sensory environment"
+  },
+  {
+    "id": 4,
+    "card_name": "Reality Questioning",
+    "scenario_id": "dissociation_episode",
+    "title": "What Is Real?",
+    "card_type": "spectrum",
+    "conditions": {
+      "reality_perception": "<=20",
+      "mental_state": "<=25",
+      "trigger_symptoms": ["dissociation", "derealization"]
+    },
+    "setup": "Character questions whether their experiences and surroundings are real or imagined.",
+    "image_prompt": "visual novel background, room with reality distortion effects, questioning existence atmosphere, surreal color shifts, dissociative environment with reality-bending visuals"
+  },
+  {
+    "id": 5,
+    "card_name": "Fragmented Thoughts",
+    "scenario_id": "thought_disorganization",
+    "title": "Scattered Mind",
+    "card_type": "spectrum",
+    "conditions": {
+      "mental_state": "<=35",
+      "reality_perception": "<=40",
+      "trigger_symptoms": ["disorganized_thinking", "cognitive_fragmentation"]
+    },
+    "setup": "Character struggles with disorganized thoughts that jump between topics without clear connection.",
+    "image_prompt": "visual novel background, room with scattered thought fragments floating around, mental chaos visualization, fragmented atmosphere, broken mirror effects, cognitive disorganization environment"
+  },
+  {
+    "id": 6,
+    "card_name": "Paranoid Watching",
+    "scenario_id": "surveillance_delusion",
+    "title": "Always Watched",
+    "card_type": "spectrum",
+    "conditions": {
+      "social_connection": "<=15",
+      "reality_perception": "<=30",
+      "trigger_symptoms": ["paranoid_delusions", "surveillance_anxiety"]
+    },
+    "setup": "Character feels constantly monitored and watched by unknown entities or people.",
+    "image_prompt": "visual novel background, room with multiple eyes watching from shadows, surveillance atmosphere, paranoid environment, dark colors with watching eyes, constant observation feeling"
+  },
+  {
+    "id": 7,
+    "card_name": "Emotional Numbness",
+    "scenario_id": "affective_flattening",
+    "title": "Feeling Nothing",
+    "card_type": "spectrum",
+    "conditions": {
+      "mental_state": "<=25",
+      "social_connection": "<=25",
+      "trigger_symptoms": ["flat_affect", "emotional_withdrawal"]
+    },
+    "setup": "Character experiences complete emotional numbness and inability to feel or express emotions.",
+    "image_prompt": "visual novel background, room drained of all color and emotion, flat gray atmosphere, emotionless environment, muted everything, affective flattening visualization"
+  },
+  {
+    "id": 8,
+    "card_name": "Word Salad",
+    "scenario_id": "speech_disorganization",
+    "title": "Lost Language",
+    "card_type": "spectrum",
+    "conditions": {
+      "mental_state": "<=20",
+      "reality_perception": "<=25",
+      "trigger_symptoms": ["disorganized_speech", "communication_breakdown"]
+    },
+    "setup": "Character struggles to communicate coherently, words becoming jumbled and meaning unclear.",
+    "image_prompt": "visual novel background, room with scrambled letters and words floating chaotically, communication breakdown atmosphere, linguistic chaos, confused speech visualization"
+  },
+  {
+    "id": 9,
+    "card_name": "Catatonic Freeze",
+    "scenario_id": "movement_disruption",
+    "title": "Frozen in Place",
+    "card_type": "spectrum",
+    "conditions": {
+      "mental_state": "<=15",
+      "reality_perception": "<=20",
+      "trigger_symptoms": ["catatonic_symptoms", "motor_disruption"]
+    },
+    "setup": "Character becomes unable to move or respond, frozen in a catatonic state.",
+    "image_prompt": "visual novel background, room where character appears frozen like a statue, stillness atmosphere, immobility visualization, static environment, catatonic state representation"
+  },
+  {
+    "id": 10,
+    "card_name": "Identity Confusion",
+    "scenario_id": "self_dissolution",
+    "title": "Who Am I?",
+    "card_type": "spectrum",
+    "conditions": {
+      "reality_perception": "<=25",
+      "social_connection": "<=20",
+      "trigger_symptoms": ["identity_disturbance", "self_fragmentation"]
+    },
+    "setup": "Character loses sense of personal identity and struggles to recognize themselves.",
+    "image_prompt": "visual novel background, room with multiple fragmented mirror reflections showing different versions of self, identity crisis atmosphere, fractured self-image, confused identity environment"
+  },
+  {
+    "id": 11,
+    "card_name": "Conspiracy Connections",
+    "scenario_id": "delusional_thinking",
+    "title": "Hidden Patterns",
+    "card_type": "spectrum",
+    "conditions": {
+      "reality_perception": "<=30",
+      "social_connection": "<=25",
+      "trigger_symptoms": ["delusional_thinking", "conspiracy_beliefs"]
+    },
+    "setup": "Character sees meaningful connections and conspiracies in random events and coincidences.",
+    "image_prompt": "visual novel background, room with red string connecting random objects and photos, conspiracy board atmosphere, pattern-seeking visualization, delusional connection environment"
+  },
+  {
+    "id": 12,
+    "card_name": "Command Voices",
+    "scenario_id": "imperative_hallucinations",
+    "title": "Demanding Orders",
+    "card_type": "spectrum",
+    "conditions": {
+      "reality_perception": "<=20",
+      "mental_state": "<=30",
+      "trigger_symptoms": ["command_hallucinations", "loss_of_control"]
+    },
+    "setup": "Character hears voices giving specific commands or instructions that feel compelling to follow.",
+    "image_prompt": "visual novel background, room with authoritative voice commands visualized as imposing text, commanding atmosphere, pressure visualization, controlling voice environment"
+  },
+  {
+    "id": 13,
+    "card_name": "Time Distortion",
+    "scenario_id": "temporal_confusion",
+    "title": "Lost in Time",
+    "card_type": "spectrum",
+    "conditions": {
+      "reality_perception": "<=35",
+      "mental_state": "<=40",
+      "trigger_symptoms": ["temporal_disorientation", "time_confusion"]
+    },
+    "setup": "Character loses track of time completely, unable to distinguish between minutes, hours, or days.",
+    "image_prompt": "visual novel background, room with clocks showing different times, temporal confusion atmosphere, time distortion effects, chronological chaos environment"
+  },
+  {
+    "id": 14,
+    "card_name": "Mind Reading Others",
+    "scenario_id": "telepathic_delusion",
+    "title": "Hearing Their Thoughts",
+    "card_type": "spectrum",
+    "conditions": {
+      "reality_perception": "<=25",
+      "social_connection": "<=30",
+      "trigger_symptoms": ["telepathic_delusions", "boundary_confusion"]
+    },
+    "setup": "Character believes they can hear other people's thoughts or that minds are connected.",
+    "image_prompt": "visual novel background, room with thought streams flowing between people, telepathic connection visualization, mind-reading atmosphere, psychic connection environment"
+  },
+  {
+    "id": 15,
+    "card_name": "Somatic Hallucinations",
+    "scenario_id": "body_sensations",
+    "title": "False Physical Feelings",
+    "card_type": "spectrum",
+    "conditions": {
+      "sensory_sensitivity": ">=75",
+      "reality_perception": "<=35",
+      "trigger_symptoms": ["tactile_hallucinations", "body_disturbance"]
+    },
+    "setup": "Character feels physical sensations that aren't there - bugs crawling, burning, or touching.",
+    "image_prompt": "visual novel background, room with phantom sensations visualized on character's body, tactile hallucination atmosphere, false sensation environment, disturbing body feelings"
+  },
+  {
+    "id": 16,
+    "card_name": "Grandiose Delusions",
+    "scenario_id": "inflated_importance",
+    "title": "Special Mission",
+    "card_type": "spectrum",
+    "conditions": {
+      "reality_perception": "<=30",
+      "mental_state": "<=35",
+      "trigger_symptoms": ["grandiose_delusions", "inflated_self_importance"]
+    },
+    "setup": "Character believes they have special powers, importance, or a divine mission to fulfill.",
+    "image_prompt": "visual novel background, room with character surrounded by divine light and importance symbols, grandiose atmosphere, special mission visualization, inflated importance environment"
+  },
+  {
+    "id": 17,
+    "card_name": "Referential Thinking",
+    "scenario_id": "personal_references",
+    "title": "Everything Relates to Me",
+    "card_type": "spectrum",
+    "conditions": {
+      "reality_perception": "<=35",
+      "social_connection": "<=30",
+      "trigger_symptoms": ["ideas_of_reference", "self_referential_thinking"]
+    },
+    "setup": "Character believes random events, TV shows, or conversations are specifically about them.",
+    "image_prompt": "visual novel background, room with arrows pointing at character from various media and objects, referential thinking atmosphere, self-reference visualization, everything-about-me environment"
+  },
+  {
+    "id": 18,
+    "card_name": "Thought Insertion",
+    "scenario_id": "foreign_thoughts",
+    "title": "Not My Thoughts",
+    "card_type": "spectrum",
+    "conditions": {
+      "reality_perception": "<=20",
+      "mental_state": "<=25",
+      "trigger_symptoms": ["thought_insertion", "foreign_thoughts"]
+    },
+    "setup": "Character believes thoughts that aren't their own are being inserted into their mind.",
+    "image_prompt": "visual novel background, room with foreign thoughts being injected into character's head, thought insertion visualization, alien thoughts atmosphere, mind invasion environment"
+  },
+  {
+    "id": 19,
+    "card_name": "Mirror Distortion",
+    "scenario_id": "reflection_confusion",
+    "title": "Wrong Reflection",
+    "card_type": "spectrum",
+    "conditions": {
+      "reality_perception": "<=30",
+      "identity_stability": "<=25",
+      "trigger_symptoms": ["visual_distortions", "self_recognition_issues"]
+    },
+    "setup": "Character sees distorted or different reflections in mirrors that don't match their appearance.",
+    "image_prompt": "visual novel background, room with mirror showing wrong or distorted reflection, mirror distortion atmosphere, false reflection visualization, identity confusion environment"
+  },
+  {
+    "id": 20,
+    "card_name": "Olfactory Hallucinations",
+    "scenario_id": "phantom_smells",
+    "title": "Strange Odors",
+    "card_type": "spectrum",
+    "conditions": {
+      "sensory_sensitivity": ">=70",
+      "reality_perception": "<=40",
+      "trigger_symptoms": ["olfactory_hallucinations", "smell_disturbance"]
+    },
+    "setup": "Character smells strong, unpleasant, or strange odors that others cannot detect.",
+    "image_prompt": "visual novel background, room with phantom smell waves visualized, olfactory hallucination atmosphere, false smell environment, disturbing odor visualization"
+  },
+  {
+    "id": 21,
+    "card_name": "Thought Withdrawal",
+    "scenario_id": "stolen_thoughts",
+    "title": "Thoughts Being Stolen",
+    "card_type": "spectrum",
+    "conditions": {
+      "reality_perception": "<=25",
+      "mental_state": "<=30",
+      "trigger_symptoms": ["thought_withdrawal", "cognitive_theft"]
+    },
+    "setup": "Character believes their thoughts are being removed or stolen from their mind by external forces.",
+    "image_prompt": "visual novel background, room with thoughts being sucked out of character's head, thought theft visualization, mind robbery atmosphere, stolen thoughts environment"
+  },
+  {
+    "id": 22,
+    "card_name": "Persecutory Delusions",
+    "scenario_id": "persecution_complex",
+    "title": "They're After Me",
+    "card_type": "spectrum",
+    "conditions": {
+      "social_connection": "<=20",
+      "reality_perception": "<=30",
+      "trigger_symptoms": ["persecutory_delusions", "paranoid_fear"]
+    },
+    "setup": "Character believes they are being actively persecuted, followed, or targeted for harm.",
+    "image_prompt": "visual novel background, room with threatening shadows and pursuing figures, persecution atmosphere, paranoid fear visualization, being hunted environment"
+  },
+  {
+    "id": 23,
+    "card_name": "Echolalia Episodes",
+    "scenario_id": "repetitive_speech",
+    "title": "Repeating Words",
+    "card_type": "spectrum",
+    "conditions": {
+      "mental_state": "<=25",
+      "reality_perception": "<=35",
+      "trigger_symptoms": ["echolalia", "repetitive_speech"]
+    },
+    "setup": "Character compulsively repeats words, phrases, or sounds they hear without conscious control.",
+    "image_prompt": "visual novel background, room with repeated words echoing and multiplying, echolalia visualization, repetitive speech atmosphere, word echo environment"
+  },
+  {
+    "id": 24,
+    "card_name": "Depersonalization",
+    "scenario_id": "self_detachment",
+    "title": "Watching Myself",
+    "card_type": "spectrum",
+    "conditions": {
+      "reality_perception": "<=30",
+      "identity_stability": "<=30",
+      "trigger_symptoms": ["depersonalization", "self_detachment"]
+    },
+    "setup": "Character feels detached from themselves, as if watching their life from outside their body.",
+    "image_prompt": "visual novel background, room with character watching themselves from above, out-of-body experience visualization, detachment atmosphere, self-observation environment"
+  },
+  {
+    "id": 25,
+    "card_name": "Gustatory Hallucinations",
+    "scenario_id": "phantom_tastes",
+    "title": "False Flavors",
+    "card_type": "spectrum",
+    "conditions": {
+      "sensory_sensitivity": ">=65",
+      "reality_perception": "<=35",
+      "trigger_symptoms": ["gustatory_hallucinations", "taste_disturbance"]
+    },
+    "setup": "Character tastes strong, unpleasant, or metallic flavors when eating nothing or normal food.",
+    "image_prompt": "visual novel background, room with phantom taste sensations visualized, gustatory hallucination atmosphere, false taste environment, disturbing flavor visualization"
+  },
+  {
+    "id": 26,
+    "card_name": "Poverty of Speech",
+    "scenario_id": "communication_withdrawal",
+    "title": "Words Won't Come",
+    "card_type": "spectrum",
+    "conditions": {
+      "mental_state": "<=30",
+      "social_connection": "<=25",
+      "trigger_symptoms": ["alogia", "speech_poverty"]
+    },
+    "setup": "Character finds it extremely difficult to speak or form coherent responses to questions.",
+    "image_prompt": "visual novel background, room with character struggling to speak, empty speech bubbles, communication difficulty atmosphere, silent struggle environment"
+  },
+  {
+    "id": 27,
+    "card_name": "Hypervigilance",
+    "scenario_id": "constant_alertness",
+    "title": "Always on Guard",
+    "card_type": "spectrum",
+    "conditions": {
+      "anxiety_level": ">=80",
+      "reality_perception": "<=35",
+      "trigger_symptoms": ["hypervigilance", "paranoid_alertness"]
+    },
+    "setup": "Character remains in constant state of alertness, scanning for threats that may not exist.",
+    "image_prompt": "visual novel background, room with character's heightened awareness visualized, hypervigilant atmosphere, constant alertness environment, threat-scanning visualization"
+  },
+  {
+    "id": 28,
+    "card_name": "Bizarre Behavior",
+    "scenario_id": "unusual_actions",
+    "title": "Strange Compulsions",
+    "card_type": "spectrum",
+    "conditions": {
+      "mental_state": "<=20",
+      "reality_perception": "<=25",
+      "trigger_symptoms": ["bizarre_behavior", "unusual_compulsions"]
+    },
+    "setup": "Character engages in strange, repetitive, or seemingly meaningless behaviors without clear reason.",
+    "image_prompt": "visual novel background, room with character performing unusual repetitive actions, bizarre behavior visualization, strange compulsion atmosphere, unexplained actions environment"
+  },
+  {
+    "id": 29,
+    "card_name": "Cognitive Flooding",
+    "scenario_id": "information_overload",
+    "title": "Too Much Information",
+    "card_type": "spectrum",
+    "conditions": {
+      "mental_state": "<=25",
+      "sensory_sensitivity": ">=75",
+      "trigger_symptoms": ["cognitive_overload", "information_flooding"]
+    },
+    "setup": "Character becomes overwhelmed by too much sensory and cognitive information processing at once.",
+    "image_prompt": "visual novel background, room with overwhelming information streams flooding character's mind, cognitive overload visualization, information chaos atmosphere, mental flooding environment"
+  }
+]
